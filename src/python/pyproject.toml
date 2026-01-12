@@ -8,23 +8,23 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
-bottle = "*"
-mkdocs = "*"
-mkdocs-material = "*"
-parameterized = "*"
-paste = "*"
-patool = "*"
-pexpect = "*"
-pytz = "*"
-requests = "*"
-tblib = "*"
-timeout-decorator = "*"
+bottle = "^0.13.4"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.7.1"
+parameterized = "^0.9.0"
+paste = "^3.10.1"
+patool = "^4.0.3"
+pexpect = "^4.9.0"
+pytz = "^2025.2"
+requests = "^2.32.5"
+tblib = "^3.2.2"
+timeout-decorator = "^0.5.0"
 
 [tool.poetry.group.dev.dependencies]
-pyinstaller = "*"
-testfixtures = "*"
-webtest = "*"
-pytest = "^7.0.0"
+pyinstaller = "^6.0.0"
+testfixtures = "^10.0.0"
+webtest = "^3.0.7"
+pytest = "^7.4.4"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
