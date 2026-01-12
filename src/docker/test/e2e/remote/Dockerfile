@@ -1,12 +1,13 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 # Install dependencies
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
-    python3.7
+    python3
 
-# Switch to Python 3.7
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1
-RUN update-alternatives --set python /usr/bin/python3.7
+# Switch to Python 3 (3.10 is default in Ubuntu 22.04)
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+RUN update-alternatives --set python /usr/bin/python3
 
 # Create non-root user
 RUN useradd --create-home -s /bin/bash remoteuser && \

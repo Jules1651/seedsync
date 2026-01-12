@@ -1,18 +1,19 @@
 # Creates environment to build python binaries
-FROM ubuntu:16.04 as seedsync_build_pyinstaller_env
+FROM ubuntu:22.04 as seedsync_build_pyinstaller_env
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update && apt-get install -y \
-    python3.8 \
-    python3.8-dev \
-    python3.8-distutils \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
     curl \
     binutils
-# Switch to Python 3.8
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.8 1
-RUN update-alternatives --set python /usr/bin/python3.8
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1
-RUN update-alternatives --set python3 /usr/bin/python3.8
+# Switch to Python 3.11
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.11 1
+RUN update-alternatives --set python /usr/bin/python3.11
+RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+RUN update-alternatives --set python3 /usr/bin/python3.11
 # Install Poetry
 RUN curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python get-pip.py --force-reinstall && \
@@ -60,7 +61,8 @@ RUN	pyinstaller /python/scan_fs.py \
 
 
 # Creates environment for angular
-FROM node:12.16 as seedsync_build_angular_env
+# Note: Using Node 20 LTS. Angular 4.x is legacy but npm/build still works.
+FROM node:20-slim as seedsync_build_angular_env
 COPY src/angular/package*.json /app/
 WORKDIR /app
 RUN npm install
@@ -74,9 +76,11 @@ RUN node_modules/@angular/cli/bin/ng build -prod --output-path /build/dist/
 
 
 # Creates environment to build deb packages
-FROM ubuntu:16.04 as seedsync_build_deb_env
+FROM ubuntu:22.04 as seedsync_build_deb_env
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update
-RUN apt-get install -y build-essential dh-systemd debhelper
+# Note: dh-systemd is merged into debhelper in Ubuntu 22.04+
+RUN apt-get install -y build-essential debhelper
 RUN apt-get install -y devscripts
 
 

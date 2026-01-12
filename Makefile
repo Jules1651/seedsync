@@ -162,6 +162,9 @@ tests-e2e-deps:
 	$(DOCKER) build \
 		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-20.04-systemd \
 		-t ubuntu-systemd:20.04
+	$(DOCKER) build \
+		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-22.04-systemd \
+		-t ubuntu-systemd:22.04
 
 	# Setup docker for the systemd container
 	# See: https://github.com/solita/docker-systemd
@@ -179,7 +182,7 @@ run-tests-e2e: tests-e2e-deps
 	@if [[ ! -z "${SEEDSYNC_DEB}" ]] ; then \
 		if [[ -z "${SEEDSYNC_OS}" ]] ; then \
 			echo "${red}ERROR: SEEDSYNC_OS is required for DEB e2e test${reset}"; \
-			echo "${red}Options include: ubu1604, ubu1804, ubu2004${reset}"; exit 1; \
+			echo "${red}Options include: ubu1604, ubu1804, ubu2004, ubu2204${reset}"; exit 1; \
 		fi
 	fi
 
