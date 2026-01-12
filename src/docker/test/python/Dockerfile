@@ -12,7 +12,7 @@ RUN apt-get update && \
 ADD src/docker/test/python/entrypoint.sh /app/
 
 # setup sshd
-RUN mkdir /var/run/sshd
+RUN mkdir -p /var/run/sshd
 RUN ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa && \
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 # Disable the known hosts prompt
