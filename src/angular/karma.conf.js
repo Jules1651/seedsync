@@ -34,12 +34,12 @@ module.exports = function (config) {
 
         customLaunchers: {
             ChromeHeadless: {
-                base: 'Chrome',
+                base: 'ChromeHeadless',
                 flags: [
-                    '--headless',
+                    '--no-sandbox',
+                    '--disable-dev-shm-usage',
                     '--disable-gpu',
-                    '--remote-debugging-port=9222',
-                    '--no-sandbox'
+                    '--disable-software-rasterizer'
                 ]
             }
         },
