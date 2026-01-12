@@ -32,6 +32,12 @@ module.exports = function (config) {
         browsers: ['Chrome'],
         singleRun: false,
 
+        // Timeout settings for CI/Docker environments
+        browserDisconnectTimeout: 10000,
+        browserDisconnectTolerance: 3,
+        browserNoActivityTimeout: 60000,
+        captureTimeout: 60000,
+
         customLaunchers: {
             ChromeHeadless: {
                 base: 'Chrome',
