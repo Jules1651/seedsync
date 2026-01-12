@@ -1,5 +1,5 @@
 # Creates environment for e2e tests with Playwright
-FROM node:20-slim as seedsync_test_e2e_env
+FROM node:20-slim AS seedsync_test_e2e_env
 
 # Install dependencies for Playwright
 RUN apt-get update && apt-get install -y \
@@ -16,7 +16,7 @@ RUN npx playwright install --with-deps chromium
 
 
 # Builds and runs e2e tests
-FROM seedsync_test_e2e_env as seedsync_test_e2e
+FROM seedsync_test_e2e_env AS seedsync_test_e2e
 
 COPY \
     src/e2e/playwright.config.ts \

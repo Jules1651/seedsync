@@ -1,11 +1,10 @@
-FROM seedsync/run/python/devenv as seedsync_test_python
+FROM seedsync/run/python/devenv AS seedsync_test_python
 
 RUN ls -l /app/python
 
 # Install dependencies
-RUN apt-get install -y software-properties-common && \
-    apt-add-repository non-free && \
-    apt-get update && \
+# Note: The base image (seedsync_run_python_env) already has non-free repos enabled via DEB822 format
+RUN apt-get update && \
     apt-get install -y \
         openssh-server \
         rar
@@ -13,7 +12,7 @@ RUN apt-get install -y software-properties-common && \
 ADD src/docker/test/python/entrypoint.sh /app/
 
 # setup sshd
-RUN mkdir /var/run/sshd
+RUN mkdir -p /var/run/sshd
 RUN ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa && \
     cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 # Disable the known hosts prompt

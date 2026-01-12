@@ -36,10 +36,11 @@ module.exports = function (config) {
             ChromeHeadless: {
                 base: 'Chrome',
                 flags: [
-                    '--headless',
+                    '--headless=new',
                     '--disable-gpu',
                     '--remote-debugging-port=9222',
-                    '--no-sandbox'
+                    '--no-sandbox',
+                    '--disable-dev-shm-usage'
                 ]
             }
         },
