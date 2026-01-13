@@ -6,6 +6,7 @@ ENV NG_CLI_ANALYTICS=false
 # Copy Angular configuration files
 COPY \
     src/angular/tsconfig.json \
+    src/angular/tsconfig.app.json \
     src/angular/tsconfig.spec.json \
     src/angular/angular.json \
     /app/
