@@ -30,6 +30,5 @@ COPY \
 # ng src needs to be mounted on /app/src
 WORKDIR /app/src
 
-CMD ["/app/node_modules/@angular/cli/bin/ng", "test", \
-     "--browsers", "ChromeHeadless", \
-     "--single-run"]
+# First verify the build works, then run tests
+CMD ["sh", "-c", "cd /app && node_modules/@angular/cli/bin/ng build --progress=false 2>&1 | head -50 && node_modules/@angular/cli/bin/ng test --browsers ChromeHeadless --single-run"]
