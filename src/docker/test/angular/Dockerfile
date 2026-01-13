@@ -1,5 +1,6 @@
-# Use Node 16 for Karma 2.0.5 compatibility (Node 20 has breaking changes)
-FROM node:16-slim AS seedsync_test_angular
+# Use Node 18 for Karma 2.0.5 compatibility (Node 20 has breaking changes)
+# Node 18 uses Debian Bullseye which is still supported
+FROM node:18-slim AS seedsync_test_angular
 
 # Install Chrome for headless testing via Google's apt repository
 RUN apt-get update && \
@@ -13,7 +14,10 @@ RUN apt-get update && \
 # Set Chrome binary path for Karma
 ENV CHROME_BIN=/usr/bin/google-chrome-stable
 
-# Install npm dependencies with Node 16
+# Node 18 OpenSSL 3.0 compatibility for Angular CLI 1.3.2
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
+# Install npm dependencies
 COPY src/angular/package*.json /app/
 WORKDIR /app
 RUN npm install --legacy-peer-deps
