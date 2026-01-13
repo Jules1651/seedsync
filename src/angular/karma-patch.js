@@ -1,5 +1,7 @@
 // Aggressive patch for Node 18+ compatibility with old libraries
-// Patches multiple serialization paths to handle objects with .inspect() method
+// Use process.stderr.write for guaranteed output
+process.stderr.write('[karma-patch] Loading patch...\n');
+
 const util = require('util');
 
 // Create a helper to extract value from objects with inspect method
@@ -7,10 +9,10 @@ function resolveInspect(obj) {
     if (obj && typeof obj === 'object' && typeof obj.inspect === 'function' && !obj[util.inspect.custom]) {
         try {
             const result = obj.inspect();
-            console.log('[karma-patch] Resolved inspect:', result);
+            process.stderr.write('[karma-patch] Resolved inspect: ' + result + '\n');
             return result;
         } catch (e) {
-            console.log('[karma-patch] inspect() threw:', e.message);
+            process.stderr.write('[karma-patch] inspect() threw: ' + e.message + '\n');
         }
     }
     return obj;
@@ -44,4 +46,4 @@ JSON.stringify = function(obj, ...rest) {
     };
 });
 
-console.log('[karma-patch] Patches applied successfully');
+process.stderr.write('[karma-patch] Patches applied successfully\n');
