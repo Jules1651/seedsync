@@ -1306,14 +1306,17 @@ class TestController(unittest.TestCase):
         command.add_callback(callback)
         self.controller.queue_command(command)
         # Process until extract complete
+        # Note: Search through all file_updated calls since scanner may also
+        # detect newly extracted files (like re.rar.txt) and trigger updates
         while True:
             self.controller.process()
-            call = listener.file_updated.call_args
-            if call:
+            for call in listener.file_updated.call_args_list:
                 new_file = call[0][1]
-                self.assertEqual("re.rar", new_file.name)
-                if new_file.state == ModelFile.State.EXTRACTED:
+                if new_file.name == "re.rar" and new_file.state == ModelFile.State.EXTRACTED:
                     break
+            else:
+                continue
+            break
         callback.on_success.assert_called_once_with()
         callback.on_failure.assert_not_called()
 
@@ -1529,14 +1532,17 @@ class TestController(unittest.TestCase):
         command.add_callback(callback)
         self.controller.queue_command(command)
         # Process until extract complete
+        # Note: Search through all file_updated calls since scanner may also
+        # detect newly extracted files (like re.rar.txt) and trigger updates
         while True:
             self.controller.process()
-            call = listener.file_updated.call_args
-            if call:
+            for call in listener.file_updated.call_args_list:
                 new_file = call[0][1]
-                self.assertEqual("re.rar", new_file.name)
-                if new_file.state == ModelFile.State.EXTRACTED:
+                if new_file.name == "re.rar" and new_file.state == ModelFile.State.EXTRACTED:
                     break
+            else:
+                continue
+            break
         callback.on_success.assert_called_once_with()
         callback.on_success.reset_mock()
         callback.on_failure.assert_not_called()
