@@ -79,6 +79,9 @@ class Sshcp:
                     'lost connection',  # i=2, connection refused
                     'Could not resolve hostname',  # i=3, bad hostname
                     'Connection refused',  # i=4, connection refused
+                    'Connection closed',  # i=5, connection closed (newer OpenSSH)
+                    'hostname contains invalid characters',  # i=6, bad hostname (newer OpenSSH)
+                    'Name or service not known',  # i=7, bad hostname (DNS failure)
                 ])
                 if i > 0:
                     before = sp.before.decode().strip() if sp.before != pexpect.EOF else ""
@@ -89,9 +92,9 @@ class Sshcp:
                     if sp.before.decode().strip():
                         error_msg += " - " + sp.before.decode().strip()
                     raise SshcpError(error_msg)
-                elif i == 3:
+                elif i in {3, 6, 7}:
                     raise SshcpError("Bad hostname: {}".format(self.__host))
-                elif i in {2, 4}:
+                elif i in {2, 4, 5}:
                     error_msg = "Connection refused by server"
                     if sp.before.decode().strip():
                         error_msg += " - " + sp.before.decode().strip()
@@ -105,6 +108,9 @@ class Sshcp:
                     'lost connection',  # i=2, connection refused
                     'Could not resolve hostname',  # i=3, bad hostname
                     'Connection refused',  # i=4, connection refused
+                    'Connection closed',  # i=5, connection closed (newer OpenSSH)
+                    'hostname contains invalid characters',  # i=6, bad hostname (newer OpenSSH)
+                    'Name or service not known',  # i=7, bad hostname (DNS failure)
                 ],
                 timeout=self.__TIMEOUT_SECS
             )
@@ -114,9 +120,9 @@ class Sshcp:
                 self.logger.warning("Command failed: '{} - {}'".format(before, after))
             if i == 1:
                 raise SshcpError("Incorrect password")
-            elif i == 3:
+            elif i in {3, 6, 7}:
                 raise SshcpError("Bad hostname: {}".format(self.__host))
-            elif i in {2, 4}:
+            elif i in {2, 4, 5}:
                 error_msg = "Connection refused by server"
                 if sp.before.decode().strip():
                     error_msg += " - " + sp.before.decode().strip()
