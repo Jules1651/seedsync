@@ -24,11 +24,12 @@ RUN npm install --legacy-peer-deps
 COPY \
     src/angular/tsconfig.json \
     src/angular/karma.conf.js \
+    src/angular/karma-patch.js \
     src/angular/.angular-cli.json \
     /app/
 
 # ng src needs to be mounted on /app/src
 WORKDIR /app/src
 
-# First verify the build works, then run tests
-CMD ["sh", "-c", "cd /app && node_modules/@angular/cli/bin/ng build --progress=false 2>&1 | head -50 && node_modules/@angular/cli/bin/ng test --browsers ChromeHeadless --single-run"]
+# Load patch before running tests to fix Node 18 compatibility
+CMD ["sh", "-c", "cd /app && node -r ./karma-patch.js node_modules/@angular/cli/bin/ng test --browsers ChromeHeadless --single-run"]
