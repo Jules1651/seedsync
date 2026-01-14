@@ -12,7 +12,6 @@ services:
     tmpfs:
       - /run
       - /run/lock
-      - /sys/fs/cgroup
     volumes:
       - type: bind
         source: ${SEEDSYNC_DEB}

@@ -1,27 +1,28 @@
-# Copied from:
-# https://github.com/solita/docker-systemd/blob/master/Dockerfile
-# https://hub.docker.com/r/solita/ubuntu-systemd/
+# Based on modern systemd-in-docker approaches for cgroups v2 compatibility
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y systemd
+ENV container=docker
 
-ENV container docker
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    systemd \
+    systemd-sysv \
+    dbus \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Don't start any optional services except for the few we need.
-RUN find /etc/systemd/system \
-         /lib/systemd/system \
-         -path '*.wants/*' \
-         -not -name '*journald*' \
-         -not -name '*systemd-tmpfiles*' \
-         -not -name '*systemd-user-sessions*' \
-         -exec rm \{} \;
+# Remove unnecessary systemd services that can cause issues in containers
+RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
+    /etc/systemd/system/*.wants/* \
+    /lib/systemd/system/local-fs.target.wants/* \
+    /lib/systemd/system/sockets.target.wants/*udev* \
+    /lib/systemd/system/sockets.target.wants/*initctl* \
+    /lib/systemd/system/sysinit.target.wants/systemd-tmpfiles-setup* \
+    /lib/systemd/system/systemd-update-utmp*
 
 RUN systemctl set-default multi-user.target
 
-COPY setup /sbin/
-
 STOPSIGNAL SIGRTMIN+3
 
-# Workaround for docker/docker#27202, technique based on comments from docker/docker#9212
-CMD ["/bin/bash", "-c", "exec /lib/systemd/systemd --log-target=journal 3>&1"]
+# Use /sbin/init which is a symlink to systemd
+CMD ["/sbin/init"]
