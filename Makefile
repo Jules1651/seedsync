@@ -166,9 +166,15 @@ tests-e2e-deps:
 		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-22.04-systemd \
 		-t ubuntu-systemd:22.04
 
-	# Setup docker for the systemd container
+	# Setup docker for the systemd container (only needed for cgroups v1)
 	# See: https://github.com/solita/docker-systemd
-	$(DOCKER) run --rm --privileged -v /:/host solita/ubuntu-systemd setup
+	# Skip on cgroups v2 systems (indicated by presence of cgroup.controllers)
+	@if [ ! -f /sys/fs/cgroup/cgroup.controllers ]; then \
+		echo "Detected cgroups v1, running systemd setup..."; \
+		$(DOCKER) run --rm --privileged -v /:/host solita/ubuntu-systemd setup; \
+	else \
+		echo "Detected cgroups v2, skipping systemd setup (not needed)"; \
+	fi
 
 run-tests-e2e: tests-e2e-deps
 	# Check our settings
