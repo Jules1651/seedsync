@@ -10,4 +10,4 @@ echo "Installing SeedSync"
 
 echo "Continuing docker CMD"
 echo "$@"
-exec $@
+exec "$@"

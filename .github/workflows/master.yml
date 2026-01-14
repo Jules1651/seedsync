@@ -68,7 +68,7 @@ jobs:
 
       # Upload package
       - name: Publish artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           path: ${{ github.workspace }}/build/*.deb
           name: deb-${{ github.run_number }}
@@ -118,13 +118,15 @@ jobs:
     needs: [ build-deb ]
     strategy:
       matrix:
-        oscode: [ ubu1604, ubu1804, ubu2004 ]
+        # Using Ubuntu 20.04+ which have systemd with cgroups v2 support
+        # Ubuntu 16.04 and 18.04 are end-of-life and don't support cgroups v2
+        oscode: [ ubu2004, ubu2204 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: Download deb package artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: deb-${{ github.run_number }}
           path: build/
@@ -238,7 +240,7 @@ jobs:
       - name: Set release env variable
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: Download deb package artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: deb-${{ github.run_number }}
           path: build/
