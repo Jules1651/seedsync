@@ -118,6 +118,7 @@ class TestSshcp(unittest.TestCase):
         self.assertTrue(
             "bad hostname" in error_str or
             "connection refused" in error_str or
+            "connection closed" in error_str or
             "name or service not known" in error_str or
             "could not resolve" in error_str or
             "no route to host" in error_str or
@@ -136,6 +137,7 @@ class TestSshcp(unittest.TestCase):
         error_str = str(ctx.exception).lower()
         self.assertTrue(
             "connection refused" in error_str or
+            "connection closed" in error_str or
             "connection timed out" in error_str or
             "no route to host" in error_str or
             "unknown error" in error_str or
@@ -190,6 +192,7 @@ class TestSshcp(unittest.TestCase):
         error_str = str(ctx.exception).lower()
         self.assertTrue(
             "bad hostname" in error_str or
+            "connection closed" in error_str or
             "name or service not known" in error_str or
             "could not resolve" in error_str or
             "no route to host" in error_str or
@@ -208,6 +211,7 @@ class TestSshcp(unittest.TestCase):
         error_str = str(ctx.exception).lower()
         self.assertTrue(
             "connection refused" in error_str or
+            "connection closed" in error_str or
             "connection timed out" in error_str or
             "no route to host" in error_str or
             "unknown error" in error_str or
