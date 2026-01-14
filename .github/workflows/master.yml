@@ -118,7 +118,9 @@ jobs:
     needs: [ build-deb ]
     strategy:
       matrix:
-        oscode: [ ubu1604, ubu1804, ubu2004 ]
+        # Using Ubuntu 20.04+ which have systemd with cgroups v2 support
+        # Ubuntu 16.04 and 18.04 are end-of-life and don't support cgroups v2
+        oscode: [ ubu2004, ubu2204 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
