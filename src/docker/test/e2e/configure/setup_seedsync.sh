@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 ./wait-for-it.sh myapp:8800 -- echo "Seedsync app is up (before configuring)"
 curl -sS "http://myapp:8800/server/config/set/general/debug/true"; echo
