@@ -166,9 +166,9 @@ tests-e2e-deps:
 		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-22.04-systemd \
 		-t ubuntu-systemd:22.04
 
-	# Setup docker for the systemd container
+	# Setup docker for the systemd container (optional - may fail on cgroupv2 systems)
 	# See: https://github.com/solita/docker-systemd
-	$(DOCKER) run --rm --privileged -v /:/host solita/ubuntu-systemd setup
+	-$(DOCKER) run --rm --privileged -v /:/host solita/ubuntu-systemd setup || echo "Warning: systemd setup failed, continuing anyway (may work on cgroupv2)"
 
 run-tests-e2e: tests-e2e-deps
 	# Check our settings
