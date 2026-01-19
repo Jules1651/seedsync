@@ -190,7 +190,7 @@ run-tests-e2e: tests-e2e-deps
 	@if [[ ! -z "${STAGING_VERSION}" ]] ; then \
 		if [[ -z "${SEEDSYNC_ARCH}" ]] ; then \
 			echo "${red}ERROR: SEEDSYNC_ARCH is required for docker image e2e test${reset}"; \
-			echo "${red}Options include: amd64, arm64, arm/v7${reset}"; exit 1; \
+			echo "${red}Options include: amd64, arm64${reset}"; exit 1; \
 		fi
 		if [[ -z "${STAGING_REGISTRY}" ]] ; then \
 			export STAGING_REGISTRY="${DEFAULT_STAGING_REGISTRY}"; \
