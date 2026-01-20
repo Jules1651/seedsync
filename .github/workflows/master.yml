@@ -118,7 +118,9 @@ jobs:
     needs: [ build-deb ]
     strategy:
       matrix:
-        oscode: [ ubu1604, ubu1804, ubu2004 ]
+        # Only test on Ubuntu 20.04+ which has systemd 240+ with proper cgroupv2 support
+        # Ubuntu 16.04/18.04 have older systemd that doesn't work on GitHub Actions (cgroupv2)
+        oscode: [ ubu2004, ubu2204 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
