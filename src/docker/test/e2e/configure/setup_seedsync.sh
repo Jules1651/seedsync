@@ -1,5 +1,5 @@
 #!/bin/bash
-# Force rebuild: 2026-01-21-v4
+# Force rebuild: 2026-01-21-v5
 
 echo "Waiting for seedsync to be available on port 8800..."
 ./wait-for-it.sh myapp:8800 -t 120 -- echo "Seedsync app is reachable (before configuring)"
@@ -7,7 +7,12 @@ echo "Waiting for seedsync to be available on port 8800..."
 # Wait a moment for seedsync to fully initialize
 sleep 2
 
-echo "Setting configuration values..."
+# Check initial status
+echo "=== Initial status before configuration ==="
+curl -sS "http://myapp:8800/server/status" || echo "Failed to get status"
+echo ""
+
+echo "=== Setting configuration values ==="
 curl -sS "http://myapp:8800/server/config/set/general/debug/true"; echo
 curl -sS "http://myapp:8800/server/config/set/general/verbose/true"; echo
 curl -sS "http://myapp:8800/server/config/set/lftp/local_path/%252Fdownloads"; echo
@@ -18,15 +23,25 @@ curl -sS "http://myapp:8800/server/config/set/lftp/remote_port/1234"; echo
 curl -sS "http://myapp:8800/server/config/set/lftp/remote_path/%252Fhome%252Fremoteuser%252Ffiles"; echo
 curl -sS "http://myapp:8800/server/config/set/autoqueue/patterns_only/true"; echo
 
-echo "Sending restart command..."
+# Check status after config (should still be down, but config should be set)
+echo "=== Status after configuration (before restart) ==="
+curl -sS "http://myapp:8800/server/status" || echo "Failed to get status"
+echo ""
+
+# Verify config was set
+echo "=== Current config (should show new values) ==="
+curl -sS "http://myapp:8800/server/config/get" | python3 -c "import sys,json; d=json.load(sys.stdin); print('remote_address:', d.get('Lftp',{}).get('remote_address')); print('local_path:', d.get('Lftp',{}).get('local_path'))" 2>/dev/null || echo "Failed to parse config"
+
+echo "=== Sending restart command ==="
 curl -sS "http://myapp:8800/server/command/restart"; echo
 
 # Give seedsync time to save config, shutdown old server, and begin restarting
-# The restart involves: persist config, terminate webapp, join threads, create new instance
-echo "Waiting for seedsync to restart..."
+# The restart involves: persist config, terminate webapp, join threads, exit process
+echo "Waiting for seedsync to restart (sleeping 10s)..."
 sleep 10
 
 # Wait for port to become available again after restart
+echo "=== Waiting for port 8800 after restart ==="
 ./wait-for-it.sh myapp:8800 -t 120 -- echo "Seedsync app is reachable (after restart)"
 
 # Now wait for seedsync to actually report healthy status
