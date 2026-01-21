@@ -8,17 +8,12 @@ services:
       context: ../../../..
       dockerfile: src/docker/stage/deb/Dockerfile
     tty: true
-    privileged: true
-    cgroup: host
-    tmpfs:
-      - /run
-      - /run/lock
+    # Run seedsync directly without systemd for CI compatibility
+    # GitHub Actions runners don't support systemd containers properly
+    environment:
+      - SEEDSYNC_NO_SYSTEMD=1
     volumes:
       - type: bind
         source: ${SEEDSYNC_DEB}
         target: /install/seedsync.deb
         read_only: true
-
-      - type: bind
-        source: /sys/fs/cgroup
-        target: /sys/fs/cgroup

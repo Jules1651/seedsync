@@ -8,9 +8,23 @@ echo "Running entrypoint"
 echo "Installing SeedSync"
 ./expect_seedsync.exp
 
-# Check if systemd is available and working
-if [ -d /run/systemd/system ]; then
-    echo "Systemd detected, starting via systemd"
+# Determine if we should use systemd or run seedsync directly
+# SEEDSYNC_NO_SYSTEMD=1 forces direct mode (useful for CI where systemd doesn't work)
+USE_SYSTEMD=true
+
+if [ "${SEEDSYNC_NO_SYSTEMD:-0}" = "1" ]; then
+    echo "SEEDSYNC_NO_SYSTEMD=1 set, forcing direct mode"
+    USE_SYSTEMD=false
+elif [ ! -f /lib/systemd/systemd ]; then
+    echo "Systemd binary not found, using direct mode"
+    USE_SYSTEMD=false
+elif [ ! -d /sys/fs/cgroup ]; then
+    echo "Cgroups not mounted, systemd won't work, using direct mode"
+    USE_SYSTEMD=false
+fi
+
+if [ "$USE_SYSTEMD" = "true" ]; then
+    echo "Starting via systemd"
     echo "Continuing docker CMD"
     echo "$@"
     exec $@
