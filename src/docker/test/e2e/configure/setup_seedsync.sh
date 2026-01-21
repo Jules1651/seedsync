@@ -1,8 +1,11 @@
 #!/bin/bash
-# Force rebuild: 2026-01-21-v3
+# Force rebuild: 2026-01-21-v4
 
 echo "Waiting for seedsync to be available on port 8800..."
 ./wait-for-it.sh myapp:8800 -t 120 -- echo "Seedsync app is reachable (before configuring)"
+
+# Wait a moment for seedsync to fully initialize
+sleep 2
 
 echo "Setting configuration values..."
 curl -sS "http://myapp:8800/server/config/set/general/debug/true"; echo
@@ -18,9 +21,10 @@ curl -sS "http://myapp:8800/server/config/set/autoqueue/patterns_only/true"; ech
 echo "Sending restart command..."
 curl -sS "http://myapp:8800/server/command/restart"; echo
 
-# Give seedsync time to save config and begin restarting
+# Give seedsync time to save config, shutdown old server, and begin restarting
+# The restart involves: persist config, terminate webapp, join threads, create new instance
 echo "Waiting for seedsync to restart..."
-sleep 5
+sleep 10
 
 # Wait for port to become available again after restart
 ./wait-for-it.sh myapp:8800 -t 120 -- echo "Seedsync app is reachable (after restart)"
@@ -44,10 +48,11 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
 done
 
 if [[ "${SERVER_UP}" != "True" ]]; then
-    echo "WARNING: Seedsync did not report healthy status after configuration"
+    echo "ERROR: Seedsync did not report healthy status after configuration"
     echo "Last response: ${RESPONSE}"
-    echo "This may cause E2E tests to fail"
+    echo "Config may not have been applied correctly. Failing the configure step."
+    exit 1
 fi
 
 echo
-echo "Done configuring SeedSync app"
+echo "Done configuring SeedSync app - server is up and healthy"
