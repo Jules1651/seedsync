@@ -186,18 +186,21 @@ class Seedsync:
             #       will do for now
             time.sleep(Constants.MAIN_THREAD_SLEEP_INTERVAL_IN_SECS)
 
-            # Join all the threads here
-            if do_start_controller:
-                controller_job.terminate()
-            webapp_job.terminate()
+            # Join all the threads here with a timeout to avoid hanging
+            try:
+                if do_start_controller:
+                    controller_job.terminate()
+                webapp_job.terminate()
 
-            # Wait for the threads to close
-            if do_start_controller:
-                controller_job.join()
-            webapp_job.join()
+                # Wait for the threads to close (with timeout to avoid hanging)
+                if do_start_controller:
+                    controller_job.join(timeout=5.0)
+                webapp_job.join(timeout=5.0)
 
-            # Last persist
-            self.persist()
+                # Last persist
+                self.persist()
+            except Exception as cleanup_error:
+                self.context.logger.error("Error during cleanup: {}".format(cleanup_error))
 
             # Raise any exceptions so they can be logged properly
             # Note: ServiceRestart and ServiceExit will be caught and handled
