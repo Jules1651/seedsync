@@ -19,6 +19,12 @@ else
     # Create required directories as user
     sudo -u user mkdir -p /home/user/.seedsync
     sudo -u user mkdir -p /home/user/.seedsync/log
-    # Run seedsync directly as user
-    exec sudo -u user /usr/lib/seedsync/seedsync --logdir /home/user/.seedsync/log -c /home/user/.seedsync
+
+    # Run seedsync in a loop to handle restarts (since we don't have systemd to restart it)
+    while true; do
+        echo "Starting seedsync..."
+        sudo -u user /usr/lib/seedsync/seedsync --logdir /home/user/.seedsync/log -c /home/user/.seedsync || true
+        echo "Seedsync exited, restarting in 2 seconds..."
+        sleep 2
+    done
 fi
