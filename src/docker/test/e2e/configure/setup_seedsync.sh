@@ -1,7 +1,6 @@
 #!/bin/bash
-set -e
-
-./wait-for-it.sh myapp:8800 -- echo "Seedsync app is up (before configuring)"
+# Force rebuild: 2026-01-21-v2
+./wait-for-it.sh myapp:8800 -t 60 -- echo "Seedsync app is up (before configuring)"
 curl -sS "http://myapp:8800/server/config/set/general/debug/true"; echo
 curl -sS "http://myapp:8800/server/config/set/general/verbose/true"; echo
 curl -sS "http://myapp:8800/server/config/set/lftp/local_path/%252Fdownloads"; echo
@@ -14,7 +13,8 @@ curl -sS "http://myapp:8800/server/config/set/autoqueue/patterns_only/true"; ech
 
 curl -sS "http://myapp:8800/server/command/restart"; echo
 
-./wait-for-it.sh myapp:8800 -- echo "Seedsync app is up (after configuring)"
+./wait-for-it.sh myapp:8800 -t 60 -- echo "Seedsync app is up (after configuring)"
 
 echo
 echo "Done configuring SeedSync app"
+
