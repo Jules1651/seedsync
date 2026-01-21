@@ -4,6 +4,7 @@ services:
   myapp:
     image: seedsync/stage/deb
     container_name: seedsync_stage_deb
+    hostname: myapp
     build:
       context: ../../../..
       dockerfile: src/docker/stage/deb/Dockerfile

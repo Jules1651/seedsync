@@ -3,6 +3,7 @@ services:
   myapp:
     image: ${STAGING_REGISTRY}/seedsync:${STAGING_VERSION}
     container_name: seedsync_test_e2e_myapp
+    hostname: myapp
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8800/server/status"]
       interval: 5s
