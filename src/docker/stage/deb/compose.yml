@@ -17,3 +17,9 @@ services:
         source: ${SEEDSYNC_DEB}
         target: /install/seedsync.deb
         read_only: true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8800/server/status"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+      start_period: 30s
