@@ -113,7 +113,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       # Set staging registry (must be lowercase for Docker)
       - name: Set staging registry env variable
-        run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       # Build docker image (skip cache on first run or if cache doesn't exist)
       - name: Build docker image
@@ -200,7 +200,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       # Set staging registry (must be lowercase for Docker)
       - name: Set staging registry env variable
-        run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       # Run e2e test
       - name: Run e2e test
@@ -251,7 +251,7 @@ jobs:
           docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
       # Set staging registry (must be lowercase for Docker)
       - name: Set staging registry env variable
-        run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       # Push image to dockerhub
       - name: Push to Dockerhub (tag vX.X.X)
