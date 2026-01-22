@@ -251,10 +251,28 @@ run-tests-e2e: tests-e2e-deps
 
 	# Run the test
 	echo "${green}Running the tests${reset}"
+	set +e
 	$(DOCKER_COMPOSE) \
 		$${COMPOSE_FLAGS} \
 		up --force-recreate \
 		$${COMPOSE_RUN_FLAGS}
+	COMPOSE_EXIT=$?
+	set -e
+
+	# If compose failed (e.g., configure service failed), show logs immediately
+	if [[ "$${COMPOSE_EXIT}" != "0" ]] ; then
+		echo "${red}Docker compose failed with exit code $${COMPOSE_EXIT}${reset}"
+		echo "${red}Showing all container logs for debugging:${reset}"
+		echo "${red}=== Configure service logs ===${reset}"
+		$(DOCKER) logs seedsync_test_e2e_configure 2>/dev/null || echo "No configure logs available"
+		echo "${red}=== MyApp container logs ===${reset}"
+		$(DOCKER) logs seedsync_stage_deb_ubu2004 2>/dev/null || true
+		$(DOCKER) logs seedsync_stage_deb_ubu2204 2>/dev/null || true
+		$(DOCKER) logs seedsync_test_e2e_myapp 2>/dev/null || true
+		echo "${red}=== Remote container logs ===${reset}"
+		$(DOCKER) logs seedsync_test_e2e_remote 2>/dev/null || true
+		false
+	fi
 
 	if [[ "${DEV}" != "1" ]] ; then
 		$(DOCKER) logs -f seedsync_test_e2e
