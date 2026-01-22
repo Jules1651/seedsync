@@ -154,10 +154,10 @@ jobs:
         env:
           SEEDSYNC_OS: ${{ matrix.oscode }}
         run: |
-          DEB_PATH=$(readlink -f build/*.deb)
-          echo "Using DEB_PATH=$DEB_PATH"
+          export SEEDSYNC_DEB=$(readlink -f build/*.deb)
+          echo "Using SEEDSYNC_DEB=$SEEDSYNC_DEB"
           echo "Using SEEDSYNC_OS=$SEEDSYNC_OS"
-          make run-tests-e2e SEEDSYNC_DEB="$DEB_PATH"
+          make run-tests-e2e
 
   e2etests-docker-image:
     name: End-to-end tests on Docker Image
