@@ -104,16 +104,20 @@ jobs:
       - name: Show buildx available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
-      # Login using GITHUB_TOKEN (automatically available, no manual secret setup required)
+      # Login to GHCR using official Docker action (handles auth more robustly)
       - name: Log into GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       # Set staging registry (must be lowercase for Docker)
       - name: Set staging registry env variable
         run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      # Build docker image
+      # Build docker image (skip cache on first run or if cache doesn't exist)
       - name: Build docker image
-        run: make docker-image STAGING_REGISTRY=${{ env.staging_registry }} STAGING_VERSION=${{ github.run_number }}
+        run: make docker-image STAGING_REGISTRY=${{ env.staging_registry }} STAGING_VERSION=${{ github.run_number }} SKIP_CACHE=1
 
   e2etests-deb:
     name: End-to-end tests on Deb
@@ -172,9 +176,13 @@ jobs:
       - name: Show buildx available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
-      # Login using GITHUB_TOKEN (automatically available, no manual secret setup required)
+      # Login to GHCR using official Docker action
       - name: Log into GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       # Set staging registry (must be lowercase for Docker)
       - name: Set staging registry env variable
         run: echo "staging_registry=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
@@ -215,9 +223,13 @@ jobs:
       - name: Show buildx available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
 
-      # Login to GHCR using GITHUB_TOKEN (for pulling cached images)
+      # Login to GHCR using official Docker action (for pulling cached images)
       - name: Log into GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       # Login to Dockerhub
       - name: Log into Dockerhub registry
         run: echo "${{ secrets.DOCKER_PASSWORD }}" |

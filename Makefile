@@ -56,13 +56,24 @@ docker-image: docker-buildx
 	fi;
 	echo "${green}STAGING_VERSION=$${STAGING_VERSION}${reset}";
 
+	# Set cache flags (can be disabled with SKIP_CACHE=1 for first run or permission issues)
+	CACHE_FLAGS_SCANFS=""
+	CACHE_FLAGS_ANGULAR=""
+	CACHE_FLAGS_FINAL=""
+	if [[ -z "${SKIP_CACHE}" ]] ; then \
+		CACHE_FLAGS_SCANFS="--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/scanfs/export:cache,mode=max --cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/scanfs/export:cache"; \
+		CACHE_FLAGS_ANGULAR="--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/angular/export:cache,mode=max --cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/angular/export:cache"; \
+		CACHE_FLAGS_FINAL="--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache,mode=max --cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache"; \
+	else \
+		echo "${green}SKIP_CACHE=1, skipping registry cache${reset}"; \
+	fi
+
 	# scanfs image
 	$(DOCKER) buildx build \
 		-f ${SOURCEDIR}/docker/build/deb/Dockerfile \
 		--target seedsync_build_scanfs_export \
 		--tag $${STAGING_REGISTRY}/seedsync/build/scanfs/export:$${STAGING_VERSION} \
-		--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/scanfs/export:cache,mode=max \
-		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/scanfs/export:cache \
+		$${CACHE_FLAGS_SCANFS} \
 		--push \
 		${ROOTDIR}
 
@@ -71,8 +82,7 @@ docker-image: docker-buildx
 		-f ${SOURCEDIR}/docker/build/deb/Dockerfile \
 		--target seedsync_build_angular_export \
 		--tag $${STAGING_REGISTRY}/seedsync/build/angular/export:$${STAGING_VERSION} \
-		--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/angular/export:cache,mode=max \
-		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/angular/export:cache \
+		$${CACHE_FLAGS_ANGULAR} \
 		--push \
 		${ROOTDIR}
 
@@ -83,8 +93,7 @@ docker-image: docker-buildx
 		--build-arg STAGING_VERSION=$${STAGING_VERSION} \
 		--build-arg STAGING_REGISTRY=$${STAGING_REGISTRY} \
 		--tag $${STAGING_REGISTRY}/seedsync:$${STAGING_VERSION} \
-		--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache,mode=max \
-		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache \
+		$${CACHE_FLAGS_FINAL} \
 		--platform linux/amd64,linux/arm64 \
 		--push \
 		${ROOTDIR}
