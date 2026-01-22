@@ -151,11 +151,13 @@ jobs:
 
       # Run e2e test
       - name: Run e2e test
+        env:
+          SEEDSYNC_OS: ${{ matrix.oscode }}
         run: |
           DEB_PATH=$(readlink -f build/*.deb)
           echo "Using DEB_PATH=$DEB_PATH"
-          echo "Using SEEDSYNC_OS=${{ matrix.oscode }}"
-          make run-tests-e2e SEEDSYNC_DEB="$DEB_PATH" SEEDSYNC_OS=${{ matrix.oscode }}
+          echo "Using SEEDSYNC_OS=$SEEDSYNC_OS"
+          make run-tests-e2e SEEDSYNC_DEB="$DEB_PATH"
 
   e2etests-docker-image:
     name: End-to-end tests on Docker Image
