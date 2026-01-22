@@ -54,6 +54,17 @@ else
     echo "Checking config directory..."
     ls -la /home/user/.seedsync/ || echo "Config directory not found!"
 
+    # Background process to periodically dump seedsync logs (every 30 seconds)
+    (
+        while true; do
+            sleep 30
+            echo "=== Periodic log dump ($(date)) ==="
+            tail -30 /home/user/.seedsync/log/seedsync.log 2>/dev/null || echo "No log file yet"
+            echo "=== End periodic log dump ==="
+        done
+    ) &
+    LOG_DUMPER_PID=$!
+
     # Run seedsync in a loop to handle restarts (since we don't have systemd to restart it)
     RESTART_COUNT=0
     while true; do
@@ -85,6 +96,10 @@ else
         # Show last few lines of output
         echo "=== Last 20 lines of seedsync output ==="
         tail -20 /tmp/seedsync_output.log 2>/dev/null || echo "No output log"
+
+        # Show seedsync log file
+        echo "=== Seedsync log file (last 50 lines) ==="
+        tail -50 /home/user/.seedsync/log/seedsync.log 2>/dev/null || echo "No log file"
 
         # Show config file after exit
         if [ -f /home/user/.seedsync/settings.cfg ]; then

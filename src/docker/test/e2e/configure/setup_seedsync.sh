@@ -92,6 +92,11 @@ else:
 " 2>/dev/null || echo "Failed to parse config"
 
     echo "Config may not have been applied correctly. Failing the configure step."
+
+    # Try to get seedsync log from myapp container for debugging
+    echo "=== Attempting to fetch seedsync log from myapp ==="
+    curl -sS "http://myapp:8800/server/log/get" 2>/dev/null || echo "Log endpoint not available"
+
     exit 1
 fi
 
