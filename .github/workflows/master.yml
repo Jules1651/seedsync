@@ -138,9 +138,24 @@ jobs:
           name: deb-${{ github.run_number }}
           path: build/
 
+      # Debug: verify artifact downloaded correctly
+      - name: Debug build contents
+        run: |
+          echo "=== Build directory contents ==="
+          ls -la build/ || echo "build/ directory not found"
+          echo "=== Checking for .deb files ==="
+          ls -la build/*.deb 2>/dev/null || echo "No .deb files found"
+          echo "=== SEEDSYNC_DEB would be ==="
+          readlink -f build/*.deb 2>/dev/null || echo "readlink failed"
+          echo "=== matrix.oscode = ${{ matrix.oscode }} ==="
+
       # Run e2e test
       - name: Run e2e test
-        run: make run-tests-e2e SEEDSYNC_DEB=`readlink -f build/*.deb` SEEDSYNC_OS=${{ matrix.oscode }}
+        run: |
+          DEB_PATH=$(readlink -f build/*.deb)
+          echo "Using DEB_PATH=$DEB_PATH"
+          echo "Using SEEDSYNC_OS=${{ matrix.oscode }}"
+          make run-tests-e2e SEEDSYNC_DEB="$DEB_PATH" SEEDSYNC_OS=${{ matrix.oscode }}
 
   e2etests-docker-image:
     name: End-to-end tests on Docker Image
