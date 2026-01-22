@@ -30,8 +30,8 @@ RUN chmod 600 /home/user/.ssh/id_rsa
 USER root
 
 
-# Let user run sudo without password
-RUN echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers
+# Let user run sudo without password (use sudoers.d to not overwrite default config)
+RUN echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user && chmod 440 /etc/sudoers.d/user
 
 WORKDIR /scripts
 
