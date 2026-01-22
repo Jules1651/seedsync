@@ -4,6 +4,10 @@
 set -e
 
 echo "Running entrypoint"
+echo "Environment variables:"
+echo "  SEEDSYNC_NO_SYSTEMD=${SEEDSYNC_NO_SYSTEMD:-not set}"
+echo "  SEEDSYNC_DEB=${SEEDSYNC_DEB:-not set}"
+echo "  SEEDSYNC_OS=${SEEDSYNC_OS:-not set}"
 
 echo "Installing SeedSync"
 # Run install script directly (debconf value is pre-set via debconf-set-selections)
@@ -46,18 +50,49 @@ else
     echo "Checking scanfs..."
     ls -la /usr/lib/seedsync/scanfs 2>/dev/null || echo "scanfs not found!"
 
+    # Debug: check config directory
+    echo "Checking config directory..."
+    ls -la /home/user/.seedsync/ || echo "Config directory not found!"
+
     # Run seedsync in a loop to handle restarts (since we don't have systemd to restart it)
+    RESTART_COUNT=0
     while true; do
+        RESTART_COUNT=$((RESTART_COUNT + 1))
         echo "========================================="
-        echo "Starting seedsync at $(date)..."
+        echo "Starting seedsync (run #$RESTART_COUNT) at $(date)..."
         echo "========================================="
+
+        # Show config file if it exists
+        if [ -f /home/user/.seedsync/settings.cfg ]; then
+            echo "=== Config file exists, showing contents ==="
+            cat /home/user/.seedsync/settings.cfg
+            echo "=== End of config file ==="
+        else
+            echo "=== Config file does not exist yet ==="
+        fi
+
         # Run seedsync and capture exit code
         set +e
-        sudo -u user /usr/lib/seedsync/seedsync --logdir /home/user/.seedsync/log -c /home/user/.seedsync
+        sudo -u user /usr/lib/seedsync/seedsync --logdir /home/user/.seedsync/log -c /home/user/.seedsync 2>&1 | tee /tmp/seedsync_output.log &
+        SEEDSYNC_PID=$!
+        wait $SEEDSYNC_PID
         EXIT_CODE=$?
         set -e
+
         echo "========================================="
         echo "Seedsync exited with code $EXIT_CODE at $(date)"
+
+        # Show last few lines of output
+        echo "=== Last 20 lines of seedsync output ==="
+        tail -20 /tmp/seedsync_output.log 2>/dev/null || echo "No output log"
+
+        # Show config file after exit
+        if [ -f /home/user/.seedsync/settings.cfg ]; then
+            echo "=== Config file after exit ==="
+            cat /home/user/.seedsync/settings.cfg
+            echo "=== End of config file ==="
+        fi
+
         echo "Restarting in 2 seconds..."
         echo "========================================="
         sleep 2
