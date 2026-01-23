@@ -50,3 +50,4 @@ if [[ "${SERVER_UP}" != "True" ]]; then
 fi
 
 echo "Done configuring SeedSync"
+exit 0

@@ -13,7 +13,7 @@ services:
       remote:
         condition: service_started
       configure:
-        condition: service_completed_successfully
+        condition: service_started
     # Playwright needs more shared memory for browser
     shm_size: 1024M
     dns:
