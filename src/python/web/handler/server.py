@@ -30,7 +30,6 @@ class ServerHandler(IHandler):
         Request a server restart
         :return:
         """
-        self.logger.info("Received a restart action, setting restart_event")
+        self.logger.info("Received restart request")
         self.__restart_event.set()
-        self.logger.info("restart_event.is_set() is now: {}".format(self.__restart_event.is_set()))
         return HTTPResponse(body="Requested restart")

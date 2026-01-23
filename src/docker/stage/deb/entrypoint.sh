@@ -39,77 +39,26 @@ else
     sudo -u user mkdir -p /home/user/.seedsync
     sudo -u user mkdir -p /home/user/.seedsync/log
 
-    # Debug: check if binary exists and is executable
-    echo "Checking seedsync binary..."
-    ls -la /usr/lib/seedsync/seedsync || echo "Binary not found!"
-    ls -la /usr/lib/seedsync/ || echo "Directory not found!"
-
-    # Debug: check for html and scanfs
-    echo "Checking html directory..."
-    ls -la /usr/lib/seedsync/html/ 2>/dev/null | head -5 || echo "HTML directory not found!"
-    echo "Checking scanfs..."
-    ls -la /usr/lib/seedsync/scanfs 2>/dev/null || echo "scanfs not found!"
-
-    # Debug: check config directory
-    echo "Checking config directory..."
-    ls -la /home/user/.seedsync/ || echo "Config directory not found!"
-
-    # Background process to periodically dump seedsync logs (every 30 seconds)
-    (
-        while true; do
-            sleep 30
-            echo "=== Periodic log dump ($(date)) ==="
-            tail -30 /home/user/.seedsync/log/seedsync.log 2>/dev/null || echo "No log file yet"
-            echo "=== End periodic log dump ==="
-        done
-    ) &
-    LOG_DUMPER_PID=$!
-
     # Run seedsync in a loop to handle restarts (since we don't have systemd to restart it)
     RESTART_COUNT=0
     while true; do
         RESTART_COUNT=$((RESTART_COUNT + 1))
-        echo "========================================="
-        echo "Starting seedsync (run #$RESTART_COUNT) at $(date)..."
-        echo "========================================="
-
-        # Show config file if it exists
-        if [ -f /home/user/.seedsync/settings.cfg ]; then
-            echo "=== Config file exists, showing contents ==="
-            cat /home/user/.seedsync/settings.cfg
-            echo "=== End of config file ==="
-        else
-            echo "=== Config file does not exist yet ==="
-        fi
+        echo "Starting seedsync (run #$RESTART_COUNT)..."
 
         # Run seedsync and capture exit code
         set +e
-        sudo -u user /usr/lib/seedsync/seedsync --logdir /home/user/.seedsync/log -c /home/user/.seedsync 2>&1 | tee /tmp/seedsync_output.log &
-        SEEDSYNC_PID=$!
-        wait $SEEDSYNC_PID
+        sudo -u user /usr/lib/seedsync/seedsync --logdir /home/user/.seedsync/log -c /home/user/.seedsync
         EXIT_CODE=$?
         set -e
 
-        echo "========================================="
-        echo "Seedsync exited with code $EXIT_CODE at $(date)"
+        echo "Seedsync exited with code $EXIT_CODE"
 
-        # Show last few lines of output
-        echo "=== Last 20 lines of seedsync output ==="
-        tail -20 /tmp/seedsync_output.log 2>/dev/null || echo "No output log"
-
-        # Show seedsync log file
-        echo "=== Seedsync log file (last 50 lines) ==="
-        tail -50 /home/user/.seedsync/log/seedsync.log 2>/dev/null || echo "No log file"
-
-        # Show config file after exit
-        if [ -f /home/user/.seedsync/settings.cfg ]; then
-            echo "=== Config file after exit ==="
-            cat /home/user/.seedsync/settings.cfg
-            echo "=== End of config file ==="
+        # Exit code 0 means restart requested, any other code is an error
+        if [ $EXIT_CODE -ne 0 ]; then
+            echo "Seedsync exited with error, showing last 20 lines of log:"
+            tail -20 /home/user/.seedsync/log/seedsync.log 2>/dev/null || echo "No log file"
         fi
 
-        echo "Restarting in 2 seconds..."
-        echo "========================================="
         sleep 2
     done
 fi

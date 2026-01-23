@@ -171,9 +171,7 @@ class Seedsync:
                         raise
 
                 # Check if a restart is requested
-                restart_requested = web_app_builder.server_handler.is_restart_requested()
-                self.context.logger.debug("Main loop: restart_requested={}".format(restart_requested))
-                if restart_requested:
+                if web_app_builder.server_handler.is_restart_requested():
                     self.context.logger.info("Restart requested, raising ServiceRestart")
                     raise ServiceRestart()
 
