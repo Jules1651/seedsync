@@ -233,10 +233,16 @@ class Seedsync:
         is_frozen = getattr(sys, 'frozen', False)
 
         # Html path is only required if not running a frozen package
-        # For a frozen package, set default to root/html
+        # For a frozen package, check both _MEIPASS and parent directory
+        # (deb package installs html in parent of _internal)
         # noinspection PyUnresolvedReferences
         # noinspection PyProtectedMember
-        default_html_path = os.path.join(sys._MEIPASS, "html") if is_frozen else None
+        if is_frozen:
+            meipass_html = os.path.join(sys._MEIPASS, "html")
+            parent_html = os.path.join(os.path.dirname(sys._MEIPASS), "html")
+            default_html_path = meipass_html if os.path.exists(meipass_html) else parent_html
+        else:
+            default_html_path = None
         parser.add_argument("--html",
                             required=not is_frozen,
                             default=default_html_path,
