@@ -5,6 +5,7 @@ FROM node:20-slim AS seedsync_test_e2e_env
 RUN apt-get update && apt-get install -y \
     curl \
     python3 \
+    dbus \
     && rm -rf /var/lib/apt/lists/*
 
 COPY src/e2e/package*.json /app/
