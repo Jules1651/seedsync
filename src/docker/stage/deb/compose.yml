@@ -8,11 +8,13 @@ services:
       context: ../../../..
       dockerfile: src/docker/stage/deb/Dockerfile
     tty: true
+    privileged: true
     tmpfs:
       - /run
       - /run/lock
     security_opt:
       - seccomp:unconfined
+    cgroup: host
     volumes:
       - type: bind
         source: ${SEEDSYNC_DEB}
@@ -22,4 +24,3 @@ services:
       - type: bind
         source: /sys/fs/cgroup
         target: /sys/fs/cgroup
-        read_only: true
