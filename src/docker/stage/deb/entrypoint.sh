@@ -10,5 +10,4 @@ echo "Installing SeedSync"
 
 echo "Continuing docker CMD"
 echo "$@"
-# 3>&1 workaround for docker/docker#27202
-exec $@ 3>&1
+exec "$@"

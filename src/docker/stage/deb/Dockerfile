@@ -38,7 +38,9 @@ ADD src/docker/stage/deb/install_seedsync.sh /scripts/
 ADD src/docker/stage/deb/expect_seedsync.exp /scripts/
 ADD src/docker/stage/deb/entrypoint.sh /scripts/
 
+STOPSIGNAL SIGRTMIN+3
+
 ENTRYPOINT ["/scripts/entrypoint.sh"]
-CMD ["/lib/systemd/systemd", "--log-target=journal"]
+CMD ["/bin/bash", "-c", "exec /lib/systemd/systemd --log-target=journal 3>&1"]
 
 EXPOSE 8800
