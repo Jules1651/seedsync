@@ -92,7 +92,8 @@ COPY src/debian /build/work/debian
 COPY --from=seedsync_build_pyinstaller /build/dist/seedsync /build/work/seedsync
 # Copy scanfs into _internal directory where PyInstaller expects it (sys._MEIPASS)
 COPY --from=seedsync_build_scanfs /build/dist/scanfs /build/work/seedsync/_internal/
-COPY --from=seedsync_build_angular /build/dist /build/work/seedsync/html
+# Copy html into _internal directory where PyInstaller expects it (sys._MEIPASS)
+COPY --from=seedsync_build_angular /build/dist /build/work/seedsync/_internal/html
 WORKDIR /build/work
 RUN dpkg-buildpackage -B -uc -us
 RUN ls /build/*.deb && echo "----" && ls /build/work
