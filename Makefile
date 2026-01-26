@@ -151,22 +151,7 @@ run-tests-angular: tests-angular
 		-f ${SOURCEDIR}/docker/test/angular/compose.yml \
 		up --force-recreate --exit-code-from tests
 
-tests-e2e-deps:
-	# deb pre-reqs
-	$(DOCKER) build \
-		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-16.04-systemd \
-		-t ubuntu-systemd:16.04
-	$(DOCKER) build \
-		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-18.04-systemd \
-		-t ubuntu-systemd:18.04
-	$(DOCKER) build \
-		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-20.04-systemd \
-		-t ubuntu-systemd:20.04
-	$(DOCKER) build \
-		${SOURCEDIR}/docker/stage/deb/ubuntu-systemd/ubuntu-22.04-systemd \
-		-t ubuntu-systemd:22.04
-
-run-tests-e2e: tests-e2e-deps
+run-tests-e2e:
 	# Check our settings
 	@if [[ -z "${STAGING_VERSION}" ]] && [[ -z "${SEEDSYNC_DEB}" ]]; then \
 		echo "${red}ERROR: One of STAGING_VERSION or SEEDSYNC_DEB must be set${reset}"; exit 1; \

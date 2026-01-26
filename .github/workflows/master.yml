@@ -129,18 +129,6 @@ jobs:
           name: deb-${{ github.run_number }}
           path: build/
 
-      # Configure Docker for systemd containers on cgroups v2
-      - name: Configure Docker daemon for cgroups v2
-        run: |
-          # Merge with existing daemon.json if present
-          if [ -f /etc/docker/daemon.json ]; then
-            sudo jq '. + {"default-cgroupns-mode": "host"}' /etc/docker/daemon.json | sudo tee /etc/docker/daemon.json.new
-            sudo mv /etc/docker/daemon.json.new /etc/docker/daemon.json
-          else
-            echo '{"default-cgroupns-mode": "host"}' | sudo tee /etc/docker/daemon.json
-          fi
-          sudo systemctl restart docker
-
       # Run e2e test
       - name: Run e2e test
         run: make run-tests-e2e SEEDSYNC_DEB=`readlink -f build/*.deb` SEEDSYNC_OS=${{ matrix.oscode }}
