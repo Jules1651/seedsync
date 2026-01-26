@@ -9,6 +9,8 @@ export class AutoQueuePage extends App {
 
     async navigateTo() {
         await this.page.goto(Paths.AUTOQUEUE);
+        // Wait for the autoqueue data to load
+        await this.page.waitForLoadState('networkidle');
     }
 
     async getPatterns(): Promise<string[]> {
