@@ -118,7 +118,9 @@ jobs:
     needs: [ build-deb ]
     strategy:
       matrix:
-        oscode: [ ubu1604, ubu1804, ubu2004 ]
+        # Note: Python 3.11 requires GLIBC 2.29+, so only Ubuntu 20.04+ is supported
+        # Ubuntu 16.04 (GLIBC 2.23) and 18.04 (GLIBC 2.27) are no longer supported
+        oscode: [ ubu2004, ubu2204 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
