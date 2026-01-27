@@ -14,7 +14,7 @@ describe("Testing view file options service", () => {
             ]
         });
 
-        domService = TestBed.get(DomService);
+        domService = TestBed.inject(DomService);
     });
 
     it("should create an instance", () => {
@@ -23,7 +23,7 @@ describe("Testing view file options service", () => {
 
     it("should forward updates to headerHeight", fakeAsync(() => {
         let count = 0;
-        let headerHeight = null;
+        let headerHeight: number | null = null;
         domService.headerHeight.subscribe({
             next: height => {
                 headerHeight = height;
