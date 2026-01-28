@@ -42,6 +42,10 @@ module.exports = function (config) {
                     '--remote-debugging-port=9222',
                     '--no-sandbox'
                 ]
+            },
+            ChromeHeadlessCI: {
+                base: 'ChromeHeadless',
+                flags: ['--no-sandbox', '--disable-dev-shm-usage']
             }
         },
         mochaReporter: {
