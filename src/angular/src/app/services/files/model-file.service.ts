@@ -1,6 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
 
 import * as Immutable from "immutable";
 
@@ -21,7 +21,7 @@ import {RestService, WebReaction} from "../utils/rest.service";
  *            -apps-using-rxjs-observable-data-services-pitfalls-to-avoid
  */
 @Injectable()
-export class ModelFileService extends BaseStreamService {
+export class ModelFileService extends BaseStreamService implements OnDestroy {
     private readonly EVENT_INIT = "model-init";
     private readonly EVENT_ADDED = "model-added";
     private readonly EVENT_UPDATED = "model-updated";
@@ -29,6 +29,7 @@ export class ModelFileService extends BaseStreamService {
 
     private _files: BehaviorSubject<Immutable.Map<string, ModelFile>> =
         new BehaviorSubject(Immutable.Map<string, ModelFile>());
+    private destroy$ = new Subject<void>();
 
     constructor(private _logger: LoggerService,
                 private _restService: RestService) {
@@ -37,6 +38,11 @@ export class ModelFileService extends BaseStreamService {
         this.registerEventName(this.EVENT_ADDED);
         this.registerEventName(this.EVENT_UPDATED);
         this.registerEventName(this.EVENT_REMOVED);
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     get files(): Observable<Immutable.Map<string, ModelFile>> {

@@ -1,6 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
 
 import * as Immutable from "immutable";
 
@@ -11,7 +11,8 @@ import {Notification} from "./notification";
  * NotificationService manages which notifications are shown or hidden
  */
 @Injectable()
-export class NotificationService {
+export class NotificationService implements OnDestroy {
+    private destroy$ = new Subject<void>();
 
     private _notifications: Immutable.List<Notification> = Immutable.List([]);
     private _notificationsSubject: BehaviorSubject<Immutable.List<Notification>> =
@@ -56,5 +57,10 @@ export class NotificationService {
             this._notifications = this._notifications.remove(index);
             this._notificationsSubject.next(this._notifications);
         }
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

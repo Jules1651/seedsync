@@ -1,6 +1,7 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
+import "rxjs/add/operator/takeUntil";
 
 import * as Immutable from "immutable";
 
@@ -16,7 +17,8 @@ import {RestService, WebReaction} from "../utils/rest.service";
  * AutoQueueService provides the store for the autoqueue patterns
  */
 @Injectable()
-export class AutoQueueService extends BaseWebService {
+export class AutoQueueService extends BaseWebService implements OnDestroy {
+    private destroy$ = new Subject<void>();
 
     private readonly AUTOQUEUE_GET_URL = "/server/autoqueue/get";
     private readonly AUTOQUEUE_ADD_URL = (pattern) => `/server/autoqueue/add/${pattern}`;
@@ -65,7 +67,7 @@ export class AutoQueueService extends BaseWebService {
             const patternEncoded = encodeURIComponent(encodeURIComponent(pattern));
             const url = this.AUTOQUEUE_ADD_URL(patternEncoded);
             const obs = this._restService.sendRequest(url);
-            obs.subscribe({
+            obs.takeUntil(this.destroy$).subscribe({
                 next: reaction => {
                     if (reaction.success) {
                         // Update our copy and notify clients
@@ -102,7 +104,7 @@ export class AutoQueueService extends BaseWebService {
             const patternEncoded = encodeURIComponent(encodeURIComponent(pattern));
             const url = this.AUTOQUEUE_REMOVE_URL(patternEncoded);
             const obs = this._restService.sendRequest(url);
-            obs.subscribe({
+            obs.takeUntil(this.destroy$).subscribe({
                 next: reaction => {
                     if (reaction.success) {
                         // Update our copy and notify clients
@@ -127,9 +129,14 @@ export class AutoQueueService extends BaseWebService {
         this._patterns.next(Immutable.List([]));
     }
 
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     private getPatterns() {
         this._logger.debug("Getting autoqueue patterns...");
-        this._restService.sendRequest(this.AUTOQUEUE_GET_URL).subscribe({
+        this._restService.sendRequest(this.AUTOQUEUE_GET_URL).takeUntil(this.destroy$).subscribe({
             next: reaction => {
                 if (reaction.success) {
                     const parsed: AutoQueuePatternJson[] = JSON.parse(reaction.data);

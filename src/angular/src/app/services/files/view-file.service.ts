@@ -1,6 +1,7 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
+import "rxjs/add/operator/takeUntil";
 
 import * as Immutable from "immutable";
 
@@ -69,9 +70,10 @@ export interface ViewFileComparator {
  *      need to be built outside the service (see ViewFileFilterService)
  */
 @Injectable()
-export class ViewFileService {
+export class ViewFileService implements OnDestroy {
 
     private readonly USE_MOCK_MODEL = false;
+    private destroy$ = new Subject<void>();
 
     private modelFileService: ModelFileService;
 
@@ -91,18 +93,25 @@ export class ViewFileService {
         const _viewFileService = this;
 
         if (!this.USE_MOCK_MODEL) {
-            this.modelFileService.files.subscribe({
-                next: modelFiles => {
-                    let t0 = performance.now();
-                    _viewFileService.buildViewFromModelFiles(modelFiles);
-                    let t1 = performance.now();
-                    this._logger.debug("ViewFile creation took", (t1 - t0).toFixed(0), "ms");
-                }
-            });
+            this.modelFileService.files
+                .takeUntil(this.destroy$)
+                .subscribe({
+                    next: modelFiles => {
+                        let t0 = performance.now();
+                        _viewFileService.buildViewFromModelFiles(modelFiles);
+                        let t1 = performance.now();
+                        this._logger.debug("ViewFile creation took", (t1 - t0).toFixed(0), "ms");
+                    }
+                });
         } else {
             // For layout/style testing
             this.buildViewFromModelFiles(MOCK_MODEL_FILES);
         }
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     private buildViewFromModelFiles(modelFiles: Immutable.Map<string, ModelFile>) {
