@@ -1,6 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
 
 import {LoggerService} from "./logger.service";
 import {BaseStreamService} from "../base/base-stream.service";
@@ -12,7 +12,8 @@ import {RestService} from "./rest.service";
  * as an Observable
  */
 @Injectable()
-export class ConnectedService extends BaseStreamService {
+export class ConnectedService extends BaseStreamService implements OnDestroy {
+    private destroy$ = new Subject<void>();
 
     // For clients
     private _connectedSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -40,5 +41,10 @@ export class ConnectedService extends BaseStreamService {
         if(this._connectedSubject.getValue() === true) {
             this._connectedSubject.next(false);
         }
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

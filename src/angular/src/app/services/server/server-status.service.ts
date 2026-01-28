@@ -1,6 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
 
 import {Localization} from "../../common/localization";
 import {ServerStatus, ServerStatusJson} from "./server-status";
@@ -8,7 +8,8 @@ import {BaseStreamService} from "../base/base-stream.service";
 
 
 @Injectable()
-export class ServerStatusService extends BaseStreamService {
+export class ServerStatusService extends BaseStreamService implements OnDestroy {
+    private destroy$ = new Subject<void>();
 
     private _status: BehaviorSubject<ServerStatus> =
         new BehaviorSubject(new ServerStatus({
@@ -43,6 +44,11 @@ export class ServerStatusService extends BaseStreamService {
                 errorMessage: Localization.Error.SERVER_DISCONNECTED
             }
         }));
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     /**

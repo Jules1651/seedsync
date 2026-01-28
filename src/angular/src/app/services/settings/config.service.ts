@@ -1,6 +1,7 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/Rx";
+import {BehaviorSubject, Subject} from "rxjs/Rx";
+import "rxjs/add/operator/takeUntil";
 
 import {Config, IConfig} from "./config";
 import {LoggerService} from "../utils/logger.service";
@@ -14,7 +15,9 @@ import {RestService, WebReaction} from "../utils/rest.service";
  * ConfigService provides the store for the config
  */
 @Injectable()
-export class ConfigService extends BaseWebService {
+export class ConfigService extends BaseWebService implements OnDestroy {
+    private destroy$ = new Subject<void>();
+
     private readonly CONFIG_GET_URL = "/server/config/get";
 
     // noinspection UnterminatedStatementJS
@@ -62,7 +65,7 @@ export class ConfigService extends BaseWebService {
             const valueEncoded = encodeURIComponent(encodeURIComponent(valueStr));
             const url = this.CONFIG_SET_URL(section, option, valueEncoded);
             const obs = this._restService.sendRequest(url);
-            obs.subscribe({
+            obs.takeUntil(this.destroy$).subscribe({
                 next: reaction => {
                     if (reaction.success) {
                         // Update our copy and notify clients
@@ -86,9 +89,14 @@ export class ConfigService extends BaseWebService {
         this._config.next(null);
     }
 
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     private getConfig() {
         this._logger.debug("Getting config...");
-        this._restService.sendRequest(this.CONFIG_GET_URL).subscribe({
+        this._restService.sendRequest(this.CONFIG_GET_URL).takeUntil(this.destroy$).subscribe({
             next: reaction => {
                 if (reaction.success) {
                     const config_json: IConfig = JSON.parse(reaction.data);
