@@ -60,9 +60,6 @@ RUN apt-get update && apt-get install -y build-essential && rm -rf /var/lib/apt/
 COPY src/angular/package*.json /app/
 WORKDIR /app
 RUN npm install --legacy-peer-deps
-# Force exact @types versions compatible with TypeScript 2.4.x
-# (newer versions use TS 3.x+ syntax that the old compiler can't parse)
-RUN npm install @types/jasmine@2.8.8 @types/node@8.0.0 --save-dev --legacy-peer-deps
 
 # Builds angular app into html
 # Output is in /build/dist/
