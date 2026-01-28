@@ -1,6 +1,7 @@
 import {Injectable, OnDestroy} from "@angular/core";
 import {Observable} from "rxjs/Observable";
-import {BehaviorSubject, Subject} from "rxjs/Rx";
+import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Subject} from "rxjs/Subject";
 
 import * as Immutable from "immutable";
 
