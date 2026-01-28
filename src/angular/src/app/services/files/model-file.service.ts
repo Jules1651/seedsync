@@ -6,7 +6,7 @@ import {Subject} from "rxjs/Subject";
 import * as Immutable from "immutable";
 
 import {LoggerService} from "../utils/logger.service";
-import {ModelFile} from "./model-file";
+import {ModelFile, ModelFileJson} from "./model-file";
 import {BaseStreamService} from "../base/base-stream.service";
 import {RestService, WebReaction} from "../utils/rest.service";
 
@@ -140,7 +140,7 @@ export class ModelFileService extends BaseStreamService implements OnDestroy {
             let t1: number;
 
             t0 = performance.now();
-            const parsed: [any] = JSON.parse(data);
+            const parsed: ModelFileJson[] = JSON.parse(data);
             t1 = performance.now();
             this._logger.debug("Parsing took", (t1 - t0).toFixed(0), "ms");
 
@@ -163,7 +163,7 @@ export class ModelFileService extends BaseStreamService implements OnDestroy {
         } else if (name === this.EVENT_ADDED) {
             // Added event receives old and new ModelFiles
             // Only new file is relevant
-            const parsed: {new_file: any} = JSON.parse(data);
+            const parsed: {new_file: ModelFileJson} = JSON.parse(data);
             const file = ModelFile.fromJson(parsed.new_file);
             if (this._files.getValue().has(file.name)) {
                 this._logger.error("ModelFile named " + file.name + " already exists");
@@ -174,7 +174,7 @@ export class ModelFileService extends BaseStreamService implements OnDestroy {
         } else if (name === this.EVENT_REMOVED) {
             // Removed event receives old and new ModelFiles
             // Only old file is relevant
-            const parsed: {old_file: any} = JSON.parse(data);
+            const parsed: {old_file: ModelFileJson} = JSON.parse(data);
             const file = ModelFile.fromJson(parsed.old_file);
             if (this._files.getValue().has(file.name)) {
                 this._files.next(this._files.getValue().remove(file.name));
@@ -185,7 +185,7 @@ export class ModelFileService extends BaseStreamService implements OnDestroy {
         } else if (name === this.EVENT_UPDATED) {
             // Updated event received old and new ModelFiles
             // We will only use the new one here
-            const parsed: {new_file: any} = JSON.parse(data);
+            const parsed: {new_file: ModelFileJson} = JSON.parse(data);
             const file = ModelFile.fromJson(parsed.new_file);
             if (this._files.getValue().has(file.name)) {
                 this._files.next(this._files.getValue().set(file.name, file));
