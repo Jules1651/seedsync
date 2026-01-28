@@ -1,6 +1,27 @@
 import {Record, Set} from "immutable";
 
 /**
+ * JSON representation of a model file received from the backend
+ * Used for type-safe JSON parsing before conversion to ModelFile
+ */
+export interface ModelFileJson {
+    name: string;
+    is_dir: boolean;
+    local_size: number;
+    remote_size: number;
+    state: string;
+    downloading_speed: number;
+    eta: number;
+    full_path: string;
+    is_extractable: boolean;
+    local_created_timestamp: number | null;
+    local_modified_timestamp: number | null;
+    remote_created_timestamp: number | null;
+    remote_modified_timestamp: number | null;
+    children: ModelFileJson[];
+}
+
+/**
  * Model file received from the backend
  * Note: Naming convention matches that used in the JSON
  */
@@ -68,42 +89,56 @@ export class ModelFile extends ModelFileRecord implements IModelFile {
 }
 
 // Additional types
-export module ModelFile {
-    export function fromJson(json): ModelFile {
+export namespace ModelFile {
+    export function fromJson(json: ModelFileJson): ModelFile {
         // Create immutable objects for children as well
         const children: ModelFile[] = [];
         for (const child of json.children) {
             children.push(ModelFile.fromJson(child));
         }
-        json.children = Set<ModelFile>(children);
 
         // State mapping
-        json.state = ModelFile.State[json.state.toUpperCase()];
+        const state = ModelFile.State[json.state.toUpperCase() as keyof typeof ModelFile.State];
 
         // Timestamps
-        if (json.local_created_timestamp != null) {
-            json.local_created_timestamp = new Date(1000 * +json.local_created_timestamp);
-        }
-        if (json.local_modified_timestamp != null) {
-            json.local_modified_timestamp = new Date(1000 * +json.local_modified_timestamp);
-        }
-        if (json.remote_created_timestamp != null) {
-            json.remote_created_timestamp = new Date(1000 * +json.remote_created_timestamp);
-        }
-        if (json.remote_modified_timestamp != null) {
-            json.remote_modified_timestamp = new Date(1000 * +json.remote_modified_timestamp);
-        }
+        const localCreatedTimestamp = json.local_created_timestamp != null
+            ? new Date(1000 * json.local_created_timestamp)
+            : null;
+        const localModifiedTimestamp = json.local_modified_timestamp != null
+            ? new Date(1000 * json.local_modified_timestamp)
+            : null;
+        const remoteCreatedTimestamp = json.remote_created_timestamp != null
+            ? new Date(1000 * json.remote_created_timestamp)
+            : null;
+        const remoteModifiedTimestamp = json.remote_modified_timestamp != null
+            ? new Date(1000 * json.remote_modified_timestamp)
+            : null;
 
-        return new ModelFile(json);
+        return new ModelFile({
+            name: json.name,
+            is_dir: json.is_dir,
+            local_size: json.local_size,
+            remote_size: json.remote_size,
+            state: state,
+            downloading_speed: json.downloading_speed,
+            eta: json.eta,
+            full_path: json.full_path,
+            is_extractable: json.is_extractable,
+            local_created_timestamp: localCreatedTimestamp,
+            local_modified_timestamp: localModifiedTimestamp,
+            remote_created_timestamp: remoteCreatedTimestamp,
+            remote_modified_timestamp: remoteModifiedTimestamp,
+            children: Set<ModelFile>(children)
+        });
     }
 
     export enum State {
-        DEFAULT         = <any> "default",
-        QUEUED          = <any> "queued",
-        DOWNLOADING     = <any> "downloading",
-        DOWNLOADED      = <any> "downloaded",
-        DELETED         = <any> "deleted",
-        EXTRACTING      = <any> "extracting",
-        EXTRACTED       = <any> "extracted"
+        DEFAULT = "default",
+        QUEUED = "queued",
+        DOWNLOADING = "downloading",
+        DOWNLOADED = "downloaded",
+        DELETED = "deleted",
+        EXTRACTING = "extracting",
+        EXTRACTED = "extracted"
     }
 }
