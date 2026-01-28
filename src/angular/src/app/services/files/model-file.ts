@@ -3,6 +3,7 @@ import {Record, Set} from "immutable";
 /**
  * JSON representation of a model file received from the backend
  * Used for type-safe JSON parsing before conversion to ModelFile
+ * Note: Some fields are optional as they may not always be present in the JSON
  */
 export interface ModelFileJson {
     name: string;
@@ -13,11 +14,11 @@ export interface ModelFileJson {
     downloading_speed: number;
     eta: number;
     full_path: string;
-    is_extractable: boolean;
-    local_created_timestamp: number | null;
-    local_modified_timestamp: number | null;
-    remote_created_timestamp: number | null;
-    remote_modified_timestamp: number | null;
+    is_extractable?: boolean;
+    local_created_timestamp?: number | null;
+    local_modified_timestamp?: number | null;
+    remote_created_timestamp?: number | null;
+    remote_modified_timestamp?: number | null;
     children: ModelFileJson[];
 }
 
@@ -123,7 +124,7 @@ export namespace ModelFile {
             downloading_speed: json.downloading_speed,
             eta: json.eta,
             full_path: json.full_path,
-            is_extractable: json.is_extractable,
+            is_extractable: json.is_extractable != null ? json.is_extractable : null,
             local_created_timestamp: localCreatedTimestamp,
             local_modified_timestamp: localModifiedTimestamp,
             remote_created_timestamp: remoteCreatedTimestamp,
