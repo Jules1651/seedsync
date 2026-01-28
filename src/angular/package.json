@@ -2,6 +2,9 @@
   "name": "seedsync",
   "version": "0.8.6",
   "license": "Apache 2.0",
+  "overrides": {
+    "node-sass": "npm:sass@^1.69.0"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -23,7 +26,7 @@
     "@angular/router": "^4.2.4",
     "@types/eventsource": "^1.0.2",
     "angular-webstorage-service": "^1.0.2",
-    "bootstrap": "^4.2.1",
+    "bootstrap": "^4.6.2",
     "compare-versions": "^3.4.0",
     "core-js": "^2.4.1",
     "css-element-queries": "^1.1.1",
@@ -55,7 +58,7 @@
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-spec-reporter": "^0.0.36",
-    "node-sass": "^9.0.0",
+    "sass": "^1.69.0",
     "playwright": "^1.48.0",
     "ts-node": "~3.2.0",
     "typescript": "~2.4.2"
