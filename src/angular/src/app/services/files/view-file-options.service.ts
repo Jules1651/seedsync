@@ -1,6 +1,5 @@
 import {Inject, Injectable} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
+import {Observable, BehaviorSubject} from "rxjs";
 
 import {LoggerService} from "../utils/logger.service";
 import {ViewFileOptions} from "./view-file-options";

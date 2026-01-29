@@ -1,8 +1,6 @@
 import {Injectable, OnDestroy} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subject} from "rxjs/Subject";
-import "rxjs/add/operator/takeUntil";
+import {Observable, BehaviorSubject, Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 import * as Immutable from "immutable";
 
@@ -52,7 +50,7 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
 
         // Value check
         if (pattern == null || pattern.trim().length === 0) {
-            return Observable.create(observer => {
+            return new Observable<WebReaction>(observer => {
                 observer.next(new WebReaction(false, null, Localization.Notification.AUTOQUEUE_PATTERN_EMPTY));
             });
         }
@@ -60,7 +58,7 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
         const currentPatterns = this._patterns.getValue();
         const index = currentPatterns.findIndex(pat => pat.pattern === pattern);
         if (index >= 0) {
-            return Observable.create(observer => {
+            return new Observable<WebReaction>(observer => {
                 observer.next(new WebReaction(false, null, `Pattern '${pattern}' already exists.`));
             });
         } else {
@@ -68,7 +66,7 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
             const patternEncoded = encodeURIComponent(encodeURIComponent(pattern));
             const url = this.AUTOQUEUE_ADD_URL(patternEncoded);
             const obs = this._restService.sendRequest(url);
-            obs.takeUntil(this.destroy$).subscribe({
+            obs.pipe(takeUntil(this.destroy$)).subscribe({
                 next: reaction => {
                     if (reaction.success) {
                         // Update our copy and notify clients
@@ -97,7 +95,7 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
         const currentPatterns = this._patterns.getValue();
         const index = currentPatterns.findIndex(pat => pat.pattern === pattern);
         if (index < 0) {
-            return Observable.create(observer => {
+            return new Observable<WebReaction>(observer => {
                 observer.next(new WebReaction(false, null, `Pattern '${pattern}' not found.`));
             });
         } else {
@@ -105,7 +103,7 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
             const patternEncoded = encodeURIComponent(encodeURIComponent(pattern));
             const url = this.AUTOQUEUE_REMOVE_URL(patternEncoded);
             const obs = this._restService.sendRequest(url);
-            obs.takeUntil(this.destroy$).subscribe({
+            obs.pipe(takeUntil(this.destroy$)).subscribe({
                 next: reaction => {
                     if (reaction.success) {
                         // Update our copy and notify clients
@@ -137,7 +135,7 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
 
     private getPatterns() {
         this._logger.debug("Getting autoqueue patterns...");
-        this._restService.sendRequest(this.AUTOQUEUE_GET_URL).takeUntil(this.destroy$).subscribe({
+        this._restService.sendRequest(this.AUTOQUEUE_GET_URL).pipe(takeUntil(this.destroy$)).subscribe({
             next: reaction => {
                 if (reaction.success) {
                     const parsed: AutoQueuePatternJson[] = JSON.parse(reaction.data);

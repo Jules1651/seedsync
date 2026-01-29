@@ -1,7 +1,5 @@
 import {Injectable, OnDestroy} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subject} from "rxjs/Subject";
+import {Observable, BehaviorSubject, Subject} from "rxjs";
 
 import {LoggerService} from "./logger.service";
 import {BaseStreamService} from "../base/base-stream.service";

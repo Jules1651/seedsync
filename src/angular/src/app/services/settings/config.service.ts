@@ -1,8 +1,6 @@
 import {Injectable, OnDestroy} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subject} from "rxjs/Subject";
-import "rxjs/add/operator/takeUntil";
+import {Observable, BehaviorSubject, Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 import {Config, IConfig} from "./config";
 import {LoggerService} from "../utils/logger.service";
@@ -52,11 +50,11 @@ export class ConfigService extends BaseWebService implements OnDestroy {
         const valueStr: string = value;
         const currentConfig = this._config.getValue();
         if (!currentConfig.has(section) || !currentConfig.get(section).has(option)) {
-            return Observable.create(observer => {
+            return new Observable<WebReaction>(observer => {
                 observer.next(new WebReaction(false, null, `Config has no option named ${section}.${option}`));
             });
         } else if (valueStr.length === 0) {
-            return Observable.create(observer => {
+            return new Observable<WebReaction>(observer => {
                 observer.next(new WebReaction(
                     false, null, Localization.Notification.CONFIG_VALUE_BLANK(section, option))
                 );
@@ -66,7 +64,7 @@ export class ConfigService extends BaseWebService implements OnDestroy {
             const valueEncoded = encodeURIComponent(encodeURIComponent(valueStr));
             const url = this.CONFIG_SET_URL(section, option, valueEncoded);
             const obs = this._restService.sendRequest(url);
-            obs.takeUntil(this.destroy$).subscribe({
+            obs.pipe(takeUntil(this.destroy$)).subscribe({
                 next: reaction => {
                     if (reaction.success) {
                         // Update our copy and notify clients
@@ -97,7 +95,7 @@ export class ConfigService extends BaseWebService implements OnDestroy {
 
     private getConfig() {
         this._logger.debug("Getting config...");
-        this._restService.sendRequest(this.CONFIG_GET_URL).takeUntil(this.destroy$).subscribe({
+        this._restService.sendRequest(this.CONFIG_GET_URL).pipe(takeUntil(this.destroy$)).subscribe({
             next: reaction => {
                 if (reaction.success) {
                     const config_json: IConfig = JSON.parse(reaction.data);
