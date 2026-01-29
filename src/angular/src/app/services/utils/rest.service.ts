@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {Observable} from "rxjs/Observable";
-import "rxjs/add/operator/shareReplay";
+import {Observable} from "rxjs";
+import {shareReplay} from "rxjs/operators";
 
 import {LoggerService} from "./logger.service";
 
@@ -39,7 +39,7 @@ export class RestService {
      * @returns {Observable<WebReaction>}
      */
     public sendRequest(url: string): Observable<WebReaction> {
-        return Observable.create(observer => {
+        return new Observable<WebReaction>(observer => {
             this._http.get(url, {responseType: "text"})
                 .subscribe(
                 data => {
@@ -57,7 +57,7 @@ export class RestService {
                     observer.next(new WebReaction(false, null, errorMessage));
                 }
             );
-        }).shareReplay(1);
+        }).pipe(shareReplay(1));
         // shareReplay is needed to:
         //      prevent duplicate http requests
         //      share result with those that subscribe after the value was published

@@ -1,8 +1,6 @@
 import {Injectable, OnDestroy} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subject} from "rxjs/Subject";
-import "rxjs/add/operator/takeUntil";
+import {Observable, BehaviorSubject, Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 import * as Immutable from "immutable";
 
@@ -95,7 +93,7 @@ export class ViewFileService implements OnDestroy {
 
         if (!this.USE_MOCK_MODEL) {
             this.modelFileService.files
-                .takeUntil(this.destroy$)
+                .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: modelFiles => {
                         let t0 = performance.now();
@@ -455,7 +453,7 @@ export class ViewFileService implements OnDestroy {
     private createAction(file: ViewFile,
                          action: (file: ModelFile) => Observable<WebReaction>)
             : Observable<WebReaction> {
-        return Observable.create(observer => {
+        return new Observable<WebReaction>(observer => {
             if (!this._prevModelFiles.has(file.name)) {
                 // File not found, exit early
                 this._logger.error("File to queue not found: " + file.name);

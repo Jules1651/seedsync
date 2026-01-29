@@ -1,7 +1,5 @@
 import {Injectable, OnDestroy} from "@angular/core";
-import {Observable} from "rxjs/Observable";
-import {BehaviorSubject} from "rxjs/BehaviorSubject";
-import {Subject} from "rxjs/Subject";
+import {Observable, BehaviorSubject, Subject} from "rxjs";
 
 import {Localization} from "../../common/localization";
 import {ServerStatus, ServerStatusJson} from "./server-status";
