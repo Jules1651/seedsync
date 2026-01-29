@@ -27,6 +27,7 @@ describe("Testing view file sort service", () => {
             ]
         });
         viewFileService = TestBed.get(ViewFileService);
+        sortComparator = undefined;  // Reset before each test
         spyOn(viewFileService, "setComparator").and.callFake(
             value => sortComparator = value
         );
