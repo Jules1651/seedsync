@@ -27,6 +27,7 @@ describe("Testing view file filter service", () => {
             ]
         });
         viewFileService = TestBed.get(ViewFileService);
+        filterCriteria = undefined;  // Reset before each test
         spyOn(viewFileService, "setFilterCriteria").and.callFake(
             value => filterCriteria = value
         );

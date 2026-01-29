@@ -136,16 +136,12 @@ describe("Testing notification service", () => {
     }));
 
     it("should sort notifications by timestamp", fakeAsync(() => {
-        function sleepFor( sleepDuration ) {
-            const now = new Date().getTime();
-            while (new Date().getTime() < now + sleepDuration) { /* do nothing */ }
-        }
-
-        // Sleep a little between inits
+        // Use tick() to advance fakeAsync clock between notifications
+        // fakeAsync patches Date.now() to return the fake clock time
         const noteOlder = new Notification({level: Notification.Level.DANGER, text: "older"});
-        sleepFor(10);
+        tick(10);
         const noteNewer = new Notification({level: Notification.Level.DANGER, text: "newer"});
-        sleepFor(10);
+        tick(10);
         const noteNewest = new Notification({level: Notification.Level.DANGER, text: "newest"});
 
         notificationService.show(noteNewer);
@@ -168,16 +164,12 @@ describe("Testing notification service", () => {
     }));
 
     it("should sort notifications by level first, then timestamp", fakeAsync(() => {
-        function sleepFor( sleepDuration ) {
-            const now = new Date().getTime();
-            while (new Date().getTime() < now + sleepDuration) { /* do nothing */ }
-        }
-
-        // Sleep a little between inits
+        // Use tick() to advance fakeAsync clock between notifications
+        // fakeAsync patches Date.now() to return the fake clock time
         const noteOlder = new Notification({level: Notification.Level.DANGER, text: "older"});
-        sleepFor(10);
+        tick(10);
         const noteNewer = new Notification({level: Notification.Level.INFO, text: "newer"});
-        sleepFor(10);
+        tick(10);
         const noteNewest = new Notification({level: Notification.Level.INFO, text: "newest"});
 
         notificationService.show(noteNewer);

@@ -4,7 +4,7 @@ import {DomService} from "../../../../services/utils/dom.service";
 
 
 
-describe("Testing view file options service", () => {
+describe("Testing dom service", () => {
     let domService: DomService;
 
     beforeEach(() => {

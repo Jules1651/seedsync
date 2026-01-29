@@ -15,7 +15,11 @@ module.exports = function (config) {
         ],
         client: {
             clearContext: false, // leave Jasmine Spec Runner output visible in browser
-            captureConsole: false
+            captureConsole: false,
+            jasmine: {
+                timeoutInterval: 10000,  // 10 second timeout for async tests
+                random: false  // Run tests in consistent order for debugging
+            }
         },
         coverageReporter: {
             type: 'html',
@@ -32,15 +36,35 @@ module.exports = function (config) {
         browsers: ['Chrome'],
         singleRun: false,
 
+        // Increased timeouts for CI stability
+        browserDisconnectTimeout: 30000,
+        browserDisconnectTolerance: 3,
+        browserNoActivityTimeout: 120000,
+        captureTimeout: 120000,
+        processKillTimeout: 10000,
+
         customLaunchers: {
             ChromeHeadless: {
                 base: 'Chrome',
                 flags: [
                     '--headless=new',
                     '--disable-gpu',
-                    '--remote-debugging-port=9222',
                     '--no-sandbox',
-                    '--disable-dev-shm-usage'
+                    '--disable-dev-shm-usage',
+                    '--disable-software-rasterizer',
+                    '--disable-extensions',
+                    '--disable-background-networking',
+                    '--disable-sync',
+                    '--disable-default-apps',
+                    '--disable-translate',
+                    '--mute-audio',
+                    '--no-first-run',
+                    '--disable-backgrounding-occluded-windows',
+                    '--disable-renderer-backgrounding',
+                    '--disable-background-timer-throttling',
+                    '--disable-crash-reporter',
+                    '--disable-features=TranslateUI',
+                    '--js-flags=--max-old-space-size=4096'
                 ]
             },
             ChromeHeadlessCI: {
@@ -48,9 +72,22 @@ module.exports = function (config) {
                 flags: [
                     '--headless=new',
                     '--disable-gpu',
-                    '--remote-debugging-port=9222',
                     '--no-sandbox',
-                    '--disable-dev-shm-usage'
+                    '--disable-dev-shm-usage',
+                    '--disable-software-rasterizer',
+                    '--disable-extensions',
+                    '--disable-background-networking',
+                    '--disable-sync',
+                    '--disable-default-apps',
+                    '--disable-translate',
+                    '--mute-audio',
+                    '--no-first-run',
+                    '--disable-backgrounding-occluded-windows',
+                    '--disable-renderer-backgrounding',
+                    '--disable-background-timer-throttling',
+                    '--disable-crash-reporter',
+                    '--disable-features=TranslateUI',
+                    '--js-flags=--max-old-space-size=4096'
                 ]
             }
         }
