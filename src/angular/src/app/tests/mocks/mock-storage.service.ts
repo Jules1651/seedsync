@@ -1,4 +1,6 @@
-export class MockStorageService {
+import {StorageService} from "../../services/utils/local-storage.service";
+
+export class MockStorageService implements StorageService {
     // noinspection JSUnusedLocalSymbols
     public get(key: string): any {}
 
