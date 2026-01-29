@@ -3,11 +3,10 @@ import {
     EventEmitter, OnChanges, SimpleChanges, ViewChild
 } from "@angular/core";
 
-import {Modal} from "ngx-modialog/plugins/bootstrap";
-
 import {ViewFile} from "../../services/files/view-file";
 import {Localization} from "../../common/localization";
 import {ViewFileOptions} from "../../services/files/view-file-options";
+import {ConfirmModalService} from "../../services/utils/confirm-modal.service";
 
 @Component({
     selector: "app-file",
@@ -42,7 +41,7 @@ export class FileComponent implements OnChanges {
     // Indicates an active action on-going
     activeAction: FileAction = null;
 
-    constructor(private modal: Modal) {}
+    constructor(private confirmModal: ConfirmModalService) {}
 
     ngOnChanges(changes: SimpleChanges): void {
         // Check for status changes
@@ -60,22 +59,17 @@ export class FileComponent implements OnChanges {
     }
 
     showDeleteConfirmation(title: string, message: string, callback: () => void) {
-        const dialogRef = this.modal.confirm()
-            .title(title)
-            .okBtn("Delete")
-            .okBtnClass("btn btn-danger")
-            .cancelBtn("Cancel")
-            .cancelBtnClass("btn btn-secondary")
-            .isBlocking(false)
-            .showClose(false)
-            .body(message)
-            .open();
-
-        dialogRef.then( dRef => {
-           dRef.result.then(
-               () => { callback(); },
-               () => { return; }
-           );
+        this.confirmModal.confirm({
+            title: title,
+            body: message,
+            okBtn: "Delete",
+            okBtnClass: "btn btn-danger",
+            cancelBtn: "Cancel",
+            cancelBtnClass: "btn btn-secondary"
+        }).then((confirmed) => {
+            if (confirmed) {
+                callback();
+            }
         });
     }
 

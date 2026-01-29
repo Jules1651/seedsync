@@ -4,9 +4,6 @@ import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import {RouteReuseStrategy, RouterModule} from "@angular/router";
 
-import {ModalModule} from "ngx-modialog";
-import {bootstrap4Mode, BootstrapModalModule} from "ngx-modialog/plugins/bootstrap";
-
 import {AppComponent} from "./pages/main/app.component";
 import {environment} from "../environments/environment";
 import {LoggerService} from "./services/utils/logger.service";
@@ -42,8 +39,8 @@ import {ROUTES} from "./routes";
 import {ViewFileOptionsService} from "./services/files/view-file-options.service";
 import {ViewFileSortService} from "./services/files/view-file-sort.service";
 import {DomService} from "./services/utils/dom.service";
-import {StorageServiceModule} from "angular-webstorage-service";
 import {VersionCheckService} from "./services/utils/version-check.service";
+import {LOCAL_STORAGE, LocalStorageService} from "./services/utils/local-storage.service";
 
 @NgModule({
     declarations: [
@@ -68,14 +65,11 @@ import {VersionCheckService} from "./services/utils/version-check.service";
         BrowserModule,
         HttpClientModule,
         FormsModule,
-        RouterModule.forRoot(ROUTES),
-
-        ModalModule.forRoot(),
-        BootstrapModalModule,
-        StorageServiceModule
+        RouterModule.forRoot(ROUTES)
     ],
     providers: [
         {provide: RouteReuseStrategy, useClass: CachedReuseStrategy},
+        {provide: LOCAL_STORAGE, useClass: LocalStorageService},
         LoggerService,
         NotificationService,
         RestService,
@@ -130,6 +124,3 @@ export class AppModule {
 export function dummyFactory(s) {
     return () => null;
 }
-
-// Run the ngx-modialog plugin to work with version 4 of bootstrap
-bootstrap4Mode();
