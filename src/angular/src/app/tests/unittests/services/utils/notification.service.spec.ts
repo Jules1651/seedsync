@@ -136,16 +136,14 @@ describe("Testing notification service", () => {
     }));
 
     it("should sort notifications by timestamp", fakeAsync(() => {
-        function sleepFor( sleepDuration ) {
-            const now = new Date().getTime();
-            while (new Date().getTime() < now + sleepDuration) { /* do nothing */ }
-        }
+        // Mock Date.now() to return controlled timestamps instead of blocking busy-wait
+        let mockTimestamp = 1000;
+        spyOn(Date, 'now').and.callFake(() => mockTimestamp);
 
-        // Sleep a little between inits
         const noteOlder = new Notification({level: Notification.Level.DANGER, text: "older"});
-        sleepFor(10);
+        mockTimestamp += 10;
         const noteNewer = new Notification({level: Notification.Level.DANGER, text: "newer"});
-        sleepFor(10);
+        mockTimestamp += 10;
         const noteNewest = new Notification({level: Notification.Level.DANGER, text: "newest"});
 
         notificationService.show(noteNewer);
@@ -168,16 +166,14 @@ describe("Testing notification service", () => {
     }));
 
     it("should sort notifications by level first, then timestamp", fakeAsync(() => {
-        function sleepFor( sleepDuration ) {
-            const now = new Date().getTime();
-            while (new Date().getTime() < now + sleepDuration) { /* do nothing */ }
-        }
+        // Mock Date.now() to return controlled timestamps instead of blocking busy-wait
+        let mockTimestamp = 1000;
+        spyOn(Date, 'now').and.callFake(() => mockTimestamp);
 
-        // Sleep a little between inits
         const noteOlder = new Notification({level: Notification.Level.DANGER, text: "older"});
-        sleepFor(10);
+        mockTimestamp += 10;
         const noteNewer = new Notification({level: Notification.Level.INFO, text: "newer"});
-        sleepFor(10);
+        mockTimestamp += 10;
         const noteNewest = new Notification({level: Notification.Level.INFO, text: "newest"});
 
         notificationService.show(noteNewer);
