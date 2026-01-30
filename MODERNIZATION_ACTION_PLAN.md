@@ -664,10 +664,10 @@ The current extraction provides a good balance of separation of concerns without
 - `FileOperationManager` - extract/delete operations
 
 **Test Coverage:**
-- 11 new unit tests for LftpManager
-- 17 new unit tests for FileOperationManager
-- All 315 unit tests pass
-- All 21 integration tests pass
+- 12 unit tests for LftpManager (including `lftp` property test)
+- 17 unit tests for FileOperationManager
+- All 316 unit tests pass
+- All 666 integration tests pass (fixed white-box test access to LFTP)
 
 ---
 
@@ -1084,7 +1084,9 @@ Session 16 (Frontend Dependency Modernization)
 
    This provides good separation of concerns without over-fragmenting the codebase.
 
-10. **28 new tests for 315 lines of new code**: The new managers total 315 lines (113 + 202), and we added 28 unit tests (11 + 17) providing good coverage of the extracted functionality.
+10. **29 new tests for 315 lines of new code**: The new managers total 315 lines (113 + 202), and we added 29 unit tests (12 + 17) providing good coverage of the extracted functionality.
+
+11. **White-box test compatibility**: Integration tests used Python name mangling (`_Controller__lftp`) to access the private LFTP instance for rate limiting. When refactoring moves private attributes, these tests break. Solution: expose a property (`lftp`) on `LftpManager` for testing access, then update tests to use the new path (`_Controller__lftp_manager.lftp`).
 
 ---
 
