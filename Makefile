@@ -58,9 +58,9 @@ docker-image: docker-buildx
 	$(DOCKER) buildx build \
 		-f ${SOURCEDIR}/docker/build/deb/Dockerfile \
 		--target seedsync_build_scanfs_export \
-		--tag $${STAGING_REGISTRY}/seedsync/build/scanfs/export:$${STAGING_VERSION} \
-		--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/scanfs/export:cache,mode=max \
-		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/scanfs/export:cache \
+		--tag $${STAGING_REGISTRY}-build-scanfs:$${STAGING_VERSION} \
+		--cache-to=type=registry,ref=$${STAGING_REGISTRY}-build-scanfs:cache,mode=max \
+		--cache-from=type=registry,ref=$${STAGING_REGISTRY}-build-scanfs:cache \
 		--push \
 		${ROOTDIR}
 
@@ -68,9 +68,9 @@ docker-image: docker-buildx
 	$(DOCKER) buildx build \
 		-f ${SOURCEDIR}/docker/build/deb/Dockerfile \
 		--target seedsync_build_angular_export \
-		--tag $${STAGING_REGISTRY}/seedsync/build/angular/export:$${STAGING_VERSION} \
-		--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/angular/export:cache,mode=max \
-		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync/build/angular/export:cache \
+		--tag $${STAGING_REGISTRY}-build-angular:$${STAGING_VERSION} \
+		--cache-to=type=registry,ref=$${STAGING_REGISTRY}-build-angular:cache,mode=max \
+		--cache-from=type=registry,ref=$${STAGING_REGISTRY}-build-angular:cache \
 		--push \
 		${ROOTDIR}
 
@@ -80,9 +80,9 @@ docker-image: docker-buildx
 		--target seedsync_run \
 		--build-arg STAGING_VERSION=$${STAGING_VERSION} \
 		--build-arg STAGING_REGISTRY=$${STAGING_REGISTRY} \
-		--tag $${STAGING_REGISTRY}/seedsync:$${STAGING_VERSION} \
-		--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache,mode=max \
-		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache \
+		--tag $${STAGING_REGISTRY}:$${STAGING_VERSION} \
+		--cache-to=type=registry,ref=$${STAGING_REGISTRY}:cache,mode=max \
+		--cache-from=type=registry,ref=$${STAGING_REGISTRY}:cache \
 		--platform linux/amd64,linux/arm64 \
 		--push \
 		${ROOTDIR}
@@ -112,7 +112,7 @@ docker-image-release:
 		--build-arg STAGING_VERSION=$${STAGING_VERSION} \
 		--build-arg STAGING_REGISTRY=$${STAGING_REGISTRY} \
 		--tag ${RELEASE_REGISTRY}/seedsync:${RELEASE_VERSION} \
-		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache \
+		--cache-from=type=registry,ref=$${STAGING_REGISTRY}:cache \
 		--platform linux/amd64,linux/arm64 \
 		--push \
 		${ROOTDIR}
@@ -182,8 +182,8 @@ run-tests-e2e:
 		export SEEDSYNC_PLATFORM="linux/$${SEEDSYNC_ARCH}";
 		echo "${green}SEEDSYNC_PLATFORM=$${SEEDSYNC_PLATFORM}${reset}";
 		# Removing and pulling is the only way to select the arch from a multi-arch image :(
-		$(DOCKER) rmi -f $${STAGING_REGISTRY}/seedsync:$${STAGING_VERSION}
-		$(DOCKER) pull $${STAGING_REGISTRY}/seedsync:$${STAGING_VERSION} --platform linux/$${SEEDSYNC_ARCH}
+		$(DOCKER) rmi -f $${STAGING_REGISTRY}:$${STAGING_VERSION}
+		$(DOCKER) pull $${STAGING_REGISTRY}:$${STAGING_VERSION} --platform linux/$${SEEDSYNC_ARCH}
 		# Pre-build the remote container for the target platform
 		# This is needed because docker-compose build doesn't respect platform for building
 		echo "${green}Building remote container for platform $${SEEDSYNC_PLATFORM}${reset}";
