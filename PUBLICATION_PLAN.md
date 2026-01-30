@@ -113,49 +113,32 @@ These steps must be completed by the user before any code changes:
 
 ---
 
-## Session 1: Version Bump & Core Metadata
+## Session 1: Version Bump & Core Metadata ✅ COMPLETED
 
-**Context needed**: Version locations, pyproject.toml structure
-**Estimated scope**: 4 files, ~20 lines changed
+**Status**: Completed 2026-01-30
+**Commit**: `294bfe1` - "Bump version to 1.0.0 for publication (Session 1)"
 
-### 1.1 Fix pyproject.toml
-**File**: `src/python/pyproject.toml`
+### Changes Made
 
-Update:
-```toml
-[tool.poetry]
-name = "seedsync"
-version = "1.0.0"
-description = "Fast file syncing from remote servers with a web UI, powered by LFTP"
-authors = ["thejuran"]
-```
+| File | Change |
+|------|--------|
+| `src/python/pyproject.toml` | Version `0.0.0` → `1.0.0`, added description and author `thejuran` |
+| `src/angular/package.json` | Version `0.8.6` → `1.0.0` |
+| `src/debian/changelog` | Added 1.0.0 entry with modernization notes |
+| `src/e2e/tests/about.page.spec.ts` | Test expects `v1.0.0` |
 
-### 1.2 Update Angular Version
-**File**: `src/angular/package.json`
+### Version Locations Reference
 
-Change version from `0.8.6` to `1.0.0`
+For future version bumps, update these 4 files:
+1. `src/python/pyproject.toml` - `version = "X.Y.Z"`
+2. `src/angular/package.json` - `"version": "X.Y.Z"`
+3. `src/debian/changelog` - Add new entry at top
+4. `src/e2e/tests/about.page.spec.ts` - `expect(version).toBe('vX.Y.Z')`
 
-### 1.3 Update Debian Changelog
-**File**: `src/debian/changelog`
+### Verification
 
-Add new entry at top:
-```
-seedsync (1.0.0) stable; urgency=low
-
-  * Fork maintained by thejuran
-  * Re-enable ARM64 support
-  * Modernized Angular frontend
-  * Version 1.0.0 release
-
- -- thejuran <thejuran@users.noreply.github.com>  <DATE>
-```
-
-### 1.4 Update E2E Version Test
-**File**: `src/e2e/tests/about.page.spec.ts`
-
-Update expected version from `v0.8.6` to `v1.0.0`
-
-**Completion check**: `grep -r "0\.8\.6" src/` returns no results
+- `grep -r "0\.8\.6" src/` returns only historical debian changelog entry (expected)
+- All active version references now show `1.0.0`
 
 ---
 
@@ -502,21 +485,21 @@ git push origin v1.0.0
 
 ## Session Summary
 
-| Session | Focus | Files | Dependencies |
-|---------|-------|-------|--------------|
-| 0 | Manual GitHub setup | - | None |
-| 1 | Version & metadata | 4 | Session 0 |
-| 2 | Repository references | 3 | Session 0 |
-| 3 | ARM64 builds & Debian modernization | 5 (1 deleted) | None |
-| 4 | CI/CD configuration | 1 | Session 0 |
-| 5 | Community files (docs) | 3 | None |
-| 6 | GitHub templates | 4 | None |
-| 7 | Documentation site | 2-3 | Sessions 0, 2 |
-| 8 | Final review & release | - | All sessions |
+| Session | Focus | Files | Dependencies | Status |
+|---------|-------|-------|--------------|--------|
+| 0 | Manual GitHub setup | - | None | Pending |
+| 1 | Version & metadata | 4 | Session 0 | ✅ Done |
+| 2 | Repository references | 3 | Session 0 | Pending |
+| 3 | ARM64 builds & Debian modernization | 5 (1 deleted) | None | Pending |
+| 4 | CI/CD configuration | 1 | Session 0 | Pending |
+| 5 | Community files (docs) | 3 | None | Pending |
+| 6 | GitHub templates | 4 | None | Pending |
+| 7 | Documentation site | 2-3 | Sessions 0, 2 | Pending |
+| 8 | Final review & release | - | All sessions | Pending |
 
-**Parallelizable**: Sessions 1-6 can be done in any order after Session 0. Session 7 depends on Session 2 (URLs). Session 8 must be last.
+**Parallelizable**: Sessions 2-6 can be done in any order after Session 0. Session 7 depends on Session 2 (URLs). Session 8 must be last.
 
-**Recommended order**: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+**Recommended order**: 0 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 ---
 
