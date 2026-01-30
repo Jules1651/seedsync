@@ -270,6 +270,7 @@ class Config(Persist):
         interval_ms_downloading_scan = PROP("interval_ms_downloading_scan", Checkers.int_positive, Converters.int)
         extract_path = PROP("extract_path", Checkers.string_nonempty, Converters.null)
         use_local_path_as_extract_path = PROP("use_local_path_as_extract_path", Checkers.null, Converters.bool)
+        max_tracked_files = PROP("max_tracked_files", Checkers.int_positive, Converters.int)
 
         def __init__(self):
             super().__init__()
@@ -278,6 +279,7 @@ class Config(Persist):
             self.interval_ms_downloading_scan = None
             self.extract_path = None
             self.use_local_path_as_extract_path = None
+            self.max_tracked_files = None
 
     class Web(InnerConfig):
         port = PROP("port", Checkers.int_positive, Converters.int)

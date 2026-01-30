@@ -156,6 +156,14 @@ class MemoryMonitor:
         stats = self.collect_stats()
         self.__last_log_time = current_time
 
+        # Collect all data source values
+        data_values = {}
+        for name, callback in self.__data_source_callbacks.items():
+            try:
+                data_values[name] = callback()
+            except Exception:
+                data_values[name] = -1
+
         # Log the statistics
         self.logger.info(
             "Memory stats: process={:.1f}MB, downloaded_files={}, "
@@ -167,6 +175,17 @@ class MemoryMonitor:
                 stats.lftp_statuses_count
             )
         )
+
+        # Log eviction stats if any evictions have occurred
+        downloaded_evictions = data_values.get('downloaded_evictions', 0)
+        extracted_evictions = data_values.get('extracted_evictions', 0)
+        if downloaded_evictions > 0 or extracted_evictions > 0:
+            self.logger.info(
+                "Collection evictions: downloaded={}, extracted={}".format(
+                    downloaded_evictions,
+                    extracted_evictions
+                )
+            )
 
         # Log stream queue stats
         for queue_name, queue_stats in stats.stream_queues_stats.items():

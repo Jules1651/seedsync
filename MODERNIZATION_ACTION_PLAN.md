@@ -289,25 +289,41 @@ Implemented the "freeze-on-add" pattern:
 ### Session 9: Backend Performance - Collection Limits
 
 **Focus:** Implement bounds on downloaded/extracted collections
-**Files:** `src/python/controller/controller.py`
+**Files:** `src/python/controller/controller.py`, `src/python/controller/controller_persist.py`, `src/python/common/bounded_ordered_set.py`
 **Estimated Time:** 45-60 minutes
 
 #### Tasks
 
-- [ ] Review unbounded collections at `controller.py:170-171`
-- [ ] Determine appropriate size limits (consider typical usage patterns)
-- [ ] Implement bounded collections (e.g., `collections.deque` with maxlen)
-- [ ] Add configuration option for collection limits
-- [ ] Implement LRU eviction for oldest entries
-- [ ] Add memory monitoring/logging
-- [ ] Run tests
+- [x] Review unbounded collections at `controller.py:170-171`
+- [x] Determine appropriate size limits (consider typical usage patterns)
+- [x] Implement bounded collections (e.g., `collections.deque` with maxlen)
+- [x] Add configuration option for collection limits
+- [x] Implement LRU eviction for oldest entries
+- [x] Add memory monitoring/logging
+- [x] Run tests — **277 unit tests passed**
 
 #### Success Criteria
 
-- Collections have reasonable upper bounds
-- Memory growth is linear with bound, not file count
-- Old entries evicted gracefully
-- Tests pass
+- Collections have reasonable upper bounds ✓
+- Memory growth is linear with bound, not file count ✓
+- Old entries evicted gracefully ✓
+- Tests pass ✓
+
+#### Notes
+
+Implemented the `BoundedOrderedSet` class to provide:
+1. Set semantics with O(1) membership testing
+2. Insertion order preservation
+3. Automatic LRU-style eviction when `maxlen` is reached
+4. Eviction count tracking for monitoring
+
+Configuration:
+- Added `max_tracked_files` config option to `[Controller]` section (default: 10000)
+- Config is used when loading `ControllerPersist` from file
+
+Memory monitoring:
+- Added `downloaded_evictions` and `extracted_evictions` data sources
+- Eviction stats are logged when non-zero during periodic memory stats logging
 
 ---
 
@@ -582,7 +598,7 @@ Session 15 (Controller Split Part 2)
 | 6 | Completed | 2026-01-30 | Added destroy$ + takeUntil to FileOptionsComponent subscriptions |
 | 7 | Completed | 2026-01-30 | Fixed ViewFileFilterService, ViewFileSortService, VersionCheckService subscription leaks |
 | 8 | Completed | 2026-01-30 | Replaced deep copy with freeze-on-add immutability pattern |
-| 9 | Not Started | | |
+| 9 | Completed | 2026-01-30 | Implemented BoundedOrderedSet with LRU eviction, added max_tracked_files config |
 | 10 | Not Started | | |
 
 ### Phase 2 Status
@@ -703,6 +719,22 @@ Session 15 (Controller Split Part 2)
 6. **Test updates required**: One existing test (`test_update_file`) was modifying a file after retrieval from the model. This needed to be updated to create a new file instead, which matches the actual usage pattern in the codebase.
 
 7. **New tests for immutability**: Added two new tests (`test_file_immutable_after_add`, `test_file_immutable_after_update`) to verify and document the new immutability behavior.
+
+### Session 9 Learnings
+
+1. **OrderedDict as LRU backing store**: Python's `OrderedDict` provides O(1) membership testing and insertion-order preservation, making it ideal for implementing a bounded set with LRU eviction. Use `popitem(last=False)` to evict the oldest entry.
+
+2. **Set-like interface for compatibility**: The `BoundedOrderedSet` class implements `add()`, `discard()`, `remove()`, `difference_update()`, `__contains__`, and `__iter__` to be a drop-in replacement for regular sets in the existing codebase.
+
+3. **Config backwards compatibility**: Adding a new config option requires updating test files that have hardcoded config dictionaries. Always search for test files that reference the config class when adding new options.
+
+4. **Specialized loading for Persist subclasses**: The generic `_load_persist` method doesn't support passing additional parameters. For `ControllerPersist`, we created `from_file_with_limit()` and a specialized loader `_load_controller_persist()` to pass the config value.
+
+5. **Eviction tracking for monitoring**: The `BoundedOrderedSet` tracks `total_evictions` to enable monitoring of memory pressure. This is exposed through the memory monitor's data sources and logged periodically.
+
+6. **Default limits**: A default of 10,000 tracked files balances memory usage with practical use cases. Most users won't encounter eviction, but those with very large file counts will have protection against unbounded growth.
+
+7. **Serialization preserves order**: When serializing to JSON, items are stored in insertion order (oldest first). On load, if the stored data exceeds `maxlen`, the oldest entries are evicted to fit within the limit.
 
 ---
 
