@@ -1,4 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
+import {Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 import * as compareVersions from "compare-versions";
 
@@ -17,7 +19,8 @@ const { version: appVersion } = require("../../../../package.json");
  * triggers a notification
  */
 @Injectable()
-export class VersionCheckService {
+export class VersionCheckService implements OnDestroy {
+    private destroy$ = new Subject<void>();
     private readonly GITHUB_LATEST_RELEASE_URL =
         "https://api.github.com/repos/ipsingh06/seedsync/releases/latest";
 
@@ -27,8 +30,13 @@ export class VersionCheckService {
         this.checkVersion();
     }
 
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     private checkVersion() {
-        this._restService.sendRequest(this.GITHUB_LATEST_RELEASE_URL).subscribe({
+        this._restService.sendRequest(this.GITHUB_LATEST_RELEASE_URL).pipe(takeUntil(this.destroy$)).subscribe({
             next: reaction => {
                 if (reaction.success) {
                     let jsonResponse;

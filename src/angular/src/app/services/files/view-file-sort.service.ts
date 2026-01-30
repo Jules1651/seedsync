@@ -1,4 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
+import {Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 import {LoggerService} from "../utils/logger.service";
 import {ViewFile} from "./view-file";
@@ -67,13 +69,14 @@ const NameDescendingComparator: ViewFileComparator = (a: ViewFile, b: ViewFile):
  * applies the appropriate comparators to the ViewFileService
  */
 @Injectable()
-export class ViewFileSortService {
+export class ViewFileSortService implements OnDestroy {
+    private destroy$ = new Subject<void>();
     private _sortMethod: ViewFileOptions.SortMethod = null;
 
     constructor(private _logger: LoggerService,
                 private _viewFileService: ViewFileService,
                 private _viewFileOptionsService: ViewFileOptionsService) {
-        this._viewFileOptionsService.options.subscribe(options => {
+        this._viewFileOptionsService.options.pipe(takeUntil(this.destroy$)).subscribe(options => {
             // Check if the sort method changed
             if (this._sortMethod !== options.sortMethod) {
                 this._sortMethod = options.sortMethod;
@@ -92,5 +95,10 @@ export class ViewFileSortService {
                 }
             }
         });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }
