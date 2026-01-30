@@ -77,6 +77,8 @@ class Controller:
         self.__context = context
         self.__persist = persist
         self.logger = context.logger.getChild("Controller")
+        # Set logger for persist to enable eviction logging
+        self.__persist.set_base_logger(self.logger)
 
         # Decide the password here
         self.__password = context.config.lftp.remote_password if not context.config.lftp.use_ssh_key else None
@@ -186,6 +188,15 @@ class Controller:
         self.__memory_monitor.register_data_source(
             'model_files',
             lambda: len(self.__model.get_file_names())
+        )
+        # Register eviction stats for bounded collections
+        self.__memory_monitor.register_data_source(
+            'downloaded_evictions',
+            lambda: self.__persist.downloaded_file_names.total_evictions
+        )
+        self.__memory_monitor.register_data_source(
+            'extracted_evictions',
+            lambda: self.__persist.extracted_file_names.total_evictions
         )
 
         self.__started = False

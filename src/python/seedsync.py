@@ -99,7 +99,10 @@ class Seedsync:
 
         # Load the persists
         self.controller_persist_path = os.path.join(args.config_dir, Seedsync.__FILE_CONTROLLER_PERSIST)
-        self.controller_persist = self._load_persist(ControllerPersist, self.controller_persist_path)
+        self.controller_persist = self._load_controller_persist(
+            self.controller_persist_path,
+            config.controller.max_tracked_files
+        )
 
         self.auto_queue_persist_path = os.path.join(args.config_dir, Seedsync.__FILE_AUTO_QUEUE_PERSIST)
         self.auto_queue_persist = self._load_persist(AutoQueuePersist, self.auto_queue_persist_path)
@@ -308,6 +311,7 @@ class Seedsync:
         config.controller.interval_ms_downloading_scan = 1000
         config.controller.extract_path = "/tmp"
         config.controller.use_local_path_as_extract_path = True
+        config.controller.max_tracked_files = 10000
 
         config.web.port = 8800
 
@@ -351,6 +355,31 @@ class Seedsync:
         else:
             # noinspection PyCallingNonCallable
             return cls()
+
+    @staticmethod
+    def _load_controller_persist(file_path: str, max_tracked_files: int) -> ControllerPersist:
+        """
+        Loads ControllerPersist from file with a configured limit.
+        Backs up existing persist if it's corrupted. Returns a new blank
+        persist in its place.
+
+        :param file_path: Path to the persist file
+        :param max_tracked_files: Maximum files to track in bounded collections
+        :return: ControllerPersist instance
+        """
+        if os.path.isfile(file_path):
+            try:
+                return ControllerPersist.from_file_with_limit(file_path, max_tracked_files)
+            except PersistError:
+                if Seedsync.logger:
+                    Seedsync.logger.exception("Caught exception")
+
+                # backup file
+                Seedsync.__backup_file(file_path)
+
+                return ControllerPersist(max_tracked_files=max_tracked_files)
+        else:
+            return ControllerPersist(max_tracked_files=max_tracked_files)
 
     @staticmethod
     def __backup_file(file_path: str):
