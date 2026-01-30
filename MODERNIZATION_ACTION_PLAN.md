@@ -300,7 +300,7 @@ Implemented the "freeze-on-add" pattern:
 - [x] Add configuration option for collection limits
 - [x] Implement LRU eviction for oldest entries
 - [x] Add memory monitoring/logging
-- [x] Run tests — **277 unit tests passed**
+- [x] Run tests — **All tests passed** (627 passed, 9 skipped)
 
 #### Success Criteria
 
@@ -735,6 +735,10 @@ Session 15 (Controller Split Part 2)
 6. **Default limits**: A default of 10,000 tracked files balances memory usage with practical use cases. Most users won't encounter eviction, but those with very large file counts will have protection against unbounded growth.
 
 7. **Serialization preserves order**: When serializing to JSON, items are stored in insertion order (oldest first). On load, if the stored data exceeds `maxlen`, the oldest entries are evicted to fit within the limit.
+
+8. **Integration test fixtures need config updates**: When adding new config options, remember to update integration test fixtures in addition to unit test fixtures. The `test_controller.py` integration tests have their own `config_dict` that must include all required config properties.
+
+9. **pexpect.after can be None**: When using pexpect with timeout decorators, `process.after` can be `None` (not just `pexpect.TIMEOUT`). Always check for both conditions: `if process.after not in (pexpect.TIMEOUT, None)`.
 
 ---
 
