@@ -1,4 +1,6 @@
-import {Injectable} from "@angular/core";
+import {Injectable, OnDestroy} from "@angular/core";
+import {Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
 
 import {LoggerService} from "../utils/logger.service";
 import {ViewFile} from "./view-file";
@@ -68,14 +70,15 @@ class NameFilterCriteria implements ViewFileFilterCriteria {
  * applies the appropriate filters to the ViewFileService
  */
 @Injectable()
-export class ViewFileFilterService {
+export class ViewFileFilterService implements OnDestroy {
+    private destroy$ = new Subject<void>();
     private _statusFilter: StatusFilterCriteria = null;
     private _nameFilter: NameFilterCriteria = null;
 
     constructor(private _logger: LoggerService,
                 private _viewFileService: ViewFileService,
                 private _viewFileOptionsService: ViewFileOptionsService) {
-        this._viewFileOptionsService.options.subscribe(options => {
+        this._viewFileOptionsService.options.pipe(takeUntil(this.destroy$)).subscribe(options => {
             let updateFilterCriteria = false;
 
             // Check to see if status filter changed
@@ -99,6 +102,11 @@ export class ViewFileFilterService {
                 this._viewFileService.setFilterCriteria(this.buildFilterCriteria());
             }
         });
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     private buildFilterCriteria(): ViewFileFilterCriteria {
