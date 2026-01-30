@@ -188,40 +188,25 @@ For future version bumps, update these 4 files:
 
 ---
 
-## Session 4: CI/CD & Registry Configuration
+## Session 4: CI/CD & Registry Configuration ✅ COMPLETED
 
-**Context needed**: GitHub Actions workflow structure
-**Estimated scope**: 1 file, ~15 lines changed
+**Status**: Completed 2026-01-30
+**Commit**: `77378c5` - "Update CI/CD to use GHCR with GITHUB_TOKEN (Session 4)"
 
-### 4.1 Update GitHub Actions Workflow
-**File**: `.github/workflows/master.yml`
+### Changes Made
 
-Changes needed:
-1. Update Docker registry from Docker Hub to GHCR
-2. Update image name references
-3. Ensure GITHUB_TOKEN has package write permissions
+| Change | Details |
+|--------|---------|
+| Workflow permissions | Added `contents: write`, `packages: write` |
+| GHCR login | Replaced `CR_PAT` with `GITHUB_TOKEN` via `docker/login-action@v3` |
+| Release registry | `docker.io/ipsingh06` → `ghcr.io/thejuran` |
+| Docker Hub | Removed login and publish steps (no longer needed) |
 
-Find and replace patterns:
-- `ipsingh06/seedsync` → `ghcr.io/thejuran/seedsync`
-- Docker Hub login → GHCR login:
-  ```yaml
-  - name: Login to GHCR
-    uses: docker/login-action@v3
-    with:
-      registry: ghcr.io
-      username: ${{ github.actor }}
-      password: ${{ secrets.GITHUB_TOKEN }}
-  ```
+### Key Improvements
 
-### 4.2 Update Workflow Permissions
-Ensure workflow has:
-```yaml
-permissions:
-  contents: read
-  packages: write
-```
-
-**Completion check**: Push to main triggers successful workflow with GHCR push
+- No longer requires manual PAT setup (`CR_PAT` secret)
+- Uses built-in `GITHUB_TOKEN` for GHCR authentication
+- Publishes to GHCR instead of Docker Hub
 
 ---
 
@@ -390,15 +375,15 @@ git push origin v1.0.0
 | 1 | Version & metadata | 4 | Session 0 | ✅ Done |
 | 2 | Repository references | 3 | Session 0 | ✅ Done |
 | 3 | ARM64 builds & Debian modernization | 5 (1 deleted) | None | ✅ Done |
-| 4 | CI/CD configuration | 1 | Session 0 | Pending |
+| 4 | CI/CD configuration | 1 | Session 0 | ✅ Done |
 | 5 | Community files (docs) | 3 | None | Pending |
 | 6 | GitHub templates | 4 | None | Pending |
 | 7 | Documentation site | 2-3 | Sessions 0, 2 | Pending |
 | 8 | Final review & release | - | All sessions | Pending |
 
-**Parallelizable**: Sessions 4-6 can be done in any order. Session 7 is unblocked. Session 8 must be last.
+**Parallelizable**: Sessions 5-6 can be done in any order. Session 7 is unblocked. Session 8 must be last.
 
-**Recommended order**: 4 → 5 → 6 → 7 → 8
+**Recommended order**: 5 → 6 → 7 → 8
 
 ---
 
