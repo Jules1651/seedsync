@@ -41,20 +41,26 @@ class BaseStatus:
 
 class StatusComponent(BaseStatus):
     """
-    Base class for status of a single component
+    Base class for status of a single component.
+    Thread-safe: listener operations are synchronized.
     """
 
     def __init__(self):
         self.__listeners = []
+        self.__listeners_lock = Lock()
         self.__properties = []  # names of properties created
 
     def add_listener(self, listener: IStatusComponentListener):
-        if listener not in self.__listeners:
-            self.__listeners.append(listener)
+        """Add a listener. Thread-safe."""
+        with self.__listeners_lock:
+            if listener not in self.__listeners:
+                self.__listeners.append(listener)
 
     def remove_listener(self, listener: IStatusComponentListener):
-        if listener in self.__listeners:
-            self.__listeners.remove(listener)
+        """Remove a listener. Thread-safe."""
+        with self.__listeners_lock:
+            if listener in self.__listeners:
+                self.__listeners.remove(listener)
 
     @classmethod
     def copy(cls: Type[T], src: T, dst: T) -> None:
@@ -65,8 +71,11 @@ class StatusComponent(BaseStatus):
     @overrides(BaseStatus)
     def _set_property(self, name: str, value: Any):
         super()._set_property(name, value)
-        # Notify listeners
-        for listener in self.__listeners:
+        # Copy-under-lock pattern: copy listener list while holding lock,
+        # then notify outside the lock to avoid potential deadlocks
+        with self.__listeners_lock:
+            listeners = list(self.__listeners)
+        for listener in listeners:
             listener.notify(name)
 
 
@@ -97,10 +106,12 @@ class Status(BaseStatus):
             self.status = status
 
         def notify(self, name: str):
-            self.status._listeners_lock.acquire()
-            for listener in self.status._listeners:
+            # Copy-under-lock pattern: copy listener list while holding lock,
+            # then notify outside the lock to avoid potential deadlocks
+            with self.status._listeners_lock:
+                listeners = list(self.status._listeners)
+            for listener in listeners:
                 listener.notify()
-            self.status._listeners_lock.release()
 
     # ----- Start of component definition -----
     class ServerStatus(StatusComponent):

@@ -1,5 +1,7 @@
 # Copyright 2017, Inderpreet Singh, All rights reserved.
 
+from threading import Lock
+
 from bottle import HTTPResponse
 
 from common import Context, overrides
@@ -9,6 +11,7 @@ from ..web_app import IHandler, WebApp
 class ServerHandler(IHandler):
     def __init__(self, context: Context):
         self.logger = context.logger.getChild("ServerActionHandler")
+        self.__restart_lock = Lock()
         self.__request_restart = False
 
     @overrides(IHandler)
@@ -17,16 +20,20 @@ class ServerHandler(IHandler):
 
     def is_restart_requested(self):
         """
-        Returns true is a restart is requested
+        Returns true if a restart is requested.
+        Thread-safe: can be called from any thread.
         :return:
         """
-        return self.__request_restart
+        with self.__restart_lock:
+            return self.__request_restart
 
     def __handle_action_restart(self):
         """
-        Request a server restart
+        Request a server restart.
+        Thread-safe: can be called from web server thread.
         :return:
         """
         self.logger.info("Received a restart action")
-        self.__request_restart = True
+        with self.__restart_lock:
+            self.__request_restart = True
         return HTTPResponse(body="Requested restart")

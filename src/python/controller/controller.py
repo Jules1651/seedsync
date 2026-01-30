@@ -450,7 +450,7 @@ class Controller:
             self.__lftp.queue(file.name, file.is_dir)
             return True, None
         except LftpError as e:
-            return False, "Lftp error: ".format(str(e))
+            return False, "Lftp error: {}".format(str(e))
 
     def __handle_stop_command(self, file: ModelFile, command: Command) -> (bool, str):
         """
@@ -463,7 +463,7 @@ class Controller:
             self.__lftp.kill(file.name)
             return True, None
         except (LftpError, LftpJobStatusParserError) as e:
-            return False, "Lftp error: ".format(str(e))
+            return False, "Lftp error: {}".format(str(e))
 
     def __handle_extract_command(self, file: ModelFile, command: Command) -> (bool, str):
         """

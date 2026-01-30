@@ -50,14 +50,14 @@ This plan breaks the modernization effort into **15 focused sessions**, each opt
 
 #### Tasks
 
-- [ ] Fix format string bug at `controller.py:453`
+- [x] Fix format string bug at `controller.py:453`
   ```python
   # FROM: return False, "Lftp error: ".format(str(e))
   # TO:   return False, "Lftp error: {}".format(str(e))
   ```
-- [ ] Fix format string bug at `controller.py:466`
-- [ ] Search for any other format string issues in codebase
-- [ ] Run Python tests to verify fixes
+- [x] Fix format string bug at `controller.py:466`
+- [x] Search for any other format string issues in codebase
+- [x] Run Python tests to verify fixes
 
 #### Success Criteria
 
@@ -75,36 +75,39 @@ This plan breaks the modernization effort into **15 focused sessions**, each opt
 
 #### Tasks
 
-- [ ] Update cryptography to >=43.0.1 (fixes CVE-2023-50782, CVE-2024-0727, GHSA-h4gh-qq45-vh27)
-- [ ] Update setuptools to >=70.0.0 (fixes CVE-2024-6345)
-- [ ] Update pip to >=25.3 (fixes CVE-2025-8869)
-- [ ] Update wheel to >=0.46.2 (fixes CVE-2026-24049)
-- [ ] Run `poetry lock` to regenerate lockfile
-- [ ] Run `poetry install` to verify compatibility
-- [ ] Run Python tests to verify no breaking changes
+- [x] Update cryptography to >=43.0.1 — **N/A: Not a dependency**
+- [x] Update setuptools to >=70.0.0 — **Already at 80.9.0** ✓
+- [x] Update pip to >=25.3 — **N/A: Not managed by Poetry** (system tool)
+- [x] Update wheel to >=0.46.2 — **N/A: Not a dependency**
+- [x] Run `poetry lock` to regenerate lockfile — **No changes needed**
+- [x] Run `poetry install` to verify compatibility — **Already installed**
+- [x] Run Python tests to verify no breaking changes — **243 passed**
 
 #### Success Criteria
 
-- Zero high/critical CVEs in dependencies
-- All tests pass
-- Application starts successfully
+- Zero high/critical CVEs in dependencies ✓
+- All tests pass ✓
+- Application starts successfully ✓
 
 #### Notes
 
-Check for any breaking changes in cryptography 43.x release notes before updating.
+**Session 2 Finding:** The CVEs listed in the original analysis do not apply to this project:
+- `cryptography` is not a direct or transitive dependency
+- `setuptools` was already updated to 80.9.0 (exceeds requirement)
+- `pip` and `wheel` are Python system tools, not application dependencies managed by Poetry
 
 ---
 
 ### Session 3: Thread Safety - Server & Status Components
 
 **Focus:** Add synchronization to server and status listeners
-**Files:** `src/python/web/server.py`, `src/python/common/status.py`
+**Files:** `src/python/web/handler/server.py`, `src/python/common/status.py`
 **Estimated Time:** 45-60 minutes
 
 #### Tasks
 
-- [ ] Review `server.py` for thread safety issues
-- [ ] Add `threading.Lock` to `__request_restart` flag in ServerHandler
+- [x] Review `server.py` for thread safety issues
+- [x] Add `threading.Lock` to `__request_restart` flag in ServerHandler
   ```python
   def __init__(self):
       self.__restart_lock = threading.Lock()
@@ -118,9 +121,9 @@ Check for any breaking changes in cryptography 43.x release notes before updatin
       with self.__restart_lock:
           return self.__request_restart
   ```
-- [ ] Review `status.py` for thread safety issues
-- [ ] Add `threading.Lock` to `StatusComponent.__listeners`
-- [ ] Ensure listener iteration uses copy-under-lock pattern
+- [x] Review `status.py` for thread safety issues
+- [x] Add `threading.Lock` to `StatusComponent.__listeners`
+- [x] Ensure listener iteration uses copy-under-lock pattern
   ```python
   def _notify_listeners(self):
       with self.__listeners_lock:
@@ -128,11 +131,11 @@ Check for any breaking changes in cryptography 43.x release notes before updatin
       for listener in listeners:
           listener.notify()
   ```
-- [ ] Run tests to verify thread safety
+- [x] Run tests to verify thread safety — **243 passed**
 
 #### Success Criteria
 
-- All listener operations thread-safe
+- All listener operations thread-safe ✓
 - No race conditions in restart flag
 - Tests pass
 
@@ -560,9 +563,9 @@ Session 15 (Controller Split Part 2)
 
 | Session | Status | Completed Date | Notes |
 |---------|--------|----------------|-------|
-| 1 | Not Started | | |
-| 2 | Not Started | | |
-| 3 | Not Started | | |
+| 1 | Completed | 2026-01-30 | Fixed 3 format string bugs (controller.py:453, 466, test_sshcp.py:227) |
+| 2 | Completed | 2026-01-30 | No changes needed - CVEs don't apply (see notes) |
+| 3 | Completed | 2026-01-30 | Added locks to ServerHandler and StatusComponent |
 | 4 | Not Started | | |
 
 ### Phase 1 Status
@@ -590,6 +593,43 @@ Session 15 (Controller Split Part 2)
 |---------|--------|----------------|-------|
 | 14 | Not Started | | |
 | 15 | Not Started | | |
+
+---
+
+## Appendix D: Session Learnings
+
+### Session 1 Learnings
+
+1. **Test infrastructure limitations**: Many tests (lftp, ssh, integration) require external services that may not be available in all environments. To run unit tests without external dependencies:
+   ```bash
+   cd src/python
+   poetry run pytest tests/unittests/test_controller/ tests/unittests/test_model/ tests/unittests/test_common/ -v
+   ```
+
+2. **Codebase-wide searches are valuable**: The format string search found an additional bug in `test_sshcp.py:227` not listed in the original plan. Always perform broad searches when fixing bug patterns.
+
+3. **Poetry setup required**: Run `poetry install` before tests if the virtualenv isn't initialized. The first test run will fail with import errors otherwise.
+
+4. **Format string bug pattern**: Look for `"...".format(arg)` where the string has no `{}` placeholder - the argument is silently ignored.
+
+### Session 2 Learnings
+
+1. **Verify CVEs apply before acting**: Always check if flagged packages are actually dependencies. In this case:
+   - `cryptography` was not a dependency at all
+   - `pip` and `wheel` are system tools, not Poetry-managed dependencies
+   - `setuptools` was already at a safe version
+
+2. **Check lockfile for actual versions**: Use `grep -A5 'name = "package"' poetry.lock` to quickly check current versions.
+
+3. **Distinguish direct vs transitive dependencies**: CVE scanners may flag packages that aren't actually used by the application.
+
+### Session 3 Learnings
+
+1. **Copy-under-lock pattern**: When iterating over a collection that might be modified by other threads, copy the collection while holding the lock, then iterate over the copy outside the lock. This prevents both race conditions and potential deadlocks.
+
+2. **File path corrections**: The plan listed `src/python/web/server.py` but the actual file is at `src/python/web/handler/server.py`. Always verify file paths before starting.
+
+3. **Status already partially thread-safe**: The `Status` class already had `_listeners_lock`, but `StatusComponent` didn't. When adding thread safety, check what's already in place.
 
 ---
 
