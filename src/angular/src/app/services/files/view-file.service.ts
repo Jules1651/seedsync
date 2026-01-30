@@ -24,10 +24,8 @@ export interface ViewFileFilterCriteria {
 /**
  * Interface for sorting view files
  */
-export interface ViewFileComparator {
-    // noinspection TsLint
-    (a: ViewFile, b: ViewFile): number;
-}
+// noinspection TsLint
+export type ViewFileComparator = (a: ViewFile, b: ViewFile) => number;
 
 
 /**
@@ -96,9 +94,9 @@ export class ViewFileService implements OnDestroy {
                 .pipe(takeUntil(this.destroy$))
                 .subscribe({
                     next: modelFiles => {
-                        let t0 = performance.now();
+                        const t0 = performance.now();
                         _viewFileService.buildViewFromModelFiles(modelFiles);
-                        let t1 = performance.now();
+                        const t1 = performance.now();
                         this._logger.debug("ViewFile creation took", (t1 - t0).toFixed(0), "ms");
                     }
                 });

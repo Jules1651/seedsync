@@ -133,7 +133,7 @@ describe("Testing model file initialization", () => {
         baseModelFile = ModelFile.fromJson(baseJson);
         expect(baseModelFile.children.size).toBe(2);
 
-        let a = baseModelFile.children.find(value => {return value.name === "a"});
+        const a = baseModelFile.children.find(value => {return value.name === "a";});
         expect(a.name).toBe("a");
         expect(a.is_dir).toBe(true);
         expect(a.local_size).toBe(1);
@@ -145,7 +145,7 @@ describe("Testing model file initialization", () => {
         expect(a.is_extractable).toBe(true);
         expect(a.children.size).toBe(1);
 
-        let aa = a.children.find(value => {return value.name === "aa"});
+        const aa = a.children.find(value => {return value.name === "aa";});
         expect(aa.name).toBe("aa");
         expect(aa.is_dir).toBe(false);
         expect(aa.local_size).toBe(1);
@@ -157,7 +157,7 @@ describe("Testing model file initialization", () => {
         expect(aa.is_extractable).toBe(true);
         expect(aa.children.size).toBe(0);
 
-        let b = baseModelFile.children.find(value => {return value.name === "b"});
+        const b = baseModelFile.children.find(value => {return value.name === "b";});
         expect(b.name).toBe("b");
         expect(b.is_dir).toBe(false);
         expect(b.local_size).toBe(2);

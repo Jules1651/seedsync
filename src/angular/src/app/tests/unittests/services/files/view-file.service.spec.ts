@@ -28,7 +28,7 @@ describe("Testing view file service", () => {
         });
 
         viewService = TestBed.inject(ViewFileService);
-        let mockRegistry: MockStreamServiceRegistry = TestBed.inject(StreamServiceRegistry) as unknown as MockStreamServiceRegistry;
+        const mockRegistry: MockStreamServiceRegistry = TestBed.inject(StreamServiceRegistry) as unknown as MockStreamServiceRegistry;
         mockModelService = mockRegistry.modelFileService;
     });
 
@@ -51,7 +51,7 @@ describe("Testing view file service", () => {
     }));
 
     it("should forward an empty model", fakeAsync(() => {
-        let model = Immutable.Map<string, ModelFile>();
+        const model = Immutable.Map<string, ModelFile>();
         mockModelService._files.next(model);
         tick();
 
@@ -90,7 +90,7 @@ describe("Testing view file service", () => {
         viewService.files.subscribe({
             next: list => {
                 expect(list.size).toBe(1);
-                let file = list.get(0);
+                const file = list.get(0);
                 expect(file.name).toBe("a");
                 expect(file.isDir).toBe(true);
                 expect(file.localSize).toBe(0);
@@ -119,7 +119,7 @@ describe("Testing view file service", () => {
         let model = Immutable.Map<string, ModelFile>();
         model = model.set(modelFile.name, modelFile);
 
-        let expectedStates = [
+        const expectedStates = [
             ViewFile.Status.DEFAULT,
             ViewFile.Status.QUEUED,
             ViewFile.Status.DOWNLOADING,
@@ -138,7 +138,7 @@ describe("Testing view file service", () => {
         viewService.files.subscribe({
             next: list => {
                 expect(list.size).toBe(1);
-                let file = list.get(0);
+                const file = list.get(0);
                 expect(file.status).toBe(expectedStates[count++]);
             }
         });
@@ -212,7 +212,7 @@ describe("Testing view file service", () => {
         viewService.files.subscribe({
             next: list => {
                 expect(list.size).toBe(1);
-                let file = list.get(0);
+                const file = list.get(0);
                 expect(file.localSize).toBe(0);
                 expect(file.remoteSize).toBe(0);
                 count++;
@@ -224,7 +224,7 @@ describe("Testing view file service", () => {
 
     it("should correctly set ViewFile percent downloaded", fakeAsync(() => {
         // Test vectors of local size, remote size, percentage
-        let testVectors = [
+        const testVectors = [
             [0, 10, 0],
             [5, 10, 50],
             [10, 10, 100],
@@ -238,7 +238,7 @@ describe("Testing view file service", () => {
                 // Ignore first
                 if(count >= 0) {
                     expect(list.size).toBe(1);
-                    let file = list.get(0);
+                    const file = list.get(0);
                     expect(file.percentDownloaded).toBe(testVectors[count][2]);
                 }
                 count++;
@@ -248,7 +248,7 @@ describe("Testing view file service", () => {
         expect(count).toBe(0);
 
         // Send over the test vectors
-        for(let vector of testVectors) {
+        for(const vector of testVectors) {
             let model = Immutable.Map<string, ModelFile>();
             model = model.set("a", new ModelFile({
                 name: "a",
@@ -265,7 +265,7 @@ describe("Testing view file service", () => {
         // Test and expected result vectors
         // test - [ModelFile.State, local size, remote size]
         // result - [isQueueable, ViewFile.Status]
-        let testVectors: any[][][] = [
+        const testVectors: any[][][] = [
             // Default remote file is queueable
             [[ModelFile.State.DEFAULT, null, 100], [true, ViewFile.Status.DEFAULT]],
             // Default local file is NOT queueable
@@ -294,8 +294,8 @@ describe("Testing view file service", () => {
                 // Ignore first
                 if(count >= 0) {
                     expect(list.size).toBe(1);
-                    let file = list.get(0);
-                    let resultVector = testVectors[count][1];
+                    const file = list.get(0);
+                    const resultVector = testVectors[count][1];
                     expect(file.isQueueable).toBe(resultVector[0]);
                     expect(file.status).toBe(resultVector[1]);
                 }
@@ -306,8 +306,8 @@ describe("Testing view file service", () => {
         expect(count).toBe(0);
 
         // Send over the test vectors
-        for(let vector of testVectors) {
-            let testVector = vector[0];
+        for(const vector of testVectors) {
+            const testVector = vector[0];
             let model = Immutable.Map<string, ModelFile>();
             model = model.set("a", new ModelFile({
                 name: "a",
@@ -325,7 +325,7 @@ describe("Testing view file service", () => {
         // Test and expected result vectors
         // test - [ModelFile.State, local size, remote size]
         // result - [isStoppable, ViewFile.Status]
-        let testVectors: any[][][] = [
+        const testVectors: any[][][] = [
             // Default remote file is NOT stoppable
             [[ModelFile.State.DEFAULT, null, 100], [false, ViewFile.Status.DEFAULT]],
             // Default local file is NOT stoppable
@@ -352,8 +352,8 @@ describe("Testing view file service", () => {
                 // Ignore first
                 if(count >= 0) {
                     expect(list.size).toBe(1);
-                    let file = list.get(0);
-                    let resultVector = testVectors[count][1];
+                    const file = list.get(0);
+                    const resultVector = testVectors[count][1];
                     expect(file.isStoppable).toBe(resultVector[0]);
                     expect(file.status).toBe(resultVector[1]);
                 }
@@ -364,8 +364,8 @@ describe("Testing view file service", () => {
         expect(count).toBe(0);
 
         // Send over the test vectors
-        for(let vector of testVectors) {
-            let testVector = vector[0];
+        for(const vector of testVectors) {
+            const testVector = vector[0];
             let model = Immutable.Map<string, ModelFile>();
             model = model.set("a", new ModelFile({
                 name: "a",
@@ -383,7 +383,7 @@ describe("Testing view file service", () => {
         // Test and expected result vectors
         // test - [ModelFile.State, local size, remote size]
         // result - [isExtractable, ViewFile.Status]
-        let testVectors: any[][][] = [
+        const testVectors: any[][][] = [
             // Default remote file is NOT extractable
             [[ModelFile.State.DEFAULT, null, 100], [false, ViewFile.Status.DEFAULT]],
             // Default local file is extractable
@@ -410,8 +410,8 @@ describe("Testing view file service", () => {
                 // Ignore first
                 if(count >= 0) {
                     expect(list.size).toBe(1);
-                    let file = list.get(0);
-                    let resultVector = testVectors[count][1];
+                    const file = list.get(0);
+                    const resultVector = testVectors[count][1];
                     expect(file.isExtractable).toBe(resultVector[0]);
                     expect(file.status).toBe(resultVector[1]);
                 }
@@ -422,8 +422,8 @@ describe("Testing view file service", () => {
         expect(count).toBe(0);
 
         // Send over the test vectors
-        for(let vector of testVectors) {
-            let testVector = vector[0];
+        for(const vector of testVectors) {
+            const testVector = vector[0];
             let model = Immutable.Map<string, ModelFile>();
             model = model.set("a", new ModelFile({
                 name: "a",
@@ -569,7 +569,7 @@ describe("Testing view file service", () => {
         // Test and expected result vectors
         // test - [ModelFile.State, local size, remote size]
         // result - [isLocallyDeletable, ViewFile.Status]
-        let testVectors: any[][][] = [
+        const testVectors: any[][][] = [
             // Default remote file is NOT locally deletable
             [[ModelFile.State.DEFAULT, null, 100], [false, ViewFile.Status.DEFAULT]],
             // Default local file is locally deletable
@@ -596,8 +596,8 @@ describe("Testing view file service", () => {
                 // Ignore first
                 if(count >= 0) {
                     expect(list.size).toBe(1);
-                    let file = list.get(0);
-                    let resultVector = testVectors[count][1];
+                    const file = list.get(0);
+                    const resultVector = testVectors[count][1];
                     expect(file.isLocallyDeletable).toBe(resultVector[0]);
                     expect(file.status).toBe(resultVector[1]);
                 }
@@ -608,8 +608,8 @@ describe("Testing view file service", () => {
         expect(count).toBe(0);
 
         // Send over the test vectors
-        for(let vector of testVectors) {
-            let testVector = vector[0];
+        for(const vector of testVectors) {
+            const testVector = vector[0];
             let model = Immutable.Map<string, ModelFile>();
             model = model.set("a", new ModelFile({
                 name: "a",
@@ -627,7 +627,7 @@ describe("Testing view file service", () => {
         // Test and expected result vectors
         // test - [ModelFile.State, local size, remote size]
         // result - [isRemotelyDeletable, ViewFile.Status]
-        let testVectors: any[][][] = [
+        const testVectors: any[][][] = [
             // Default remote file is remotely deletable
             [[ModelFile.State.DEFAULT, null, 100], [true, ViewFile.Status.DEFAULT]],
             // Default local file is NOT remotely deletable
@@ -654,8 +654,8 @@ describe("Testing view file service", () => {
                 // Ignore first
                 if(count >= 0) {
                     expect(list.size).toBe(1);
-                    let file = list.get(0);
-                    let resultVector = testVectors[count][1];
+                    const file = list.get(0);
+                    const resultVector = testVectors[count][1];
                     expect(file.isRemotelyDeletable).toBe(resultVector[0]);
                     expect(file.status).toBe(resultVector[1]);
                 }
@@ -666,8 +666,8 @@ describe("Testing view file service", () => {
         expect(count).toBe(0);
 
         // Send over the test vectors
-        for(let vector of testVectors) {
-            let testVector = vector[0];
+        for(const vector of testVectors) {
+            const testVector = vector[0];
             let model = Immutable.Map<string, ModelFile>();
             model = model.set("a", new ModelFile({
                 name: "a",

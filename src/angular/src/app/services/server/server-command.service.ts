@@ -45,7 +45,7 @@ export class ServerCommandService extends BaseWebService implements OnDestroy {
 /**
  * ConfigService factory and provider
  */
-export let serverCommandServiceFactory = (
+export const serverCommandServiceFactory = (
     _streamServiceRegistry: StreamServiceRegistry,
     _restService: RestService
 ) => {
@@ -55,7 +55,7 @@ export let serverCommandServiceFactory = (
 };
 
 // noinspection JSUnusedGlobalSymbols
-export let ServerCommandServiceProvider = {
+export const ServerCommandServiceProvider = {
     provide: ServerCommandService,
     useFactory: serverCommandServiceFactory,
     deps: [StreamServiceRegistry, RestService]

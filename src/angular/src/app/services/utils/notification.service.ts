@@ -33,7 +33,7 @@ export class NotificationService implements OnDestroy {
         }
         // Then sort by timestamp
         return b.timestamp - a.timestamp;
-    }
+    };
 
     constructor() {}
 

@@ -21,7 +21,7 @@ export class ConfigService extends BaseWebService implements OnDestroy {
 
     // noinspection UnterminatedStatementJS
     private readonly CONFIG_SET_URL =
-        (section, option, value) => `/server/config/set/${section}/${option}/${value}`
+        (section, option, value) => `/server/config/set/${section}/${option}/${value}`;
 
     private _config: BehaviorSubject<Config> = new BehaviorSubject(null);
 
@@ -111,7 +111,7 @@ export class ConfigService extends BaseWebService implements OnDestroy {
 /**
  * ConfigService factory and provider
  */
-export let configServiceFactory = (
+export const configServiceFactory = (
     _streamServiceRegistry: StreamServiceRegistry,
     _restService: RestService,
     _logger: LoggerService
@@ -122,7 +122,7 @@ export let configServiceFactory = (
 };
 
 // noinspection JSUnusedGlobalSymbols
-export let ConfigServiceProvider = {
+export const ConfigServiceProvider = {
     provide: ConfigService,
     useFactory: configServiceFactory,
     deps: [StreamServiceRegistry, RestService, LoggerService]

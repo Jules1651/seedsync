@@ -85,7 +85,7 @@ export class ViewFile extends ViewFileRecord implements IViewFile {
     }
 }
 
-export module ViewFile {
+export namespace ViewFile {
     export enum Status {
         DEFAULT         = <any> "default",
         QUEUED          = <any> "queued",
