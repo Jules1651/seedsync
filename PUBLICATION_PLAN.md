@@ -14,6 +14,78 @@ This plan outlines the steps to publish SeedSync as a maintained fork under the 
 
 ---
 
+## Release Strategy
+
+### Versioning Scheme
+
+Follow [Semantic Versioning](https://semver.org/):
+
+| Release Type | Version Format | Example | When to Use |
+|--------------|----------------|---------|-------------|
+| **Production** | `X.Y.Z` | `1.0.0`, `1.1.0` | Stable, tested releases |
+| **Pre-release** | `X.Y.Z-beta.N` | `1.1.0-beta.1` | Feature-complete, needs testing |
+| **Dev builds** | `X.Y.Z-dev.N` or SHA | `1.1.0-dev.42` | Bleeding edge (optional, future) |
+
+### Docker Tag Strategy
+
+```
+ghcr.io/thejuran/seedsync:latest       # Latest stable release (production)
+ghcr.io/thejuran/seedsync:1.0.0        # Pinned version (production)
+ghcr.io/thejuran/seedsync:1.0          # Minor version track (gets patch updates)
+ghcr.io/thejuran/seedsync:dev          # Latest from main branch (optional, future)
+```
+
+**For v1.0.0 launch**: Start simple with just `:latest` and `:X.Y.Z` tags. Add `:dev` later if users request bleeding-edge builds.
+
+### Branch & Release Flow
+
+```
+main (default branch)
+  │
+  ├── Every push → Run tests (CI)
+  │
+  └── Tag v1.0.0 → Build & publish:
+                    ├── Docker: :latest, :1.0.0, :1.0
+                    ├── GitHub Release with .deb
+                    └── Documentation site update
+```
+
+### CI/CD Tag Configuration
+
+The GitHub Actions workflow should use `docker/metadata-action` for automatic tagging:
+
+```yaml
+- name: Docker metadata
+  id: meta
+  uses: docker/metadata-action@v5
+  with:
+    images: ghcr.io/thejuran/seedsync
+    tags: |
+      type=semver,pattern={{version}}      # v1.0.0 → 1.0.0
+      type=semver,pattern={{major}}.{{minor}}  # v1.0.0 → 1.0
+      type=raw,value=latest,enable=${{ startsWith(github.ref, 'refs/tags/v') }}
+```
+
+### What Users Should Use
+
+| User Type | Recommended Tag | Why |
+|-----------|-----------------|-----|
+| Most users | `:latest` or `:1.0.0` | Stable, tested |
+| Want auto-updates | `:1.0` | Gets patch releases automatically |
+| Debugging issues | `:X.Y.Z` exact | Reproducible environment |
+
+### Release Checklist
+
+For each release:
+1. Update version in all 4 locations (see Session 1)
+2. Update `src/debian/changelog` with release notes
+3. Ensure all tests pass
+4. Create and push git tag: `git tag -a v1.0.0 -m "Release 1.0.0"`
+5. CI automatically builds and publishes
+6. Verify artifacts are available (GHCR image, GitHub Release .deb)
+
+---
+
 ## Session 0: Manual Prerequisites (User Action Required)
 
 **Context needed**: None (manual GitHub steps)
