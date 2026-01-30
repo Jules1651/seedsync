@@ -43,7 +43,7 @@ export class LoggerService {
     }
 }
 
-export module LoggerService {
+export namespace LoggerService {
     export enum Level {
         ERROR,
         WARN,

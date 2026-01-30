@@ -48,7 +48,7 @@ export class ServerStatus extends ServerStatusRecord implements IServerStatus {
 }
 
 
-export module ServerStatus {
+export namespace ServerStatus {
     export function fromJson(json: ServerStatusJson): ServerStatus {
         let latestLocalScanTime: Date = null;
         if (json.controller.latest_local_scan_time != null) {

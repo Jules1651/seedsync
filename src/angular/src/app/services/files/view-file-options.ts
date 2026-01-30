@@ -50,7 +50,7 @@ export class ViewFileOptions extends ViewFileOptionsRecord implements IViewFileO
     }
 }
 
-export module ViewFileOptions {
+export namespace ViewFileOptions {
     export enum SortMethod {
         STATUS,
         NAME_ASC,

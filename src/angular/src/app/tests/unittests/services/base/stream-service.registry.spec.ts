@@ -49,13 +49,13 @@ describe("Testing stream dispatch service", () => {
         spyOn(EventSourceFactory, "createEventSource").and.callFake(
             (url: string) => {
                 mockEventSource = createMockEventSource(url);
-                return mockEventSource;
+                return mockEventSource as unknown as EventSource;
             }
         );
         mockService1 = new MockStreamService();
         mockService2 = new MockStreamService();
-        spyOn(mockService1, "getEventNames").and.returnValue(['event1a', 'event1b']);
-        spyOn(mockService2, "getEventNames").and.returnValue(['event2a', 'event2b']);
+        spyOn(mockService1, "getEventNames").and.returnValue(["event1a", "event1b"]);
+        spyOn(mockService2, "getEventNames").and.returnValue(["event2a", "event2b"]);
 
         dispatchService = TestBed.inject(StreamDispatchService);
 
@@ -75,11 +75,11 @@ describe("Testing stream dispatch service", () => {
 
     it("should register all events with the event source", fakeAsync(() => {
         expect(mockEventSource.addEventListener).toHaveBeenCalledTimes(4);
-        expect(mockEventSource.eventListeners.size).toBe(4);
-        expect(mockEventSource.eventListeners.has("event1a")).toBe(true);
-        expect(mockEventSource.eventListeners.has("event1b")).toBe(true);
-        expect(mockEventSource.eventListeners.has("event2a")).toBe(true);
-        expect(mockEventSource.eventListeners.has("event2b")).toBe(true);
+        expect(mockEventSource.listeners.size).toBe(4);
+        expect(mockEventSource.listeners.has("event1a")).toBe(true);
+        expect(mockEventSource.listeners.has("event1b")).toBe(true);
+        expect(mockEventSource.listeners.has("event2a")).toBe(true);
+        expect(mockEventSource.listeners.has("event2b")).toBe(true);
     }));
 
     it("should set an error handler on the event source", fakeAsync(() => {
@@ -87,21 +87,21 @@ describe("Testing stream dispatch service", () => {
     }));
 
     it("should forward name and data correctly", fakeAsync(() => {
-        mockEventSource.eventListeners.get("event1a")(<MessageEvent>{data: "data1a"});
+        mockEventSource.listeners.get("event1a")(<MessageEvent>{data: "data1a"});
         tick();
         expect(mockService1.eventList).toEqual([
             ["event1a", "data1a"]
         ]);
         expect(mockService2.eventList).toEqual([]);
 
-        mockEventSource.eventListeners.get("event1b")(<MessageEvent>{data: "data1b"});
+        mockEventSource.listeners.get("event1b")(<MessageEvent>{data: "data1b"});
         tick();
         expect(mockService1.eventList).toEqual([
             ["event1a", "data1a"], ["event1b", "data1b"]
         ]);
         expect(mockService2.eventList).toEqual([]);
 
-        mockEventSource.eventListeners.get("event2a")(<MessageEvent>{data: "data2a"});
+        mockEventSource.listeners.get("event2a")(<MessageEvent>{data: "data2a"});
         tick();
         expect(mockService1.eventList).toEqual([
             ["event1a", "data1a"], ["event1b", "data1b"]
@@ -110,7 +110,7 @@ describe("Testing stream dispatch service", () => {
             ["event2a", "data2a"]
         ]);
 
-        mockEventSource.eventListeners.get("event2b")(<MessageEvent>{data: "data2b"});
+        mockEventSource.listeners.get("event2b")(<MessageEvent>{data: "data2b"});
         tick();
         expect(mockService1.eventList).toEqual([
             ["event1a", "data1a"], ["event1b", "data1b"]
@@ -119,7 +119,7 @@ describe("Testing stream dispatch service", () => {
             ["event2a", "data2a"], ["event2b", "data2b"]
         ]);
 
-        mockEventSource.eventListeners.get("event1b")(<MessageEvent>{data: "data1bbb"});
+        mockEventSource.listeners.get("event1b")(<MessageEvent>{data: "data1bbb"});
         tick();
         expect(mockService1.eventList).toEqual([
             ["event1a", "data1a"], ["event1b", "data1b"], ["event1b", "data1bbb"]
@@ -151,13 +151,13 @@ describe("Testing stream dispatch service", () => {
         tick(4000);
         mockEventSource.onopen(new Event("connected"));
         tick();
-        mockEventSource.eventListeners.get("event1a")(<MessageEvent>{data: "data1a"});
+        mockEventSource.listeners.get("event1a")(<MessageEvent>{data: "data1a"});
         tick();
         expect(mockService1.eventList).toEqual([
             ["event1a", "data1a"]
         ]);
         expect(mockService2.eventList).toEqual([]);
-        mockEventSource.eventListeners.get("event2b")(<MessageEvent>{data: "data2b"});
+        mockEventSource.listeners.get("event2b")(<MessageEvent>{data: "data2b"});
         tick();
         expect(mockService1.eventList).toEqual([["event1a", "data1a"]]);
         expect(mockService2.eventList).toEqual([["event2b", "data2b"]]);

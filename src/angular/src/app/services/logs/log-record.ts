@@ -32,7 +32,7 @@ export class LogRecord extends LogRecordRecord implements ILogRecord {
 }
 
 
-export module LogRecord {
+export namespace LogRecord {
     export function fromJson(json: LogRecordJson): LogRecord {
         return new LogRecord({
             // str -> number, then sec -> ms

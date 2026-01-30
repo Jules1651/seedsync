@@ -72,7 +72,7 @@ export class StreamDispatchService {
      * @returns {IStreamService}
      */
     public registerService(service: IStreamService) {
-        for(let eventName of service.getEventNames()) {
+        for(const eventName of service.getEventNames()) {
             this._eventNameToServiceMap.set(eventName, service);
         }
         this._services.push(service);
@@ -82,7 +82,7 @@ export class StreamDispatchService {
     private createSseObserver() {
         const observable = new Observable(observer => {
             const eventSource = EventSourceFactory.createEventSource(this.STREAM_URL);
-            for (let eventName of Array.from(this._eventNameToServiceMap.keys())) {
+            for (const eventName of Array.from(this._eventNameToServiceMap.keys())) {
                 eventSource.addEventListener(eventName, event => observer.next(
                     {
                         "event": eventName,
@@ -97,7 +97,7 @@ export class StreamDispatchService {
                 this._logger.info("Connected to server stream");
 
                 // Notify all services of connection
-                for (let service of this._services) {
+                for (const service of this._services) {
                     this._zone.run(() => {
                         service.notifyConnected();
                     });
@@ -112,8 +112,8 @@ export class StreamDispatchService {
         });
         observable.subscribe({
             next: (x) => {
-                let eventName = x["event"];
-                let eventData = x["data"];
+                const eventName = x["event"];
+                const eventData = x["data"];
                 // this._logger.debug("Received event:", eventName);
                 this._zone.run(() => {
                     this._eventNameToServiceMap.get(eventName).notifyEvent(eventName, eventData);
@@ -123,7 +123,7 @@ export class StreamDispatchService {
                 this._logger.error("Error in stream: %O", err);
 
                 // Notify all services of disconnection
-                for (let service of this._services) {
+                for (const service of this._services) {
                     this._zone.run(() => {
                         service.notifyDisconnected();
                     });
@@ -172,14 +172,14 @@ export class StreamServiceRegistry {
 /**
  * StreamServiceRegistry factory and provider
  */
-export let streamServiceRegistryFactory = (
+export const streamServiceRegistryFactory = (
         _dispatch: StreamDispatchService,
         _modelFileService: ModelFileService,
         _serverStatusService: ServerStatusService,
         _connectedService: ConnectedService,
         _logService: LogService
 ) => {
-    let streamServiceRegistry = new StreamServiceRegistry(
+    const streamServiceRegistry = new StreamServiceRegistry(
         _dispatch,
         _modelFileService,
         _serverStatusService,
@@ -191,7 +191,7 @@ export let streamServiceRegistryFactory = (
 };
 
 // noinspection JSUnusedGlobalSymbols
-export let StreamServiceRegistryProvider = {
+export const StreamServiceRegistryProvider = {
     provide: StreamServiceRegistry,
     useFactory: streamServiceRegistryFactory,
     deps: [

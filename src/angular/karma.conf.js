@@ -47,47 +47,21 @@ module.exports = function (config) {
             ChromeHeadless: {
                 base: 'Chrome',
                 flags: [
-                    '--headless=new',
+                    '--headless',
                     '--disable-gpu',
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
-                    '--disable-software-rasterizer',
-                    '--disable-extensions',
-                    '--disable-background-networking',
-                    '--disable-sync',
-                    '--disable-default-apps',
-                    '--disable-translate',
-                    '--mute-audio',
-                    '--no-first-run',
-                    '--disable-backgrounding-occluded-windows',
-                    '--disable-renderer-backgrounding',
-                    '--disable-background-timer-throttling',
-                    '--disable-crash-reporter',
-                    '--disable-features=TranslateUI',
-                    '--js-flags=--max-old-space-size=4096'
+                    '--remote-debugging-port=9222'
                 ]
             },
             ChromeHeadlessCI: {
                 base: 'Chrome',
                 flags: [
-                    '--headless=new',
+                    '--headless',
                     '--disable-gpu',
                     '--no-sandbox',
                     '--disable-dev-shm-usage',
-                    '--disable-software-rasterizer',
-                    '--disable-extensions',
-                    '--disable-background-networking',
-                    '--disable-sync',
-                    '--disable-default-apps',
-                    '--disable-translate',
-                    '--mute-audio',
-                    '--no-first-run',
-                    '--disable-backgrounding-occluded-windows',
-                    '--disable-renderer-backgrounding',
-                    '--disable-background-timer-throttling',
-                    '--disable-crash-reporter',
-                    '--disable-features=TranslateUI',
-                    '--js-flags=--max-old-space-size=4096'
+                    '--remote-debugging-port=9222'
                 ]
             }
         }

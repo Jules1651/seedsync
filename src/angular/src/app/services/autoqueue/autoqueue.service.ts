@@ -157,7 +157,7 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
 /**
  * AutoQueueService factory and provider
  */
-export let autoQueueServiceFactory = (
+export const autoQueueServiceFactory = (
     _streamServiceRegistry: StreamServiceRegistry,
     _restService: RestService,
     _logger: LoggerService
@@ -168,7 +168,7 @@ export let autoQueueServiceFactory = (
 };
 
 // noinspection JSUnusedGlobalSymbols
-export let AutoQueueServiceProvider = {
+export const AutoQueueServiceProvider = {
     provide: AutoQueueService,
     useFactory: autoQueueServiceFactory,
     deps: [StreamServiceRegistry, RestService, LoggerService]

@@ -29,7 +29,7 @@ export class Notification extends NotificationRecord implements INotification {
 }
 
 
-export module Notification {
+export namespace Notification {
     export enum Level {
         SUCCESS         = <any> "success",
         INFO            = <any> "info",

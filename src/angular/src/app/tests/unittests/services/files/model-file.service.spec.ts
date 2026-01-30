@@ -57,7 +57,7 @@ describe("Testing model file service", () => {
         expect(count).toBe(1);
         expect(latestModel.size).toBe(0);
 
-        let actualModelFiles = [
+        const actualModelFiles = [
             {
                 name: "File.One",
                 is_dir: false,
@@ -70,7 +70,7 @@ describe("Testing model file service", () => {
                 children: []
             }
         ];
-        let expectedModelFiles = [
+        const expectedModelFiles = [
             new ModelFile({
                 name: "File.One",
                 is_dir: false,
@@ -91,7 +91,7 @@ describe("Testing model file service", () => {
     }));
 
     it("should send correct model on an added event", fakeAsync(() => {
-        let initialModelFiles = [
+        const initialModelFiles = [
             {
                 name: "File.One",
                 is_dir: false,
@@ -118,7 +118,7 @@ describe("Testing model file service", () => {
         expect(count).toBe(1);
         expect(latestModel.size).toBe(1);
 
-        let addedModelFile = {
+        const addedModelFile = {
             new_file: {
                 name: "File.Two",
                 is_dir: false,
@@ -133,7 +133,7 @@ describe("Testing model file service", () => {
             old_file: {}
         };
 
-        let expectedModelFiles = [
+        const expectedModelFiles = [
             new ModelFile({
                 name: "File.One",
                 is_dir: false,
@@ -166,7 +166,7 @@ describe("Testing model file service", () => {
     }));
 
     it("should send correct model on a removed event", fakeAsync(() => {
-        let initialModelFiles = [
+        const initialModelFiles = [
             {
                 name: "File.One",
                 is_dir: false,
@@ -193,7 +193,7 @@ describe("Testing model file service", () => {
         expect(count).toBe(1);
         expect(latestModel.size).toBe(1);
 
-        let removedModelFile = {
+        const removedModelFile = {
             new_file: {},
             old_file: {
                 name: "File.One",
@@ -215,7 +215,7 @@ describe("Testing model file service", () => {
     }));
 
     it("should send correct model on an updated event", fakeAsync(() => {
-        let initialModelFiles = [
+        const initialModelFiles = [
             {
                 name: "File.One",
                 is_dir: false,
@@ -242,7 +242,7 @@ describe("Testing model file service", () => {
         expect(count).toBe(1);
         expect(latestModel.size).toBe(1);
 
-        let updatedModelFile = {
+        const updatedModelFile = {
             new_file: {
                 name: "File.One",
                 is_dir: false,
@@ -267,7 +267,7 @@ describe("Testing model file service", () => {
             }
         };
 
-        let expectedModelFiles = [
+        const expectedModelFiles = [
             new ModelFile({
                 name: "File.One",
                 is_dir: false,
@@ -312,7 +312,7 @@ describe("Testing model file service", () => {
         // Connect the service
         modelFileService.notifyConnected();
 
-        let modelFile = new ModelFile({
+        const modelFile = new ModelFile({
             name: "File.One",
             is_dir: false,
             local_size: 4567,
@@ -390,7 +390,7 @@ describe("Testing model file service", () => {
         // Connect the service
         modelFileService.notifyConnected();
 
-        let modelFile = new ModelFile({
+        const modelFile = new ModelFile({
             name: "File.One",
             is_dir: false,
             local_size: 4567,
@@ -467,7 +467,7 @@ describe("Testing model file service", () => {
         // Connect the service
         modelFileService.notifyConnected();
 
-        let modelFile = new ModelFile({
+        const modelFile = new ModelFile({
             name: "File.One",
             is_dir: false,
             local_size: 4567,
@@ -544,7 +544,7 @@ describe("Testing model file service", () => {
         // Connect the service
         modelFileService.notifyConnected();
 
-        let modelFile = new ModelFile({
+        const modelFile = new ModelFile({
             name: "File.One",
             is_dir: false,
             local_size: 4567,
@@ -621,7 +621,7 @@ describe("Testing model file service", () => {
         // Connect the service
         modelFileService.notifyConnected();
 
-        let modelFile = new ModelFile({
+        const modelFile = new ModelFile({
             name: "File.One",
             is_dir: false,
             local_size: 4567,
