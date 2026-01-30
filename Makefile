@@ -75,7 +75,6 @@ docker-image: docker-buildx
 		${ROOTDIR}
 
 	# final image
-	# TODO: Add arm64 back once Angular migration is complete
 	$(DOCKER) buildx build \
 		-f ${SOURCEDIR}/docker/build/docker-image/Dockerfile \
 		--target seedsync_run \
@@ -84,7 +83,7 @@ docker-image: docker-buildx
 		--tag $${STAGING_REGISTRY}/seedsync:$${STAGING_VERSION} \
 		--cache-to=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache,mode=max \
 		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache \
-		--platform linux/amd64 \
+		--platform linux/amd64,linux/arm64 \
 		--push \
 		${ROOTDIR}
 
@@ -107,7 +106,6 @@ docker-image-release:
 	echo "${green}RELEASE_VERSION=${RELEASE_VERSION}${reset}"
 
 	# final image
-	# TODO: Add arm64 back once Angular migration is complete
 	$(DOCKER) buildx build \
 		-f ${SOURCEDIR}/docker/build/docker-image/Dockerfile \
 		--target seedsync_run \
@@ -115,7 +113,7 @@ docker-image-release:
 		--build-arg STAGING_REGISTRY=$${STAGING_REGISTRY} \
 		--tag ${RELEASE_REGISTRY}/seedsync:${RELEASE_VERSION} \
 		--cache-from=type=registry,ref=$${STAGING_REGISTRY}/seedsync:cache \
-		--platform linux/amd64 \
+		--platform linux/amd64,linux/arm64 \
 		--push \
 		${ROOTDIR}
 
