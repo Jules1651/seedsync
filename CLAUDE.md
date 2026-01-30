@@ -70,11 +70,11 @@ make run-tests-python
 # Angular unit tests (Docker-based)
 make run-tests-angular
 
-# E2E tests for docker image
+# E2E tests for docker image (SEEDSYNC_ARCH: amd64 or arm64)
 make run-tests-e2e STAGING_VERSION=latest SEEDSYNC_ARCH=amd64
 
-# E2E tests for deb package
-make run-tests-e2e SEEDSYNC_DEB=`readlink -f build/*.deb` SEEDSYNC_OS=ubu2004
+# E2E tests for deb package (SEEDSYNC_OS: ubu2204 or ubu2404)
+make run-tests-e2e SEEDSYNC_DEB=`readlink -f build/*.deb` SEEDSYNC_OS=ubu2204
 ```
 
 ### Manual Testing (without Docker)
@@ -190,10 +190,12 @@ When releasing, update version in these files:
 
 ## Supported Platforms
 
-- Linux (native deb package)
-- Windows/macOS (via Docker)
+**Architectures**: `amd64` (x86_64) and `arm64` (Raspberry Pi 3/4/5, Apple Silicon)
 
-Docker images are built for: `linux/amd64`, `linux/arm64` (Raspberry Pi 3/4/5)
+- **Linux**: Native deb packages for both amd64 and arm64
+- **Windows/macOS**: Via Docker
+
+Both deb packages and Docker images are built and tested for both architectures in CI using native GitHub ARM64 runners (no QEMU emulation).
 
 ## Recent Modernization (January 2026)
 

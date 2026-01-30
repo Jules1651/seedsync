@@ -163,7 +163,7 @@ run-tests-e2e:
 	@if [[ ! -z "${SEEDSYNC_DEB}" ]] ; then \
 		if [[ -z "${SEEDSYNC_OS}" ]] ; then \
 			echo "${red}ERROR: SEEDSYNC_OS is required for DEB e2e test${reset}"; \
-			echo "${red}Options include: ubu2004, ubu2204 (requires GLIBC 2.29+)${reset}"; exit 1; \
+			echo "${red}Options include: ubu2204, ubu2404 (requires GLIBC 2.29+)${reset}"; exit 1; \
 		fi
 	fi
 
@@ -171,7 +171,7 @@ run-tests-e2e:
 	@if [[ ! -z "${STAGING_VERSION}" ]] ; then \
 		if [[ -z "${SEEDSYNC_ARCH}" ]] ; then \
 			echo "${red}ERROR: SEEDSYNC_ARCH is required for docker image e2e test${reset}"; \
-			echo "${red}Options include: amd64${reset}"; exit 1; \
+			echo "${red}Options include: amd64, arm64${reset}"; exit 1; \
 		fi
 		if [[ -z "${STAGING_REGISTRY}" ]] ; then \
 			export STAGING_REGISTRY="${DEFAULT_STAGING_REGISTRY}"; \
@@ -244,10 +244,8 @@ run-tests-e2e:
 
 	# Show logs from myapp container for debugging (try all possible container names)
 	echo "${green}=== Logs from myapp container ===${reset}"
-	$(DOCKER) logs seedsync_stage_deb_ubu1604 2>&1 || \
-		$(DOCKER) logs seedsync_stage_deb_ubu1804 2>&1 || \
-		$(DOCKER) logs seedsync_stage_deb_ubu2004 2>&1 || \
-		$(DOCKER) logs seedsync_stage_deb_ubu2204 2>&1 || \
+	$(DOCKER) logs seedsync_stage_deb_ubu2204 2>&1 || \
+		$(DOCKER) logs seedsync_stage_deb_ubu2404 2>&1 || \
 		$(DOCKER) logs seedsync_test_e2e_myapp 2>&1 || \
 		echo "No myapp logs found"
 
