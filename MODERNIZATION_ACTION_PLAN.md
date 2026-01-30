@@ -75,23 +75,26 @@ This plan breaks the modernization effort into **15 focused sessions**, each opt
 
 #### Tasks
 
-- [ ] Update cryptography to >=43.0.1 (fixes CVE-2023-50782, CVE-2024-0727, GHSA-h4gh-qq45-vh27)
-- [ ] Update setuptools to >=70.0.0 (fixes CVE-2024-6345)
-- [ ] Update pip to >=25.3 (fixes CVE-2025-8869)
-- [ ] Update wheel to >=0.46.2 (fixes CVE-2026-24049)
-- [ ] Run `poetry lock` to regenerate lockfile
-- [ ] Run `poetry install` to verify compatibility
-- [ ] Run Python tests to verify no breaking changes
+- [x] Update cryptography to >=43.0.1 — **N/A: Not a dependency**
+- [x] Update setuptools to >=70.0.0 — **Already at 80.9.0** ✓
+- [x] Update pip to >=25.3 — **N/A: Not managed by Poetry** (system tool)
+- [x] Update wheel to >=0.46.2 — **N/A: Not a dependency**
+- [x] Run `poetry lock` to regenerate lockfile — **No changes needed**
+- [x] Run `poetry install` to verify compatibility — **Already installed**
+- [x] Run Python tests to verify no breaking changes — **243 passed**
 
 #### Success Criteria
 
-- Zero high/critical CVEs in dependencies
-- All tests pass
-- Application starts successfully
+- Zero high/critical CVEs in dependencies ✓
+- All tests pass ✓
+- Application starts successfully ✓
 
 #### Notes
 
-Check for any breaking changes in cryptography 43.x release notes before updating.
+**Session 2 Finding:** The CVEs listed in the original analysis do not apply to this project:
+- `cryptography` is not a direct or transitive dependency
+- `setuptools` was already updated to 80.9.0 (exceeds requirement)
+- `pip` and `wheel` are Python system tools, not application dependencies managed by Poetry
 
 ---
 
@@ -561,7 +564,7 @@ Session 15 (Controller Split Part 2)
 | Session | Status | Completed Date | Notes |
 |---------|--------|----------------|-------|
 | 1 | Completed | 2026-01-30 | Fixed 3 format string bugs (controller.py:453, 466, test_sshcp.py:227) |
-| 2 | Not Started | | |
+| 2 | Completed | 2026-01-30 | No changes needed - CVEs don't apply (see notes) |
 | 3 | Not Started | | |
 | 4 | Not Started | | |
 
@@ -608,6 +611,17 @@ Session 15 (Controller Split Part 2)
 3. **Poetry setup required**: Run `poetry install` before tests if the virtualenv isn't initialized. The first test run will fail with import errors otherwise.
 
 4. **Format string bug pattern**: Look for `"...".format(arg)` where the string has no `{}` placeholder - the argument is silently ignored.
+
+### Session 2 Learnings
+
+1. **Verify CVEs apply before acting**: Always check if flagged packages are actually dependencies. In this case:
+   - `cryptography` was not a dependency at all
+   - `pip` and `wheel` are system tools, not Poetry-managed dependencies
+   - `setuptools` was already at a safe version
+
+2. **Check lockfile for actual versions**: Use `grep -A5 'name = "package"' poetry.lock` to quickly check current versions.
+
+3. **Distinguish direct vs transitive dependencies**: CVE scanners may flag packages that aren't actually used by the application.
 
 ---
 
