@@ -654,6 +654,8 @@ Session 15 (Controller Split Part 2)
 
 5. **npm install required**: When switching sessions or branches, run `npm install` in the Angular directory if `ng` commands fail with "not found" errors.
 
+6. **BehaviorSubject initial emission in tests**: When testing subscriptions to BehaviorSubjects, remember they emit their current value immediately upon subscription. Tests should track call counts before/after an action rather than asserting absolute counts, since the initial emission may have already triggered callbacks during setup.
+
 ---
 
 *Action plan generated from MODERNIZATION_REPORT.md*
