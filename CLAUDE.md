@@ -193,9 +193,7 @@ When releasing, update version in these files:
 - Linux (native deb package)
 - Windows/macOS (via Docker)
 
-Docker images are built for: `linux/amd64`
-
-Note: ARM64 support (Raspberry Pi 3/4/5) temporarily disabled during Angular migration.
+Docker images are built for: `linux/amd64`, `linux/arm64` (Raspberry Pi 3/4/5)
 
 ## Recent Modernization (January 2026)
 
