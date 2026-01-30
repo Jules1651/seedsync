@@ -61,6 +61,7 @@
   "overrides": {
     "karma-jasmine": {
       "jasmine-core": "$jasmine-core"
-    }
+    },
+    "tar": "^7.5.7"
   }
 }
