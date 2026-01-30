@@ -57,6 +57,19 @@ class LftpManager:
         self.__lftp.temp_file_name = "*" + Constants.LFTP_TEMP_FILE_SUFFIX
         self.__lftp.set_verbose_logging(context.config.general.verbose)
 
+    @property
+    def lftp(self) -> Lftp:
+        """
+        Direct access to the underlying Lftp instance.
+
+        This property is primarily intended for testing purposes where
+        white-box access to Lftp parameters (like rate_limit) is needed.
+
+        Returns:
+            The underlying Lftp instance.
+        """
+        return self.__lftp
+
     def queue(self, file_name: str, is_dir: bool) -> None:
         """
         Queue a file or directory for download.

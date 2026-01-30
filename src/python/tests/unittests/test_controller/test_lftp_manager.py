@@ -174,6 +174,17 @@ class TestLftpManager(unittest.TestCase):
 
         mock_lftp.raise_pending_error.assert_called_once()
 
+    @patch('controller.lftp_manager.Lftp')
+    def test_lftp_property_returns_underlying_lftp(self, mock_lftp_class):
+        """Test that lftp property returns the underlying Lftp instance."""
+        mock_lftp = MagicMock()
+        mock_lftp_class.return_value = mock_lftp
+
+        manager = LftpManager(self.mock_context)
+        result = manager.lftp
+
+        self.assertIs(result, mock_lftp)
+
 
 if __name__ == '__main__':
     unittest.main()
