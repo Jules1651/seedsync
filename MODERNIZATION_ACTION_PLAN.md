@@ -50,14 +50,14 @@ This plan breaks the modernization effort into **15 focused sessions**, each opt
 
 #### Tasks
 
-- [ ] Fix format string bug at `controller.py:453`
+- [x] Fix format string bug at `controller.py:453`
   ```python
   # FROM: return False, "Lftp error: ".format(str(e))
   # TO:   return False, "Lftp error: {}".format(str(e))
   ```
-- [ ] Fix format string bug at `controller.py:466`
-- [ ] Search for any other format string issues in codebase
-- [ ] Run Python tests to verify fixes
+- [x] Fix format string bug at `controller.py:466`
+- [x] Search for any other format string issues in codebase
+- [x] Run Python tests to verify fixes
 
 #### Success Criteria
 
@@ -560,7 +560,7 @@ Session 15 (Controller Split Part 2)
 
 | Session | Status | Completed Date | Notes |
 |---------|--------|----------------|-------|
-| 1 | Not Started | | |
+| 1 | Completed | 2026-01-30 | Fixed 3 format string bugs (controller.py:453, 466, test_sshcp.py:227) |
 | 2 | Not Started | | |
 | 3 | Not Started | | |
 | 4 | Not Started | | |

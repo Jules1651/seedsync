@@ -224,5 +224,5 @@ class TestSshcp(unittest.TestCase):
     def test_shell_error_bad_command(self, _, password):
         sshcp = Sshcp(host=self.host, port=self.port, user=self.user, password=password)
         with self.assertRaises(SshcpError) as ctx:
-            sshcp.shell("./some_bad_command.sh".format(self.local_dir))
+            sshcp.shell("./some_bad_command.sh")
         self.assertTrue("./some_bad_command.sh" in str(ctx.exception))
