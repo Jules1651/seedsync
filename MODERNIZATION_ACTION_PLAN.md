@@ -428,30 +428,64 @@ The 100ms fixed polling interval was reviewed for potential optimization:
 ### Session 12: Code Quality - build_model() Refactor
 
 **Focus:** Break down the 249-line monster method
-**Files:** `src/python/model/model_builder.py`
+**Files:** `src/python/controller/model_builder.py`
 **Estimated Time:** 90-120 minutes
 
 #### Tasks
 
-- [ ] Read and understand `build_model()` completely
-- [ ] Identify logical groupings of functionality
-- [ ] Extract helper methods:
-  - `_build_file_list()`
-  - `_merge_remote_state()`
-  - `_merge_local_state()`
-  - `_calculate_transfer_state()`
-  - etc.
-- [ ] Ensure each method is <50 lines
-- [ ] Add docstrings to new methods
-- [ ] Maintain backwards compatibility
-- [ ] Run full test suite
+- [x] Read and understand `build_model()` completely
+- [x] Identify logical groupings of functionality
+- [x] Extract helper methods:
+  - `_is_cache_valid()` - Cache TTL validation
+  - `_build_root_file()` - Build root ModelFile with children
+  - `_determine_is_dir()` - Determine is_dir from sources
+  - `_validate_is_dir_consistency()` - Validate is_dir consistency
+  - `_set_initial_state()` - Set initial QUEUED/DOWNLOADING state
+  - `_fill_model_file()` - Populate sizes, speed, timestamps
+  - `_set_transferred_size()` - Set transferred size with parent propagation
+  - `_set_extractable_flag()` - Set extractable flag with parent propagation
+  - `_set_timestamps()` - Set local/remote timestamps
+  - `_build_children()` - BFS traversal of children
+  - `_build_child_file()` - Build single child ModelFile
+  - `_find_child_transfer_state()` - Find transfer state for child
+  - `_determine_child_state()` - Determine child state
+  - `_estimate_root_eta()` - Calculate ETA if not provided
+  - `_determine_final_state()` - Orchestrate final state checks
+  - `_check_downloaded_state()` - Check if file is DOWNLOADED
+  - `_are_all_children_downloaded()` - BFS check for downloaded children
+  - `_check_deleted_state()` - Check if file is DELETED
+  - `_check_extracting_state()` - Check if file is EXTRACTING
+  - `_check_extracted_state()` - Check if file is EXTRACTED
+- [x] Ensure each method is <50 lines
+- [x] Add docstrings to new methods
+- [x] Maintain backwards compatibility
+- [x] Run full test suite — **277 passed**
 
 #### Success Criteria
 
-- `build_model()` reduced to orchestration only
-- All extracted methods <50 lines
-- Cyclomatic complexity <10 per method
-- Tests pass
+- `build_model()` reduced to orchestration only ✓ (28 lines, down from 249)
+- All extracted methods <50 lines ✓ (largest is 43 lines)
+- Cyclomatic complexity <10 per method ✓
+- Tests pass ✓
+
+#### Notes
+
+The original 249-line `build_model()` method has been refactored into 20 focused helper methods:
+
+**Method line counts after refactoring:**
+- `build_model`: 28 lines (orchestration only)
+- `_build_root_file`: 36 lines
+- `_build_children`: 37 lines
+- `_build_child_file`: 43 lines (largest)
+- All other methods: 6-33 lines
+
+**Key design decisions:**
+1. Moved the nested `__fill_model_file` function to a class method `_fill_model_file`
+2. Split child building into `_build_children` (BFS traversal) and `_build_child_file` (single child)
+3. Split final state determination into separate methods for each state (Downloaded, Deleted, Extracting, Extracted)
+4. Added comprehensive docstrings documenting behavior and parameters
+
+**File path correction:** The file is at `src/python/controller/model_builder.py`, not `src/python/model/model_builder.py` as stated in the original plan.
 
 ---
 
@@ -697,7 +731,7 @@ Session 16 (Frontend Dependency Modernization)
 | Session | Status | Completed Date | Notes |
 |---------|--------|----------------|-------|
 | 11 | Completed | 2026-01-30 | Improved HTTP status codes (404, 409, 500) - chose simpler approach over full envelope |
-| 12 | Not Started | | |
+| 12 | Completed | 2026-01-30 | Refactored build_model() from 249 lines to 28 lines + 20 helper methods |
 | 13 | Not Started | | |
 
 ### Phase 3 Status
@@ -868,6 +902,24 @@ Session 16 (Frontend Dependency Modernization)
 6. **Document design decisions**: When choosing between multiple approaches (Options A, B, C), documenting the rationale helps future developers understand why the simpler approach was chosen and when the more complex approach might be warranted.
 
 7. **Integration tests verify HTTP status codes**: When changing HTTP status codes, integration tests that assert on `resp.status_int` will fail. These tests are valuable - they catch behavioral changes that unit tests miss. Always run the full test suite in CI before considering a change complete.
+
+### Session 12 Learnings
+
+1. **Extract nested functions to class methods**: The original `build_model()` had a 52-line nested function `__fill_model_file`. Converting it to a class method `_fill_model_file` makes it testable in isolation and enables reuse across both root and child file processing.
+
+2. **BFS traversal extraction**: The BFS traversal logic for building children was split into two methods: `_build_children` for the traversal loop and `_build_child_file` for processing a single child. This separation of concerns makes each method focused and under 50 lines.
+
+3. **State determination chain**: The final state determination (Downloaded → Deleted → Extracting → Extracted) was refactored into separate `_check_*_state()` methods orchestrated by `_determine_final_state()`. Each method has a single responsibility and clear preconditions.
+
+4. **Early return pattern**: Each state check method uses early returns for preconditions (e.g., "if not in DEFAULT state, return"). This reduces nesting and makes the logic flow clearer.
+
+5. **File path verification**: The plan listed the file as `src/python/model/model_builder.py` but it's actually at `src/python/controller/model_builder.py`. Always verify file paths at the start of a session.
+
+6. **Comprehensive docstrings**: Adding docstrings to all 20 extracted methods documents the purpose, parameters, and behavior. This helps future developers understand the code without reading through the implementation.
+
+7. **Preserve behavior exactly**: The refactoring was purely structural - no behavior changes. All 46 existing tests pass unchanged, proving the refactoring preserved the original logic.
+
+8. **Line count as a metric**: Using Python's AST module to count lines per method provides objective verification of the <50 line constraint. Manual counting is error-prone for methods with docstrings and blank lines.
 
 ---
 
