@@ -163,15 +163,47 @@ run-tests-e2e:
 	@if [[ ! -z "${SEEDSYNC_DEB}" ]] ; then \
 		if [[ -z "${SEEDSYNC_OS}" ]] ; then \
 			echo "${red}ERROR: SEEDSYNC_OS is required for DEB e2e test${reset}"; \
-			echo "${red}Options include: ubu2004, ubu2204 (requires GLIBC 2.29+)${reset}"; exit 1; \
-		fi
+			echo "${red}Options include: ubu2204, ubu2404 (requires GLIBC 2.29+)${reset}"; exit 1; \
+		fi; \
+		# Auto-detect platform from host architecture for deb tests
+		HOST_ARCH=$$(uname -m); \
+		if [[ "$${HOST_ARCH}" == "x86_64" ]]; then \
+			export SEEDSYNC_PLATFORM="linux/amd64"; \
+		elif [[ "$${HOST_ARCH}" == "aarch64" ]]; then \
+			export SEEDSYNC_PLATFORM="linux/arm64"; \
+		else \
+			echo "${red}ERROR: Unsupported architecture: $${HOST_ARCH}${reset}"; exit 1; \
+		fi; \
+		echo "${green}SEEDSYNC_PLATFORM=$${SEEDSYNC_PLATFORM} (auto-detected from $${HOST_ARCH})${reset}"; \
+		# Pre-build containers for the target platform
+		# This is needed because docker-compose build doesn't respect platform for building
+		echo "${green}Building e2e containers for platform $${SEEDSYNC_PLATFORM}${reset}"; \
+		$(DOCKER) buildx build \
+			--platform $${SEEDSYNC_PLATFORM} \
+			--load \
+			-t seedsync/test/e2e/remote \
+			-f ${SOURCEDIR}/docker/test/e2e/remote/Dockerfile \
+			.; \
+		$(DOCKER) buildx build \
+			--platform $${SEEDSYNC_PLATFORM} \
+			--load \
+			-t seedsync/test/e2e/configure \
+			-f ${SOURCEDIR}/docker/test/e2e/configure/Dockerfile \
+			.; \
+		$(DOCKER) buildx build \
+			--platform $${SEEDSYNC_PLATFORM} \
+			--load \
+			--target seedsync_test_e2e \
+			-t seedsync/test/e2e \
+			-f ${SOURCEDIR}/docker/test/e2e/Dockerfile \
+			.; \
 	fi
 
 	# Set up environment for image
 	@if [[ ! -z "${STAGING_VERSION}" ]] ; then \
 		if [[ -z "${SEEDSYNC_ARCH}" ]] ; then \
 			echo "${red}ERROR: SEEDSYNC_ARCH is required for docker image e2e test${reset}"; \
-			echo "${red}Options include: amd64${reset}"; exit 1; \
+			echo "${red}Options include: amd64, arm64${reset}"; exit 1; \
 		fi
 		if [[ -z "${STAGING_REGISTRY}" ]] ; then \
 			export STAGING_REGISTRY="${DEFAULT_STAGING_REGISTRY}"; \
@@ -244,10 +276,8 @@ run-tests-e2e:
 
 	# Show logs from myapp container for debugging (try all possible container names)
 	echo "${green}=== Logs from myapp container ===${reset}"
-	$(DOCKER) logs seedsync_stage_deb_ubu1604 2>&1 || \
-		$(DOCKER) logs seedsync_stage_deb_ubu1804 2>&1 || \
-		$(DOCKER) logs seedsync_stage_deb_ubu2004 2>&1 || \
-		$(DOCKER) logs seedsync_stage_deb_ubu2204 2>&1 || \
+	$(DOCKER) logs seedsync_stage_deb_ubu2204 2>&1 || \
+		$(DOCKER) logs seedsync_stage_deb_ubu2404 2>&1 || \
 		$(DOCKER) logs seedsync_test_e2e_myapp 2>&1 || \
 		echo "No myapp logs found"
 

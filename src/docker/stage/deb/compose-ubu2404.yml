@@ -1,0 +1,7 @@
+services:
+  myapp:
+    image: seedsync/stage/deb/ubu2404
+    container_name: seedsync_stage_deb_ubu2404
+    build:
+      args:
+        - BASE_IMAGE=ubuntu:24.04
