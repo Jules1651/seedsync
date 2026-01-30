@@ -101,13 +101,13 @@ This plan breaks the modernization effort into **15 focused sessions**, each opt
 ### Session 3: Thread Safety - Server & Status Components
 
 **Focus:** Add synchronization to server and status listeners
-**Files:** `src/python/web/server.py`, `src/python/common/status.py`
+**Files:** `src/python/web/handler/server.py`, `src/python/common/status.py`
 **Estimated Time:** 45-60 minutes
 
 #### Tasks
 
-- [ ] Review `server.py` for thread safety issues
-- [ ] Add `threading.Lock` to `__request_restart` flag in ServerHandler
+- [x] Review `server.py` for thread safety issues
+- [x] Add `threading.Lock` to `__request_restart` flag in ServerHandler
   ```python
   def __init__(self):
       self.__restart_lock = threading.Lock()
@@ -121,9 +121,9 @@ This plan breaks the modernization effort into **15 focused sessions**, each opt
       with self.__restart_lock:
           return self.__request_restart
   ```
-- [ ] Review `status.py` for thread safety issues
-- [ ] Add `threading.Lock` to `StatusComponent.__listeners`
-- [ ] Ensure listener iteration uses copy-under-lock pattern
+- [x] Review `status.py` for thread safety issues
+- [x] Add `threading.Lock` to `StatusComponent.__listeners`
+- [x] Ensure listener iteration uses copy-under-lock pattern
   ```python
   def _notify_listeners(self):
       with self.__listeners_lock:
@@ -131,11 +131,11 @@ This plan breaks the modernization effort into **15 focused sessions**, each opt
       for listener in listeners:
           listener.notify()
   ```
-- [ ] Run tests to verify thread safety
+- [x] Run tests to verify thread safety — **243 passed**
 
 #### Success Criteria
 
-- All listener operations thread-safe
+- All listener operations thread-safe ✓
 - No race conditions in restart flag
 - Tests pass
 
@@ -565,7 +565,7 @@ Session 15 (Controller Split Part 2)
 |---------|--------|----------------|-------|
 | 1 | Completed | 2026-01-30 | Fixed 3 format string bugs (controller.py:453, 466, test_sshcp.py:227) |
 | 2 | Completed | 2026-01-30 | No changes needed - CVEs don't apply (see notes) |
-| 3 | Not Started | | |
+| 3 | Completed | 2026-01-30 | Added locks to ServerHandler and StatusComponent |
 | 4 | Not Started | | |
 
 ### Phase 1 Status
@@ -622,6 +622,14 @@ Session 15 (Controller Split Part 2)
 2. **Check lockfile for actual versions**: Use `grep -A5 'name = "package"' poetry.lock` to quickly check current versions.
 
 3. **Distinguish direct vs transitive dependencies**: CVE scanners may flag packages that aren't actually used by the application.
+
+### Session 3 Learnings
+
+1. **Copy-under-lock pattern**: When iterating over a collection that might be modified by other threads, copy the collection while holding the lock, then iterate over the copy outside the lock. This prevents both race conditions and potential deadlocks.
+
+2. **File path corrections**: The plan listed `src/python/web/server.py` but the actual file is at `src/python/web/handler/server.py`. Always verify file paths before starting.
+
+3. **Status already partially thread-safe**: The `Status` class already had `_listeners_lock`, but `StatusComponent` didn't. When adding thread safety, check what's already in place.
 
 ---
 
