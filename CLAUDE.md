@@ -164,7 +164,7 @@ The API uses proper HTTP status codes:
 - `src/python/controller/lftp_manager.py` - LFTP process management
 - `src/python/controller/file_operation_manager.py` - Extract/delete operations
 - `src/python/controller/model_builder.py` - Model construction logic
-- `src/angular/package.json` - Angular version and dependencies (current: 0.8.6)
+- `src/angular/package.json` - Angular version and dependencies (current: 1.0.0)
 - `src/python/pyproject.toml` - Python dependencies (Poetry)
 - `src/debian/changelog` - Version changelog for deb package
 - `Makefile` - All build and test commands
@@ -193,9 +193,7 @@ When releasing, update version in these files:
 - Linux (native deb package)
 - Windows/macOS (via Docker)
 
-Docker images are built for: `linux/amd64`
-
-Note: ARM64 support (Raspberry Pi 3/4/5) temporarily disabled during Angular migration.
+Docker images are built for: `linux/amd64`, `linux/arm64` (Raspberry Pi 3/4/5)
 
 ## Recent Modernization (January 2026)
 

@@ -1,3 +1,14 @@
+seedsync (1.0.0) stable; urgency=low
+
+  * Fork maintained by thejuran
+  * Modernized Angular frontend (upgraded to Angular 19)
+  * Upgraded Bootstrap 4 to Bootstrap 5
+  * Re-enabled ARM64 support
+  * Improved thread safety and memory management
+  * Modernized Debian packaging
+
+ -- thejuran <thejuran@users.noreply.github.com>  Fri, 30 Jan 2026 20:04:57 +0000
+
 seedsync (0.8.6) stable; urgency=low
 
   * Fixed broken rar extraction in previous release
