@@ -390,13 +390,16 @@ The 100ms fixed polling interval was reviewed for potential optimization:
 - [x] Update `WebResponseActionCallback` to use dynamic error codes
 - [x] Update config.py: 404 for missing section/option
 - [x] Update auto_queue.py: 409 for duplicate pattern, 404 for missing pattern
+- [x] Update integration tests to expect new status codes
 - [x] Run Python unit tests — **277 passed**
+- [x] Run Python integration tests — **623 passed**
 
 #### Success Criteria
 
 - Proper HTTP status codes returned ✓
 - No frontend changes required ✓ (backward compatible)
 - Unit tests pass ✓
+- Integration tests pass ✓
 
 #### Notes
 
@@ -418,6 +421,7 @@ The 100ms fixed polling interval was reviewed for potential optimization:
 2. Updated all controller command handlers to return `(success, error_msg, error_code)` tuples
 3. Updated `WebResponseActionCallback` to store and use dynamic error codes
 4. Updated `config.py` and `auto_queue.py` handlers with appropriate status codes
+5. Updated integration tests (`test_auto_queue.py`, `test_config.py`) to expect new status codes
 
 ---
 
@@ -862,6 +866,8 @@ Session 16 (Frontend Dependency Modernization)
 5. **Test callback interface changes carefully**: When modifying callback interfaces like `ICallback.on_failure()`, search for all implementations (production code, test mocks, test helpers) and update them consistently.
 
 6. **Document design decisions**: When choosing between multiple approaches (Options A, B, C), documenting the rationale helps future developers understand why the simpler approach was chosen and when the more complex approach might be warranted.
+
+7. **Integration tests verify HTTP status codes**: When changing HTTP status codes, integration tests that assert on `resp.status_int` will fail. These tests are valuable - they catch behavioral changes that unit tests miss. Always run the full test suite in CI before considering a change complete.
 
 ---
 
