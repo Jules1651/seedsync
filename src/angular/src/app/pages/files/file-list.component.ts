@@ -1,5 +1,5 @@
 import {Component, ChangeDetectionStrategy} from "@angular/core";
-import {NgFor, AsyncPipe} from "@angular/common";
+import {NgFor, NgIf, AsyncPipe} from "@angular/common";
 import {Observable, combineLatest} from "rxjs";
 import {map} from "rxjs/operators";
 
@@ -20,7 +20,7 @@ import {FileSelectionService} from "../../services/files/file-selection.service"
     styleUrls: ["./file-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, AsyncPipe, FileComponent]
+    imports: [NgFor, NgIf, AsyncPipe, FileComponent]
 })
 export class FileListComponent {
     public files: Observable<List<ViewFile>>;
