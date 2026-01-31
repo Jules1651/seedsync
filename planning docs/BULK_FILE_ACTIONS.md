@@ -352,3 +352,283 @@ src/angular/src/app/pages/files/file.component.html
 src/angular/src/app/pages/files/file.component.ts
 src/angular/src/app/services/files/view-file.service.ts
 ```
+
+---
+
+## UAT Plan
+
+### Test Environment Setup
+
+**Prerequisites:**
+- SeedSync `:dev` Docker image pulled from GHCR
+- Remote server running (can use `make run-remote-server` for localhost:1234)
+- At least 10 test files on remote server with varying states:
+  - 3+ files not yet downloaded (for Queue testing)
+  - 2+ files currently downloading (for Stop testing)
+  - 3+ files downloaded but not extracted (for Extract testing)
+  - 3+ files downloaded (for Delete Local testing)
+  - 3+ files on remote (for Delete Remote testing)
+
+**Environment Variables:**
+```bash
+REMOTE_HOST=localhost
+REMOTE_PORT=1234
+REMOTE_USER=remoteuser
+REMOTE_PASS=remotepass
+REMOTE_PATH=/home/remoteuser/files
+```
+
+**Pre-UAT Checklist:**
+- [ ] Fresh SeedSync instance running with `:dev` image
+- [ ] Remote server populated with test files
+- [ ] Browser DevTools open for network inspection
+- [ ] Test file names documented for reference
+
+---
+
+### Test Scenarios
+
+#### TS-1: Checkbox Selection Basics
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 1.1 | Click checkbox on a single file row | Checkbox becomes checked, row is highlighted | |
+| 1.2 | Click same checkbox again | Checkbox unchecked, row highlight removed | |
+| 1.3 | Click checkboxes on 3 different files | All 3 checked, all 3 highlighted | |
+| 1.4 | Click on file name (not checkbox) | File details shown, selection unchanged | |
+| 1.5 | Verify selection count in banner | Banner shows "3 files selected" | |
+
+---
+
+#### TS-2: Header Checkbox Behavior
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 2.1 | With no files selected, click header checkbox | All visible files selected, header checked | |
+| 2.2 | Click header checkbox again | All files deselected, header unchecked | |
+| 2.3 | Select 2 files manually | Header shows indeterminate state (dash) | |
+| 2.4 | Click header checkbox while indeterminate | All visible files selected | |
+| 2.5 | Click header checkbox when all selected | All files deselected | |
+
+---
+
+#### TS-3: Selection Banner
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 3.1 | Select 1 file | Banner appears showing "1 file selected" | |
+| 3.2 | Select 5 files | Banner shows "5 files selected" | |
+| 3.3 | Click "Clear" button in banner | All selections cleared, banner disappears | |
+| 3.4 | Select all visible files (header checkbox) | Banner shows "Select all X matching filter" link | |
+| 3.5 | Click "Select all matching filter" link | Banner updates to show total matching count | |
+| 3.6 | Clear selection after "select all matching" | Banner disappears, all deselected | |
+
+---
+
+#### TS-4: Keyboard Shortcuts
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 4.1 | Focus on file list, press Ctrl+A (Cmd+A on Mac) | All visible files selected | |
+| 4.2 | With files selected, press Escape | Selection cleared | |
+| 4.3 | Click checkbox on file #2 | File #2 selected | |
+| 4.4 | Hold Shift, click checkbox on file #5 | Files #2, #3, #4, #5 all selected | |
+| 4.5 | Click file #8, Shift+click file #10 | Only files #8, #9, #10 selected (previous cleared) | |
+| 4.6 | Ctrl+click file #1 while #8-10 selected | Files #1, #8, #9, #10 all selected (additive) | |
+
+---
+
+#### TS-5: Filter Interaction
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 5.1 | Select 5 files | 5 files selected | |
+| 5.2 | Change status filter dropdown | Selection cleared, banner disappears | |
+| 5.3 | Select 3 files again | 3 files selected | |
+| 5.4 | Change sort order | Selection cleared | |
+| 5.5 | Select 2 files, use search box | Selection cleared when filter applied | |
+
+---
+
+#### TS-6: Bulk Actions Bar - Display
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 6.1 | With no selection | Actions bar not visible | |
+| 6.2 | Select 1 file | Actions bar appears | |
+| 6.3 | Select files with mixed states | Buttons show counts (e.g., "Queue (3)") | |
+| 6.4 | Select only downloaded files | Queue button shows (0), is disabled | |
+| 6.5 | Select only remote files | Delete Local shows (0), is disabled | |
+| 6.6 | Verify button order | Order: Queue, Stop, Extract, Delete Local, Delete Remote | |
+
+---
+
+#### TS-7: Bulk Queue Action
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 7.1 | Select 3 queueable files + 1 already queued | Queue button shows "(3)" | |
+| 7.2 | Click Queue button | No confirmation dialog (not destructive) | |
+| 7.3 | Wait for action to complete | Toast: "Queued 3 files successfully" | |
+| 7.4 | Verify files status | All 3 files now show as Queued | |
+| 7.5 | Verify selection | Selection cleared after action | |
+| 7.6 | Check network tab | Single POST to `/server/command/bulk` | |
+
+---
+
+#### TS-8: Bulk Stop Action
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 8.1 | Queue 2 files, let them start downloading | Files show Downloading status | |
+| 8.2 | Select both downloading files | Stop button shows "(2)" | |
+| 8.3 | Click Stop button | No confirmation dialog | |
+| 8.4 | Wait for action | Toast: "Stopped 2 files successfully" | |
+| 8.5 | Verify file status | Files no longer downloading | |
+
+---
+
+#### TS-9: Bulk Extract Action
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 9.1 | Ensure 2 downloaded archive files exist | Files show Downloaded, not Extracted | |
+| 9.2 | Select both files | Extract button shows "(2)" | |
+| 9.3 | Click Extract button | No confirmation dialog | |
+| 9.4 | Wait for action | Toast: "Extracted 2 files successfully" | |
+| 9.5 | Verify file status | Files show Extracted status | |
+
+---
+
+#### TS-10: Bulk Delete Local Action
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 10.1 | Select 3 files with local copies | Delete Local shows "(3)" | |
+| 10.2 | Click Delete Local button | Confirmation dialog appears | |
+| 10.3 | Verify dialog content | Shows "Delete 3 local files?" with warning | |
+| 10.4 | Click Cancel | Dialog closes, no action taken, selection remains | |
+| 10.5 | Click Delete Local again, then Confirm | Toast: "Deleted 3 local files successfully" | |
+| 10.6 | Verify local files removed | Files no longer have local copies | |
+
+---
+
+#### TS-11: Bulk Delete Remote Action
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 11.1 | Select 2 files on remote server | Delete Remote shows "(2)" | |
+| 11.2 | Click Delete Remote button | Confirmation dialog with danger styling | |
+| 11.3 | Verify dialog content | Shows "Delete 2 remote files? This cannot be undone." | |
+| 11.4 | Click Confirm | Toast: "Deleted 2 remote files successfully" | |
+| 11.5 | Verify files removed from remote | Files no longer appear in file list | |
+
+---
+
+#### TS-12: Partial Failure Handling
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 12.1 | Select 3 files, delete 1 from remote via SSH | 1 file now invalid | |
+| 12.2 | Click Queue on all 3 | Action executes | |
+| 12.3 | Verify toast message | Warning toast: "Queued 2 files. 1 failed." | |
+| 12.4 | Verify successful files | 2 files queued successfully | |
+| 12.5 | Selection cleared | Yes, even on partial failure | |
+
+---
+
+#### TS-13: Large Selection (50+ files)
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 13.1 | Populate remote with 60 files | Files appear in list | |
+| 13.2 | Use "Select all matching filter" | All 60 selected | |
+| 13.3 | Click Queue button | Progress indicator appears | |
+| 13.4 | Wait for completion | Progress updates, then shows success toast | |
+| 13.5 | Verify all files queued | 60 files in queue | |
+| 13.6 | Response time acceptable | Action completes in <10 seconds | |
+
+---
+
+#### TS-14: Edge Cases
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 14.1 | Select file, file disappears (scan update) | Selection gracefully updated, no error | |
+| 14.2 | Select all, apply filter that shows 0 files | Selection cleared, banner hidden | |
+| 14.3 | Double-click action button rapidly | Only one request sent (debounce) | |
+| 14.4 | Select 5 files, all ineligible for Queue | Queue button disabled | |
+| 14.5 | Network error during bulk action | Error toast with retry suggestion | |
+| 14.6 | Empty selection, try keyboard shortcuts | No errors, graceful no-op | |
+
+---
+
+#### TS-15: Browser Compatibility
+
+| Browser | Version | Checkbox | Keyboard | Actions | Pass/Fail |
+|---------|---------|----------|----------|---------|-----------|
+| Chrome | Latest | | | | |
+| Safari | Latest | | | | |
+
+---
+
+#### TS-16: Mobile/Responsive
+
+| # | Step | Expected Result | Pass/Fail |
+|---|------|-----------------|-----------|
+| 16.1 | View on tablet (768px width) | Checkboxes visible, bar stacks if needed | |
+| 16.2 | View on mobile (375px width) | Checkboxes still functional | |
+| 16.3 | Touch to select on mobile | Works like click | |
+| 16.4 | Actions bar on mobile | Scrollable or wrapped, all buttons accessible | |
+
+---
+
+### Regression Tests
+
+| Area | Test | Expected | Pass/Fail |
+|------|------|----------|-----------|
+| Single file actions | Right-click/action menu still works | Unchanged behavior | |
+| File details | Clicking file name opens details | Still works | |
+| Drag and drop | If existed, still works | Unchanged | |
+| Filters | All filter options work | No regression | |
+| Sort | All sort options work | No regression | |
+| Pagination | If paginated, page changes work | Maintains selection per-page or clears | |
+
+---
+
+### UAT Sign-off
+
+**Tester:** _________________
+**Date:** _________________
+**Environment:** SeedSync `:dev` version _________________
+
+| Category | Scenarios | Passed | Failed | Blocked |
+|----------|-----------|--------|--------|---------|
+| Checkbox Selection | TS-1, TS-2 | | | |
+| Selection Banner | TS-3 | | | |
+| Keyboard Shortcuts | TS-4 | | | |
+| Filter Interaction | TS-5 | | | |
+| Actions Bar Display | TS-6 | | | |
+| Bulk Queue | TS-7 | | | |
+| Bulk Stop | TS-8 | | | |
+| Bulk Extract | TS-9 | | | |
+| Bulk Delete Local | TS-10 | | | |
+| Bulk Delete Remote | TS-11 | | | |
+| Partial Failure | TS-12 | | | |
+| Large Selection | TS-13 | | | |
+| Edge Cases | TS-14 | | | |
+| Browser Compat | TS-15 | | | |
+| Mobile/Responsive | TS-16 | | | |
+| Regression | Regression | | | |
+
+**Overall Result:** [ ] PASS  [ ] FAIL  [ ] BLOCKED
+
+**Notes:**
+```
+(Record any issues, observations, or deferred items here)
+```
+
+**Blocker Issues (if any):**
+```
+(List critical issues that block release)
+```
