@@ -10,12 +10,23 @@
 | **Total Sessions** | 10 estimated |
 
 > **Claude Code Branch Management:**
-> Each Claude Code session can only push to branches matching its session ID. When continuing
-> this feature in a new session:
-> 1. Fetch the latest branch: `git fetch origin claude/review-bulk-file-actions-*`
-> 2. Find the most recent one: `git log --oneline origin/claude/review-bulk-file-actions-* -1`
-> 3. Create your session branch and merge: `git checkout -b claude/<your-branch> && git merge origin/<latest-branch>`
-> 4. Continue development and push to your session's branch
+> Each Claude Code session can only push to branches matching its session ID.
+>
+> **IMPORTANT:** The master branch has an outdated version of this doc. To continue this feature:
+>
+> **Prompt for new session:**
+> ```
+> Run: git fetch origin && git log --oneline $(git branch -r | grep 'claude/review-bulk-file-actions' | head -1) -1
+> Then merge that branch and read planning docs/BULK_FILE_ACTIONS.md to see current progress.
+> Continue with the next incomplete session.
+> ```
+>
+> **Manual steps (what Claude should do):**
+> 1. `git fetch origin claude/review-bulk-file-actions-*`
+> 2. Find latest: `git branch -r | grep 'claude/review-bulk-file-actions' | head -1`
+> 3. Merge into your session branch: `git merge origin/<latest-branch>`
+> 4. Read THIS file from the merged branch to see actual progress
+> 5. Continue development and push to your session's branch
 >
 > **Branch History:**
 > - `claude/review-bulk-file-actions-2KjKN` - Sessions 1-2 (original)
