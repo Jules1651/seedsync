@@ -250,7 +250,13 @@ class AutoQueue:
         for name, pattern in modified_files_to_queue:
             if name not in files_to_queue_dict:
                 files_to_queue_dict[name] = pattern
-        files_to_queue = list(files_to_queue_dict.items())
+
+        # Filter out files that were explicitly stopped by user
+        # These files should not be auto-queued even if they match other criteria
+        files_to_queue = [
+            (name, pattern) for name, pattern in files_to_queue_dict.items()
+            if not self.__controller.is_file_stopped(name)
+        ]
 
         ###
         # Extract

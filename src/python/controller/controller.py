@@ -137,6 +137,10 @@ class Controller:
             lambda: len(self.__persist.extracted_file_names)
         )
         self.__memory_monitor.register_data_source(
+            'stopped_files',
+            lambda: len(self.__persist.stopped_file_names)
+        )
+        self.__memory_monitor.register_data_source(
             'model_files',
             lambda: len(self.__model.get_file_names())
         )
@@ -148,6 +152,10 @@ class Controller:
         self.__memory_monitor.register_data_source(
             'extracted_evictions',
             lambda: self.__persist.extracted_file_names.total_evictions
+        )
+        self.__memory_monitor.register_data_source(
+            'stopped_evictions',
+            lambda: self.__persist.stopped_file_names.total_evictions
         )
 
         self.__started = False
@@ -197,6 +205,16 @@ class Controller:
         with self.__model_lock:
             model_files = self.__get_model_files()
         return model_files
+
+    def is_file_stopped(self, filename: str) -> bool:
+        """
+        Check if a file was explicitly stopped by the user.
+        Used by AutoQueue to avoid re-queuing files that were stopped.
+
+        :param filename: Name of the file to check
+        :return: True if the file is in the stopped files set
+        """
+        return filename in self.__persist.stopped_file_names
 
     def add_model_listener(self, listener: IModelListener):
         """
@@ -606,6 +624,8 @@ class Controller:
             return False, "File '{}' does not exist remotely".format(command.filename), 404
         try:
             self.__lftp_manager.queue(file.name, file.is_dir)
+            # Remove from stopped files - user explicitly wants to download this
+            self.__persist.stopped_file_names.discard(file.name)
             return True, None, None
         except LftpError as e:
             return False, "Lftp error: {}".format(str(e)), 500
@@ -619,6 +639,8 @@ class Controller:
             return False, "File '{}' is not Queued or Downloading".format(command.filename), 409
         try:
             self.__lftp_manager.kill(file.name)
+            # Track this file as stopped so it won't be auto-queued on restart
+            self.__persist.stopped_file_names.add(file.name)
             return True, None, None
         except (LftpError, LftpJobStatusParserError) as e:
             return False, "Lftp error: {}".format(str(e)), 500

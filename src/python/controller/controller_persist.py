@@ -19,6 +19,7 @@ class ControllerPersist(Persist):
     # Keys
     __KEY_DOWNLOADED_FILE_NAMES = "downloaded"
     __KEY_EXTRACTED_FILE_NAMES = "extracted"
+    __KEY_STOPPED_FILE_NAMES = "stopped"
 
     # Default maximum tracked files (shared between downloaded and extracted)
     DEFAULT_MAX_TRACKED_FILES = 10000
@@ -36,6 +37,11 @@ class ControllerPersist(Persist):
             maxlen=self._max_tracked_files
         )
         self.extracted_file_names: BoundedOrderedSet[str] = BoundedOrderedSet(
+            maxlen=self._max_tracked_files
+        )
+        # Track files that were explicitly stopped by user - these should not
+        # be auto-queued on restart even if they have no local content
+        self.stopped_file_names: BoundedOrderedSet[str] = BoundedOrderedSet(
             maxlen=self._max_tracked_files
         )
 
@@ -57,6 +63,7 @@ class ControllerPersist(Persist):
         return {
             'downloaded_evictions': self.downloaded_file_names.total_evictions,
             'extracted_evictions': self.extracted_file_names.total_evictions,
+            'stopped_evictions': self.stopped_file_names.total_evictions,
             'max_tracked_files': self._max_tracked_files
         }
 
@@ -70,7 +77,7 @@ class ControllerPersist(Persist):
         If the stored data exceeds max_tracked_files, the oldest entries
         (first in the list) are evicted to fit within the limit.
 
-        :param content: JSON string with downloaded and extracted lists
+        :param content: JSON string with downloaded, extracted, and stopped lists
         :param max_tracked_files: Maximum files to track (uses default if None)
         :return: ControllerPersist instance
         """
@@ -79,6 +86,8 @@ class ControllerPersist(Persist):
             dct = json.loads(content)
             downloaded_list = dct[ControllerPersist.__KEY_DOWNLOADED_FILE_NAMES]
             extracted_list = dct[ControllerPersist.__KEY_EXTRACTED_FILE_NAMES]
+            # stopped_list is optional for backwards compatibility with old persist files
+            stopped_list = dct.get(ControllerPersist.__KEY_STOPPED_FILE_NAMES, [])
 
             # Add items in order - if we exceed maxlen, oldest items are evicted
             for name in downloaded_list:
@@ -99,6 +108,15 @@ class ControllerPersist(Persist):
                         )
                     )
 
+            for name in stopped_list:
+                evicted = persist.stopped_file_names.add(name)
+                if evicted:
+                    persist._logger.debug(
+                        "Evicted '{}' from stopped files during load (limit: {})".format(
+                            evicted, persist._max_tracked_files
+                        )
+                    )
+
             return persist
         except (json.decoder.JSONDecodeError, KeyError) as e:
             raise PersistError("Error parsing ControllerPersist - {}: {}".format(
@@ -115,6 +133,7 @@ class ControllerPersist(Persist):
         dct = dict()
         dct[ControllerPersist.__KEY_DOWNLOADED_FILE_NAMES] = self.downloaded_file_names.as_list()
         dct[ControllerPersist.__KEY_EXTRACTED_FILE_NAMES] = self.extracted_file_names.as_list()
+        dct[ControllerPersist.__KEY_STOPPED_FILE_NAMES] = self.stopped_file_names.as_list()
         return json.dumps(dct, indent=Constants.JSON_PRETTY_PRINT_INDENT)
 
     @classmethod
