@@ -1,5 +1,5 @@
 import {
-    AfterContentChecked,
+    AfterContentChecked, AfterViewInit,
     ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener,
     OnInit, ViewChild, ViewContainerRef
 } from "@angular/core";
@@ -8,6 +8,7 @@ import {NgIf, DatePipe, AsyncPipe} from "@angular/common";
 import {LogService} from "../../services/logs/log.service";
 import {LogRecord} from "../../services/logs/log-record";
 import {StreamServiceRegistry} from "../../services/base/stream-service.registry";
+import {ConnectedService} from "../../services/utils/connected.service";
 import {Localization} from "../../common/localization";
 import {DomService} from "../../services/utils/dom.service";
 import {Observable} from "rxjs";
@@ -21,14 +22,13 @@ import {Observable} from "rxjs";
     standalone: true,
     imports: [NgIf, DatePipe, AsyncPipe]
 })
-export class LogsPageComponent implements OnInit, AfterContentChecked {
+export class LogsPageComponent implements OnInit, AfterViewInit, AfterContentChecked {
     public readonly LogRecord = LogRecord;
     public readonly Localization = Localization;
 
     public headerHeight: Observable<number>;
 
     @ViewChild("templateRecord", {static: false}) templateRecord;
-    @ViewChild("templateConnected", {static: false}) templateConnected;
 
     // Where to insert the cloned content
     @ViewChild("container", {static: false, read: ViewContainerRef}) container;
@@ -39,19 +39,40 @@ export class LogsPageComponent implements OnInit, AfterContentChecked {
     public showScrollToTopButton = false;
     public showScrollToBottomButton = false;
 
+    // Connection and log state
+    public isConnected = false;
+    public hasReceivedLogs = false;
+
     private _logService: LogService;
+    private _connectedService: ConnectedService;
+    private _viewInitialized = false;
 
     constructor(private _elementRef: ElementRef,
                 private _changeDetector: ChangeDetectorRef,
                 private _streamRegistry: StreamServiceRegistry,
                 private _domService: DomService) {
         this._logService = _streamRegistry.logService;
+        this._connectedService = _streamRegistry.connectedService;
         this.headerHeight = this._domService.headerHeight;
     }
 
     ngOnInit() {
+        // Subscribe to connection status (doesn't need ViewChild elements)
+        this._connectedService.connected.subscribe({
+            next: connected => {
+                this.isConnected = connected;
+                this._changeDetector.detectChanges();
+            }
+        });
+    }
+
+    ngAfterViewInit() {
+        this._viewInitialized = true;
+
+        // Subscribe to logs after view is initialized so ViewChild elements are available
         this._logService.logs.subscribe({
             next: record => {
+                this.hasReceivedLogs = true;
                 this.insertRecord(record);
             }
         });
@@ -59,7 +80,10 @@ export class LogsPageComponent implements OnInit, AfterContentChecked {
 
     ngAfterContentChecked() {
         // Refresh button state when tabs is switched away and back
-        this.refreshScrollButtonVisibility();
+        // Only run after view is initialized (ViewChild elements are available)
+        if (this._viewInitialized) {
+            this.refreshScrollButtonVisibility();
+        }
     }
 
     scrollToTop() {
@@ -77,6 +101,11 @@ export class LogsPageComponent implements OnInit, AfterContentChecked {
     }
 
     private insertRecord(record: LogRecord) {
+        // Guard against ViewChild elements not being available
+        if (!this.container || !this.templateRecord || !this.logTail) {
+            return;
+        }
+
         // Scroll down if the log is visible and already scrolled to the bottom
         const scrollToBottom = this._elementRef.nativeElement.offsetParent != null &&
             LogsPageComponent.isElementInViewport(this.logTail.nativeElement);
@@ -90,6 +119,11 @@ export class LogsPageComponent implements OnInit, AfterContentChecked {
     }
 
     private refreshScrollButtonVisibility() {
+        // Guard against ViewChild elements not being available
+        if (!this.logHead || !this.logTail) {
+            return;
+        }
+
         // Show/hide the scroll buttons
         this.showScrollToTopButton = !LogsPageComponent.isElementInViewport(
             this.logHead.nativeElement

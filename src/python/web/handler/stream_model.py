@@ -1,6 +1,6 @@
 # Copyright 2017, Inderpreet Singh, All rights reserved.
 
-from typing import Optional
+from typing import Optional, List
 
 from ..web_app import IStreamHandler
 from ..utils import StreamQueue
@@ -42,24 +42,32 @@ class ModelStreamHandler(IStreamHandler):
         self.controller = controller
         self.serialize = SerializeModel()
         self.model_listener = WebResponseModelListener()
-        self.initial_model_files = None
-        self.first_run = True
+        self.initial_model_files: List[ModelFile] = []
 
     @overrides(IStreamHandler)
     def setup(self):
-        self.initial_model_files = self.controller.get_model_files_and_add_listener(self.model_listener)
+        self.initial_model_files = list(
+            self.controller.get_model_files_and_add_listener(self.model_listener)
+        )
 
     @overrides(IStreamHandler)
     def get_value(self) -> Optional[str]:
-        if self.first_run:
-            self.first_run = False
-            return self.serialize.model(self.initial_model_files)
-        else:
-            event = self.model_listener.get_next_event()
-            if event is not None:
-                return self.serialize.update_event(event)
-            else:
-                return None
+        # Send initial files one at a time as "added" events
+        # The streaming loop ensures fair interleaving with other handlers
+        if self.initial_model_files:
+            file = self.initial_model_files.pop(0)
+            event = SerializeModel.UpdateEvent(
+                change=SerializeModel.UpdateEvent.Change.ADDED,
+                old_file=None,
+                new_file=file
+            )
+            return self.serialize.update_event(event)
+
+        # After all initial files are sent, process real-time updates
+        event = self.model_listener.get_next_event()
+        if event is not None:
+            return self.serialize.update_event(event)
+        return None
 
     @overrides(IStreamHandler)
     def cleanup(self):

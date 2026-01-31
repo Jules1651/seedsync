@@ -57,6 +57,8 @@ class WebApp(bottle.Bottle):
     Web app implementation
     """
     _STREAM_POLL_INTERVAL_IN_MS = 100
+    _STREAM_YIELD_INTERVAL_IN_MS = 10  # Small delay between events to avoid flooding
+    _HEARTBEAT_INTERVAL_IN_MS = 15000  # Send ping every 15 seconds
 
     def __init__(self, context: Context, controller: Controller):
         super().__init__()
@@ -126,31 +128,52 @@ class WebApp(bottle.Bottle):
         """
         return static_file(file_path, root=self._html_path)
 
+    @staticmethod
+    def _sse_pack(event: str, data: str = "") -> str:
+        """Pack data into SSE format"""
+        return "event: {}\ndata: {}\n\n".format(event, data)
+
     def __web_stream(self):
         # Initialize all the handlers
         handlers = [cls(**kwargs) for (cls, kwargs) in self._streaming_handlers]
 
         try:
-            # Setup the response header
+            # Setup the response headers for SSE
             bottle.response.content_type = "text/event-stream"
-            bottle.response.cache_control = "no-cache"
+            bottle.response.set_header("Cache-Control", "no-cache")
+            bottle.response.set_header("Connection", "keep-alive")
+            bottle.response.set_header("X-Accel-Buffering", "no")  # Disable nginx buffering
 
             # Call setup on all handlers
             for handler in handlers:
                 handler.setup()
 
+            # Track time for heartbeat
+            last_heartbeat = time.time()
+
             # Get streaming values until the connection closes
             while not self._stop_flag:
+                had_value = False
                 for handler in handlers:
-                    # Process all values from this handler
-                    while True:
-                        value = handler.get_value()
-                        if value:
-                            yield value
-                        else:
-                            break
+                    # Get one value from this handler per iteration
+                    # to ensure fair interleaving between handlers
+                    value = handler.get_value()
+                    if value:
+                        yield value
+                        had_value = True
 
-                time.sleep(WebApp._STREAM_POLL_INTERVAL_IN_MS / 1000)
+                # Send heartbeat ping if interval has elapsed
+                now = time.time()
+                if (now - last_heartbeat) * 1000 >= WebApp._HEARTBEAT_INTERVAL_IN_MS:
+                    yield WebApp._sse_pack("ping")
+                    last_heartbeat = now
+
+                # Always sleep between iterations to avoid flooding the connection
+                # Use shorter sleep when data is available, longer when idle
+                if had_value:
+                    time.sleep(WebApp._STREAM_YIELD_INTERVAL_IN_MS / 1000)
+                else:
+                    time.sleep(WebApp._STREAM_POLL_INTERVAL_IN_MS / 1000)
 
         finally:
             self.logger.debug("Stream connection stopped by {}".format(
