@@ -300,6 +300,8 @@ class TestAutoQueue(unittest.TestCase):
         self.controller.queue_command = MagicMock()
         self.model_listener = None
         self.initial_model = []
+        # Track which files are "stopped" for testing
+        self.stopped_files = set()
 
         def get_model():
             return self.initial_model
@@ -308,8 +310,12 @@ class TestAutoQueue(unittest.TestCase):
             self.model_listener = listener
             return get_model()
 
+        def is_file_stopped(filename: str) -> bool:
+            return filename in self.stopped_files
+
         self.controller.get_model_files.side_effect = get_model
         self.controller.get_model_files_and_add_listener.side_effect = get_model_and_capture_listener
+        self.controller.is_file_stopped.side_effect = is_file_stopped
 
     def test_matching_new_files_are_queued(self):
         persist = AutoQueuePersist()
@@ -1612,6 +1618,90 @@ class TestAutoQueue(unittest.TestCase):
         self.model_listener.file_updated(file_one, file_one_updated)
         auto_queue.process()
         # Should queue because the remote file actually changed (100 -> 200)
+        self.controller.queue_command.assert_called_once_with(unittest.mock.ANY)
+        command = self.controller.queue_command.call_args[0][0]
+        self.assertEqual(Controller.Command.Action.QUEUE, command.action)
+        self.assertEqual("File.One", command.filename)
+
+    def test_explicitly_stopped_files_are_not_auto_queued(self):
+        """
+        Test that files tracked as 'stopped' by the controller are NOT auto-queued.
+
+        This tests the fix for files that were queued but stopped before any
+        content was downloaded. These files are tracked in stopped_file_names
+        and should not be auto-queued on restart.
+        """
+        persist = AutoQueuePersist()
+        persist.add_pattern(AutoQueuePattern(pattern="File"))
+
+        # Mark "File.One" as stopped (simulates user stopping a queued file)
+        self.stopped_files.add("File.One")
+
+        # noinspection PyTypeChecker
+        auto_queue = AutoQueue(self.context, persist, self.controller)
+
+        # New file matches pattern but is marked as stopped
+        file_one = ModelFile("File.One", True)
+        file_one.remote_size = 100
+        file_one.local_size = None  # No local content (was never downloaded)
+        file_one.state = ModelFile.State.DEFAULT
+        self.model_listener.file_added(file_one)
+
+        # Also add a file that is NOT stopped
+        file_two = ModelFile("File.Two", True)
+        file_two.remote_size = 100
+        file_two.local_size = None
+        file_two.state = ModelFile.State.DEFAULT
+        self.model_listener.file_added(file_two)
+
+        auto_queue.process()
+
+        # Only File.Two should be queued (File.One is stopped)
+        self.controller.queue_command.assert_called_once_with(unittest.mock.ANY)
+        command = self.controller.queue_command.call_args[0][0]
+        self.assertEqual(Controller.Command.Action.QUEUE, command.action)
+        self.assertEqual("File.Two", command.filename)
+
+    def test_manually_queued_file_clears_stopped_status(self):
+        """
+        Test that when a user manually queues a file (simulated by removing from
+        stopped_files), it can be auto-queued again after remote update.
+
+        This verifies the workflow: stop file -> restart -> manually queue ->
+        remote updates -> should auto-queue.
+        """
+        persist = AutoQueuePersist()
+        persist.add_pattern(AutoQueuePattern(pattern="File"))
+
+        # Initially mark file as stopped
+        self.stopped_files.add("File.One")
+
+        # noinspection PyTypeChecker
+        auto_queue = AutoQueue(self.context, persist, self.controller)
+
+        # File exists but is stopped
+        file_one = ModelFile("File.One", True)
+        file_one.remote_size = 100
+        file_one.local_size = None
+        file_one.state = ModelFile.State.DEFAULT
+        self.model_listener.file_added(file_one)
+        auto_queue.process()
+
+        # Should NOT queue because file is stopped
+        self.controller.queue_command.assert_not_called()
+
+        # User manually queues the file (removes from stopped)
+        self.stopped_files.discard("File.One")
+
+        # Remote file is updated
+        file_one_updated = ModelFile("File.One", True)
+        file_one_updated.remote_size = 200  # Size changed
+        file_one_updated.local_size = None
+        file_one_updated.state = ModelFile.State.DEFAULT
+        self.model_listener.file_updated(file_one, file_one_updated)
+        auto_queue.process()
+
+        # Now should queue because file is no longer stopped
         self.controller.queue_command.assert_called_once_with(unittest.mock.ANY)
         command = self.controller.queue_command.call_args[0][0]
         self.assertEqual(Controller.Command.Action.QUEUE, command.action)
