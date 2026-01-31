@@ -344,6 +344,43 @@ class Controller:
                 self.__persist.extracted_file_names.add(result.name)
             self.__model_builder.set_extracted_files(self.__persist.extracted_file_names)
 
+    def _detect_and_track_queued(self, diff: ModelDiff) -> None:
+        """
+        Detect if a file has started downloading and update persist state.
+
+        A file is added to tracking when it is DOWNLOADING and has local content
+        (local_size > 0). This ensures that files which were started but never
+        completed are still tracked and won't be auto-queued again.
+
+        We don't track when merely QUEUED because stopping a queued file should
+        return it to DEFAULT state, not mark it as DELETED.
+
+        Args:
+            diff: A single model diff entry.
+        """
+        new_file = diff.new_file
+        if not new_file:
+            return
+
+        # Only track when DOWNLOADING with actual local content
+        if new_file.state != ModelFile.State.DOWNLOADING:
+            return
+        if not new_file.local_size or new_file.local_size <= 0:
+            return
+
+        # Check if this is a new transition to downloading
+        should_track = False
+        if diff.change == ModelDiff.Change.ADDED:
+            should_track = True
+        elif diff.change == ModelDiff.Change.UPDATED:
+            old_state = diff.old_file.state if diff.old_file else None
+            if old_state not in (ModelFile.State.DOWNLOADING, ModelFile.State.DOWNLOADED):
+                should_track = True
+
+        if should_track:
+            self.__persist.downloaded_file_names.add(new_file.name)
+            self.__model_builder.set_downloaded_files(self.__persist.downloaded_file_names)
+
     def _detect_and_track_download(self, diff: ModelDiff) -> None:
         """
         Detect if a file was just downloaded and update persist state.
@@ -351,6 +388,9 @@ class Controller:
         A file is considered "just downloaded" if:
         - It was added in DOWNLOADED state, OR
         - It was updated and transitioned TO DOWNLOADED state from a non-DOWNLOADED state
+
+        Note: Files are also tracked when downloading (see _detect_and_track_queued),
+        so this mainly handles edge cases where a file appears already downloaded.
 
         Args:
             diff: A single model diff entry.
@@ -395,14 +435,17 @@ class Controller:
 
     def _prune_downloaded_files(self, latest_remote_scan: Optional[object]) -> None:
         """
-        Remove deleted or missing files from the downloaded files tracking list.
+        Remove missing files from the downloaded files tracking list.
 
         This prevents unbounded memory growth from tracking files indefinitely.
-        After removal, the file returns to DEFAULT state on next scan if still remote.
 
         A file is removed from tracking if:
-        - It exists in model but is in DELETED state, OR
         - It doesn't exist in model AND we've had a successful remote scan
+          (meaning the file is completely gone from both local and remote)
+
+        Note: DELETED files (locally deleted but still remote) are NOT pruned.
+        They must remain tracked so they stay in DELETED state and don't get
+        auto-queued. The user can manually re-queue them when desired.
 
         Must be called while holding the model lock.
 
@@ -413,12 +456,7 @@ class Controller:
         existing_file_names = self.__model.get_file_names()
 
         for downloaded_file_name in self.__persist.downloaded_file_names:
-            if downloaded_file_name in existing_file_names:
-                file = self.__model.get_file(downloaded_file_name)
-                if file.state == ModelFile.State.DELETED:
-                    # Deleted locally, remove from tracking
-                    remove_downloaded_file_names.add(downloaded_file_name)
-            else:
+            if downloaded_file_name not in existing_file_names:
                 # Not in the model at all - file is completely gone from both local and remote
                 # Only remove if we've had at least one successful remote scan
                 if latest_remote_scan is not None and not latest_remote_scan.failed:
@@ -453,7 +491,8 @@ class Controller:
             elif diff.change == ModelDiff.Change.UPDATED:
                 self.__model.update_file(diff.new_file)
 
-            # Detect if a file was just Downloaded and update persist state
+            # Detect if a file was just queued or downloaded and update persist state
+            self._detect_and_track_queued(diff)
             self._detect_and_track_download(diff)
 
     def _build_and_apply_model(self, latest_remote_scan: Optional[object]) -> None:
