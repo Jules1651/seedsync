@@ -346,29 +346,39 @@ class Controller:
 
     def _detect_and_track_queued(self, diff: ModelDiff) -> None:
         """
-        Detect if a file was just queued for download and update persist state.
+        Detect if a file has started downloading and update persist state.
 
-        A file is added to tracking when it enters QUEUED or DOWNLOADING state.
-        This ensures that files which were started but never completed are still
-        tracked and won't be auto-queued again.
+        A file is added to tracking when it is DOWNLOADING and has local content
+        (local_size > 0). This ensures that files which were started but never
+        completed are still tracked and won't be auto-queued again.
+
+        We don't track when merely QUEUED because stopping a queued file should
+        return it to DEFAULT state, not mark it as DELETED.
 
         Args:
             diff: A single model diff entry.
         """
-        queued = False
-        new_state = diff.new_file.state if diff.new_file else None
+        new_file = diff.new_file
+        if not new_file:
+            return
 
-        if new_state in (ModelFile.State.QUEUED, ModelFile.State.DOWNLOADING):
-            if diff.change == ModelDiff.Change.ADDED:
-                queued = True
-            elif diff.change == ModelDiff.Change.UPDATED:
-                old_state = diff.old_file.state if diff.old_file else None
-                if old_state not in (ModelFile.State.QUEUED, ModelFile.State.DOWNLOADING,
-                                     ModelFile.State.DOWNLOADED):
-                    queued = True
+        # Only track when DOWNLOADING with actual local content
+        if new_file.state != ModelFile.State.DOWNLOADING:
+            return
+        if not new_file.local_size or new_file.local_size <= 0:
+            return
 
-        if queued:
-            self.__persist.downloaded_file_names.add(diff.new_file.name)
+        # Check if this is a new transition to downloading
+        should_track = False
+        if diff.change == ModelDiff.Change.ADDED:
+            should_track = True
+        elif diff.change == ModelDiff.Change.UPDATED:
+            old_state = diff.old_file.state if diff.old_file else None
+            if old_state not in (ModelFile.State.DOWNLOADING, ModelFile.State.DOWNLOADED):
+                should_track = True
+
+        if should_track:
+            self.__persist.downloaded_file_names.add(new_file.name)
             self.__model_builder.set_downloaded_files(self.__persist.downloaded_file_names)
 
     def _detect_and_track_download(self, diff: ModelDiff) -> None:
@@ -379,7 +389,7 @@ class Controller:
         - It was added in DOWNLOADED state, OR
         - It was updated and transitioned TO DOWNLOADED state from a non-DOWNLOADED state
 
-        Note: Files are also tracked when queued (see _detect_and_track_queued),
+        Note: Files are also tracked when downloading (see _detect_and_track_queued),
         so this mainly handles edge cases where a file appears already downloaded.
 
         Args:
