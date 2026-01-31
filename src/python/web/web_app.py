@@ -131,9 +131,11 @@ class WebApp(bottle.Bottle):
         handlers = [cls(**kwargs) for (cls, kwargs) in self._streaming_handlers]
 
         try:
-            # Setup the response header
+            # Setup the response headers for SSE
             bottle.response.content_type = "text/event-stream"
-            bottle.response.cache_control = "no-cache"
+            bottle.response.set_header("Cache-Control", "no-cache")
+            bottle.response.set_header("Connection", "keep-alive")
+            bottle.response.set_header("X-Accel-Buffering", "no")  # Disable nginx buffering
 
             # Call setup on all handlers
             for handler in handlers:
