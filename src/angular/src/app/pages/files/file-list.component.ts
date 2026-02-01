@@ -19,7 +19,6 @@ import {ConfirmModalService} from "../../services/utils/confirm-modal.service";
 import {NotificationService} from "../../services/utils/notification.service";
 import {Notification} from "../../services/utils/notification";
 import {Localization} from "../../common/localization";
-import {IsSelectedPipe} from "../../common/is-selected.pipe";
 
 @Component({
     selector: "app-file-list",
@@ -28,7 +27,7 @@ import {IsSelectedPipe} from "../../common/is-selected.pipe";
     styleUrls: ["./file-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent, BulkActionsBarComponent, IsSelectedPipe]
+    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent, BulkActionsBarComponent]
 })
 export class FileListComponent {
     public files: Observable<List<ViewFile>>;
@@ -73,6 +72,7 @@ export class FileListComponent {
         });
 
         // Calculate header checkbox state based on selection and visible files
+        // Uses early-exit optimization to avoid O(N) full scan for common cases
         this.headerCheckboxState$ = combineLatest([
             this.files,
             this.fileSelectionService.selectedFiles$
@@ -81,14 +81,14 @@ export class FileListComponent {
                 if (files.size === 0 || selectedFiles.size === 0) {
                     return "none";
                 }
-                const visibleSelectedCount = files.filter(f => selectedFiles.has(f.name)).size;
-                if (visibleSelectedCount === 0) {
-                    return "none";
-                } else if (visibleSelectedCount === files.size) {
+                // Early exit: check if any file is unselected
+                const hasUnselected = files.some(f => !selectedFiles.has(f.name));
+                if (!hasUnselected) {
                     return "all";
-                } else {
-                    return "some";
                 }
+                // Check if any file is selected
+                const hasSelected = files.some(f => selectedFiles.has(f.name));
+                return hasSelected ? "some" : "none";
             })
         );
     }

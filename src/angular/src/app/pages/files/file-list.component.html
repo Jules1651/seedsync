@@ -36,7 +36,7 @@
         <app-file
             [file]="file"
             [options]="options"
-            [bulkSelected]="file.name | isSelected:vm.selectedFiles"
+            [bulkSelected]="vm.selectedFiles.has(file.name)"
             (click)="onSelect(file)"
             (checkboxToggle)="onCheckboxToggle($event)"
             (queueEvent)="onQueue($event)"
