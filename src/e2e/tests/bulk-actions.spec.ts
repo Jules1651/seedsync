@@ -220,9 +220,13 @@ test.describe('Bulk File Actions', () => {
         });
 
         test('1.5 - selection count in banner matches selected files', async () => {
+            // Click checkboxes and wait for each to be checked
             await dashboardPage.clickFileCheckbox(0);
+            await expect(dashboardPage.getFileCheckbox(0)).toBeChecked();
             await dashboardPage.clickFileCheckbox(1);
+            await expect(dashboardPage.getFileCheckbox(1)).toBeChecked();
             await dashboardPage.clickFileCheckbox(2);
+            await expect(dashboardPage.getFileCheckbox(2)).toBeChecked();
 
             const countText = await dashboardPage.selectionCount.textContent();
             expect(countText).toContain('3');
@@ -286,8 +290,10 @@ test.describe('Bulk File Actions', () => {
         });
 
         test('3.2 - selecting 5 files shows correct count', async () => {
+            // Click checkboxes and wait for each to be checked
             for (let i = 0; i < 5; i++) {
                 await dashboardPage.clickFileCheckbox(i);
+                await expect(dashboardPage.getFileCheckbox(i)).toBeChecked();
             }
 
             const text = await dashboardPage.selectionCount.textContent();
@@ -345,20 +351,26 @@ test.describe('Bulk File Actions', () => {
             await dashboardPage.clickFileCheckbox(1);
             await expect(dashboardPage.selectionBanner).toBeVisible();
 
+            // Click on file list area to move focus away from checkbox input
+            // (keyboard shortcuts are ignored when focus is on input elements)
+            await dashboardPage.getFileRow(0).locator('.name').click();
             await dashboardPage.pressEscape();
 
             await expect(dashboardPage.selectionBanner).not.toBeVisible();
         });
 
         test('4.3-4.5 - Shift+click selects range', async () => {
-            // Click on file 1
+            // Click on file 1 and wait for it to be checked (sets _lastClickedIndex)
             await dashboardPage.clickFileCheckbox(1);
-            expect(await dashboardPage.getFileCheckbox(1).isChecked()).toBe(true);
+            await expect(dashboardPage.getFileCheckbox(1)).toBeChecked();
 
-            // Shift+click on file 4
+            // Shift+click on file 4 to select range [1-4]
             await dashboardPage.shiftClickFileCheckbox(4);
 
-            // Files 1, 2, 3, 4 should be selected
+            // Wait for selection to update, then check all files in range
+            await expect(dashboardPage.getFileCheckbox(4)).toBeChecked();
+
+            // Files 1, 2, 3, 4 should all be selected
             expect(await dashboardPage.getFileCheckbox(1).isChecked()).toBe(true);
             expect(await dashboardPage.getFileCheckbox(2).isChecked()).toBe(true);
             expect(await dashboardPage.getFileCheckbox(3).isChecked()).toBe(true);
@@ -407,10 +419,13 @@ test.describe('Bulk File Actions', () => {
 
         test('6.6 - verify button order', async () => {
             await dashboardPage.clickFileCheckbox(0);
+            // Wait for bulk actions bar to be visible before checking buttons
+            await expect(dashboardPage.bulkActionsBar).toBeVisible();
 
             const buttons = await dashboardPage.getAllBulkActionButtonTexts();
 
             // Verify order: Queue, Stop, Extract, Delete Local, Delete Remote
+            expect(buttons.length).toBe(5);
             expect(buttons[0]).toContain('Queue');
             expect(buttons[1]).toContain('Stop');
             expect(buttons[2]).toContain('Extract');
