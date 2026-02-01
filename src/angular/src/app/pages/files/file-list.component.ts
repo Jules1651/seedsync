@@ -6,6 +6,7 @@ import {map} from "rxjs/operators";
 import {List} from "immutable";
 
 import {FileComponent} from "./file.component";
+import {SelectionBannerComponent} from "./selection-banner.component";
 import {ViewFileService} from "../../services/files/view-file.service";
 import {ViewFile} from "../../services/files/view-file";
 import {LoggerService} from "../../services/utils/logger.service";
@@ -20,7 +21,7 @@ import {FileSelectionService} from "../../services/files/file-selection.service"
     styleUrls: ["./file-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, AsyncPipe, FileComponent]
+    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent]
 })
 export class FileListComponent {
     public files: Observable<List<ViewFile>>;
@@ -30,12 +31,20 @@ export class FileListComponent {
     // Header checkbox state: 'none', 'some', 'all'
     public headerCheckboxState$: Observable<"none" | "some" | "all">;
 
+    // Selection state for banner
+    public selectedFiles$: Observable<Set<string>>;
+    public selectAllMatchingFilter$: Observable<boolean>;
+
     constructor(private _logger: LoggerService,
                 private viewFileService: ViewFileService,
                 private viewFileOptionsService: ViewFileOptionsService,
                 public fileSelectionService: FileSelectionService) {
         this.files = viewFileService.filteredFiles;
         this.options = this.viewFileOptionsService.options;
+
+        // Selection state observables for banner
+        this.selectedFiles$ = this.fileSelectionService.selectedFiles$;
+        this.selectAllMatchingFilter$ = this.fileSelectionService.selectAllMatchingFilter$;
 
         // Calculate header checkbox state based on selection and visible files
         this.headerCheckboxState$ = combineLatest([
@@ -133,6 +142,20 @@ export class FileListComponent {
             // None or some selected - select all visible
             this.fileSelectionService.selectAllVisible(files.toArray());
         }
+    }
+
+    /**
+     * Handle "Select all matching filter" from banner.
+     */
+    onSelectAllMatchingFilter(files: List<ViewFile>): void {
+        this.fileSelectionService.selectAllMatchingFilter(files.toArray());
+    }
+
+    /**
+     * Handle "Clear" from banner.
+     */
+    onClearSelection(): void {
+        this.fileSelectionService.clearSelection();
     }
 
 }

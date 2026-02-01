@@ -4,9 +4,9 @@
 
 | Item | Value |
 |------|-------|
-| **Latest Branch** | `claude/review-bulk-file-actions-1jrQG` |
+| **Latest Branch** | `claude/review-bulk-file-actions-olN0F` |
 | **Status** | 🟢 In Progress |
-| **Current Session** | Session 4 Complete |
+| **Current Session** | Session 5 Complete |
 | **Total Sessions** | 10 estimated |
 
 > **Claude Code Branch Management:**
@@ -31,7 +31,8 @@
 > **Branch History:**
 > - `claude/review-bulk-file-actions-2KjKN` - Sessions 1-2 (original)
 > - `claude/review-bulk-file-actions-UM3bn` - Sessions 1-3 (merged from above)
-> - `claude/review-bulk-file-actions-1jrQG` - Sessions 1-4 (current, merged from above)
+> - `claude/review-bulk-file-actions-1jrQG` - Sessions 1-4 (merged from above)
+> - `claude/review-bulk-file-actions-olN0F` - Sessions 1-5 (current, merged from above)
 
 ---
 
@@ -165,12 +166,12 @@ Response: { "results": [...], "summary": { "total": 3, "succeeded": 2, "failed":
 **Dependencies:** Session 4
 
 **Tasks:**
-- [ ] Create `src/angular/src/app/pages/files/selection-banner.component.ts`
-- [ ] Show "X files selected" when selection exists
-- [ ] Show "Select all Y matching filter" link when all visible selected
-- [ ] Add "Clear selection" button
-- [ ] Integrate into file list page
-- [ ] Style the banner
+- [x] Create `src/angular/src/app/pages/files/selection-banner.component.ts`
+- [x] Show "X files selected" when selection exists
+- [x] Show "Select all Y matching filter" link when all visible selected
+- [x] Add "Clear selection" button
+- [x] Integrate into file list page
+- [x] Style the banner
 
 **Context to read:**
 - `src/angular/src/app/pages/files/file-list.component.ts`
@@ -329,6 +330,7 @@ _Record completed sessions here with date, outcome, and learnings._
 | Session 2 | 2026-01-31 | ✅ Complete | FileSelectionService with 26 unit tests |
 | Session 3 | 2026-01-31 | ✅ Complete | Wired selection clear to filter/sort changes, 4 unit tests |
 | Session 4 | 2026-01-31 | ✅ Complete | Checkbox UI for header and rows, wired to FileSelectionService |
+| Session 5 | 2026-02-01 | ✅ Complete | Selection banner with count, "select all matching", and clear button |
 
 ---
 
@@ -369,10 +371,14 @@ _Track any blockers encountered._
 
 ## Files Reference
 
+### New Files Created
+```
+src/angular/src/app/services/files/file-selection.service.ts  # Session 2
+src/angular/src/app/pages/files/selection-banner.component.ts  # Session 5
+```
+
 ### New Files to Create
 ```
-src/angular/src/app/services/files/file-selection.service.ts
-src/angular/src/app/pages/files/selection-banner.component.ts
 src/angular/src/app/pages/files/bulk-actions-bar.component.ts
 src/angular/src/app/common/confirmation-dialog/confirmation-dialog.component.ts
 src/angular/src/app/services/server/bulk-command.service.ts

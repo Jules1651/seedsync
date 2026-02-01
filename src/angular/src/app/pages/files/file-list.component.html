@@ -1,4 +1,12 @@
-<ng-container *ngIf="{files: files | async, state: headerCheckboxState$ | async} as vm">
+<ng-container *ngIf="{files: files | async, state: headerCheckboxState$ | async, selectedFiles: selectedFiles$ | async, selectAllMatchingFilter: selectAllMatchingFilter$ | async} as vm">
+<app-selection-banner
+    [visibleFiles]="vm.files!"
+    [totalMatchingCount]="vm.files!.size"
+    [selectedFiles]="vm.selectedFiles!"
+    [selectAllMatchingFilterActive]="vm.selectAllMatchingFilter!"
+    (clearSelection)="onClearSelection()"
+    (selectAllMatchingFilter)="onSelectAllMatchingFilter(vm.files!)">
+</app-selection-banner>
 <div id="file-list">
     <div id="header">
         <div class="checkbox">
