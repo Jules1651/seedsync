@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, ChangeDetectionStrategy} from "@angular/core";
+import {Component, Input, Output, EventEmitter, ChangeDetectionStrategy, OnChanges, SimpleChanges} from "@angular/core";
 import {NgIf} from "@angular/common";
 
 import {List} from "immutable";
@@ -23,6 +23,10 @@ export interface BulkActionCounts {
  * are eligible for each action. Buttons are disabled when count is 0.
  *
  * Button order: Queue, Stop, Extract, Delete Local, Delete Remote
+ *
+ * Performance optimization: Action counts and file lists are cached
+ * and only recomputed when inputs change, avoiding repeated iteration
+ * through the file list on each template access.
  */
 @Component({
     selector: "app-bulk-actions-bar",
@@ -32,7 +36,7 @@ export interface BulkActionCounts {
     standalone: true,
     imports: [NgIf]
 })
-export class BulkActionsBarComponent {
+export class BulkActionsBarComponent implements OnChanges {
 
     /**
      * The list of currently visible (filtered) files.
@@ -48,6 +52,69 @@ export class BulkActionsBarComponent {
      * Whether a bulk operation is currently in progress.
      */
     @Input() operationInProgress = false;
+
+    // Cached computed values - recomputed only on input changes
+    private _cachedSelectedViewFiles: ViewFile[] = [];
+    private _cachedActionCounts: BulkActionCounts = {
+        queueable: 0,
+        stoppable: 0,
+        extractable: 0,
+        locallyDeletable: 0,
+        remotelyDeletable: 0
+    };
+    private _cachedQueueableFiles: string[] = [];
+    private _cachedStoppableFiles: string[] = [];
+    private _cachedExtractableFiles: string[] = [];
+    private _cachedLocallyDeletableFiles: string[] = [];
+    private _cachedRemotelyDeletableFiles: string[] = [];
+
+    ngOnChanges(changes: SimpleChanges): void {
+        // Only recompute if visibleFiles or selectedFiles changed
+        if (changes["visibleFiles"] || changes["selectedFiles"]) {
+            this._recomputeCachedValues();
+        }
+    }
+
+    /**
+     * Recompute all cached values from current inputs.
+     * This is called once per input change, avoiding repeated computation
+     * when multiple getters access the same underlying data.
+     */
+    private _recomputeCachedValues(): void {
+        // Compute selected view files once
+        this._cachedSelectedViewFiles = this.visibleFiles
+            .filter(f => this.selectedFiles.has(f.name))
+            .toArray();
+
+        // Compute action-specific lists in a single pass
+        const queueable: string[] = [];
+        const stoppable: string[] = [];
+        const extractable: string[] = [];
+        const locallyDeletable: string[] = [];
+        const remotelyDeletable: string[] = [];
+
+        for (const file of this._cachedSelectedViewFiles) {
+            if (file.isQueueable) queueable.push(file.name);
+            if (file.isStoppable) stoppable.push(file.name);
+            if (file.isExtractable) extractable.push(file.name);
+            if (file.isLocallyDeletable) locallyDeletable.push(file.name);
+            if (file.isRemotelyDeletable) remotelyDeletable.push(file.name);
+        }
+
+        this._cachedQueueableFiles = queueable;
+        this._cachedStoppableFiles = stoppable;
+        this._cachedExtractableFiles = extractable;
+        this._cachedLocallyDeletableFiles = locallyDeletable;
+        this._cachedRemotelyDeletableFiles = remotelyDeletable;
+
+        this._cachedActionCounts = {
+            queueable: queueable.length,
+            stoppable: stoppable.length,
+            extractable: extractable.length,
+            locallyDeletable: locallyDeletable.length,
+            remotelyDeletable: remotelyDeletable.length
+        };
+    }
 
     /**
      * Emitted when user clicks Queue button.
@@ -94,59 +161,52 @@ export class BulkActionsBarComponent {
     }
 
     /**
-     * Get the list of selected ViewFile objects.
+     * Get the list of selected ViewFile objects (cached).
      */
     get selectedViewFiles(): ViewFile[] {
-        return this.visibleFiles.filter(f => this.selectedFiles.has(f.name)).toArray();
+        return this._cachedSelectedViewFiles;
     }
 
     /**
-     * Calculate action counts for all selected files.
+     * Get action counts for all selected files (cached).
      */
     get actionCounts(): BulkActionCounts {
-        const selectedViewFiles = this.selectedViewFiles;
-        return {
-            queueable: selectedViewFiles.filter(f => f.isQueueable).length,
-            stoppable: selectedViewFiles.filter(f => f.isStoppable).length,
-            extractable: selectedViewFiles.filter(f => f.isExtractable).length,
-            locallyDeletable: selectedViewFiles.filter(f => f.isLocallyDeletable).length,
-            remotelyDeletable: selectedViewFiles.filter(f => f.isRemotelyDeletable).length
-        };
+        return this._cachedActionCounts;
     }
 
     /**
-     * Get files that are queueable.
+     * Get files that are queueable (cached).
      */
     get queueableFiles(): string[] {
-        return this.selectedViewFiles.filter(f => f.isQueueable).map(f => f.name);
+        return this._cachedQueueableFiles;
     }
 
     /**
-     * Get files that are stoppable.
+     * Get files that are stoppable (cached).
      */
     get stoppableFiles(): string[] {
-        return this.selectedViewFiles.filter(f => f.isStoppable).map(f => f.name);
+        return this._cachedStoppableFiles;
     }
 
     /**
-     * Get files that are extractable.
+     * Get files that are extractable (cached).
      */
     get extractableFiles(): string[] {
-        return this.selectedViewFiles.filter(f => f.isExtractable).map(f => f.name);
+        return this._cachedExtractableFiles;
     }
 
     /**
-     * Get files that are locally deletable.
+     * Get files that are locally deletable (cached).
      */
     get locallyDeletableFiles(): string[] {
-        return this.selectedViewFiles.filter(f => f.isLocallyDeletable).map(f => f.name);
+        return this._cachedLocallyDeletableFiles;
     }
 
     /**
-     * Get files that are remotely deletable.
+     * Get files that are remotely deletable (cached).
      */
     get remotelyDeletableFiles(): string[] {
-        return this.selectedViewFiles.filter(f => f.isRemotelyDeletable).map(f => f.name);
+        return this._cachedRemotelyDeletableFiles;
     }
 
     /**

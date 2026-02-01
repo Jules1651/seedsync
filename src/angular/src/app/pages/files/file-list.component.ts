@@ -19,6 +19,7 @@ import {ConfirmModalService} from "../../services/utils/confirm-modal.service";
 import {NotificationService} from "../../services/utils/notification.service";
 import {Notification} from "../../services/utils/notification";
 import {Localization} from "../../common/localization";
+import {IsSelectedPipe} from "../../common/is-selected.pipe";
 
 @Component({
     selector: "app-file-list",
@@ -27,7 +28,7 @@ import {Localization} from "../../common/localization";
     styleUrls: ["./file-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent, BulkActionsBarComponent]
+    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent, BulkActionsBarComponent, IsSelectedPipe]
 })
 export class FileListComponent {
     public files: Observable<List<ViewFile>>;
@@ -182,13 +183,6 @@ export class FileListComponent {
     // =========================================================================
     // Bulk Selection Methods
     // =========================================================================
-
-    /**
-     * Check if a file is bulk-selected (for checkbox state).
-     */
-    isBulkSelected(file: ViewFile): boolean {
-        return this.fileSelectionService.isSelected(file.name);
-    }
 
     /**
      * Handle header checkbox click.

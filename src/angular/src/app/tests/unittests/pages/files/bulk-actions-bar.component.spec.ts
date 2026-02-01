@@ -1,4 +1,5 @@
 import {ComponentFixture, TestBed} from "@angular/core/testing";
+import {SimpleChange} from "@angular/core";
 import {List} from "immutable";
 
 import {BulkActionsBarComponent, BulkActionCounts} from "../../../../pages/files/bulk-actions-bar.component";
@@ -53,6 +54,25 @@ describe("BulkActionsBarComponent", () => {
         })
     ]);
 
+    /**
+     * Helper to set inputs and trigger ngOnChanges for proper cache update.
+     */
+    function setInputsAndDetectChanges(visibleFiles: List<ViewFile>, selectedFiles: Set<string>) {
+        const changes: any = {};
+        if (component.visibleFiles !== visibleFiles) {
+            changes["visibleFiles"] = new SimpleChange(component.visibleFiles, visibleFiles, false);
+            component.visibleFiles = visibleFiles;
+        }
+        if (component.selectedFiles !== selectedFiles) {
+            changes["selectedFiles"] = new SimpleChange(component.selectedFiles, selectedFiles, false);
+            component.selectedFiles = selectedFiles;
+        }
+        if (Object.keys(changes).length > 0) {
+            component.ngOnChanges(changes);
+        }
+        fixture.detectChanges();
+    }
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [BulkActionsBarComponent]
@@ -60,8 +80,7 @@ describe("BulkActionsBarComponent", () => {
 
         fixture = TestBed.createComponent(BulkActionsBarComponent);
         component = fixture.componentInstance;
-        component.visibleFiles = testFiles;
-        fixture.detectChanges();
+        setInputsAndDetectChanges(testFiles, new Set());
     });
 
     // =========================================================================
@@ -70,17 +89,17 @@ describe("BulkActionsBarComponent", () => {
 
     describe("Visibility", () => {
         it("should not show bar when no files are selected", () => {
-            component.selectedFiles = new Set();
+            setInputsAndDetectChanges(testFiles, new Set());
             expect(component.hasSelection).toBe(false);
         });
 
         it("should show bar when files are selected", () => {
-            component.selectedFiles = new Set(["file1", "file2"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file2"]));
             expect(component.hasSelection).toBe(true);
         });
 
         it("should return correct selected count", () => {
-            component.selectedFiles = new Set(["file1", "file2", "file3"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file2", "file3"]));
             expect(component.selectedCount).toBe(3);
         });
     });
@@ -91,7 +110,7 @@ describe("BulkActionsBarComponent", () => {
 
     describe("Action counts", () => {
         it("should calculate correct counts for selected files", () => {
-            component.selectedFiles = new Set(["file1", "file2", "file3", "file4", "file5"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file2", "file3", "file4", "file5"]));
             const counts: BulkActionCounts = component.actionCounts;
 
             // file1, file2, file5 are queueable (3)
@@ -108,7 +127,7 @@ describe("BulkActionsBarComponent", () => {
 
         it("should calculate counts only for selected files", () => {
             // Only select file1 and file3
-            component.selectedFiles = new Set(["file1", "file3"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file3"]));
             const counts: BulkActionCounts = component.actionCounts;
 
             // file1 is queueable
@@ -124,7 +143,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should return zero counts when no files selected", () => {
-            component.selectedFiles = new Set();
+            setInputsAndDetectChanges(testFiles, new Set());
             const counts: BulkActionCounts = component.actionCounts;
 
             expect(counts.queueable).toBe(0);
@@ -135,7 +154,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should ignore selected files not in visible files", () => {
-            component.selectedFiles = new Set(["file1", "nonexistent"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "nonexistent"]));
             const counts: BulkActionCounts = component.actionCounts;
 
             // Only file1 should be counted
@@ -150,7 +169,7 @@ describe("BulkActionsBarComponent", () => {
 
     describe("File getters", () => {
         beforeEach(() => {
-            component.selectedFiles = new Set(["file1", "file2", "file3", "file4", "file5"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file2", "file3", "file4", "file5"]));
         });
 
         it("should return queueable file names", () => {
@@ -199,7 +218,7 @@ describe("BulkActionsBarComponent", () => {
 
     describe("Click handlers", () => {
         beforeEach(() => {
-            component.selectedFiles = new Set(["file1", "file2", "file5"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file2", "file5"]));
         });
 
         it("should emit queueAction with queueable files on Queue click", () => {
@@ -213,7 +232,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should not emit queueAction when no queueable files", () => {
-            component.selectedFiles = new Set(["file3", "file4"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file3", "file4"]));
             spyOn(component.queueAction, "emit");
 
             component.onQueueClick();
@@ -222,7 +241,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should emit stopAction with stoppable files on Stop click", () => {
-            component.selectedFiles = new Set(["file3", "file4"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file3", "file4"]));
             spyOn(component.stopAction, "emit");
 
             component.onStopClick();
@@ -241,7 +260,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should emit extractAction with extractable files on Extract click", () => {
-            component.selectedFiles = new Set(["file2", "file4", "file5"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file2", "file4", "file5"]));
             spyOn(component.extractAction, "emit");
 
             component.onExtractClick();
@@ -252,7 +271,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should not emit extractAction when no extractable files", () => {
-            component.selectedFiles = new Set(["file1", "file3"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file3"]));
             spyOn(component.extractAction, "emit");
 
             component.onExtractClick();
@@ -261,7 +280,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should emit deleteLocalAction with locally deletable files on Delete Local click", () => {
-            component.selectedFiles = new Set(["file2", "file4", "file5"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file2", "file4", "file5"]));
             spyOn(component.deleteLocalAction, "emit");
 
             component.onDeleteLocalClick();
@@ -272,7 +291,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should not emit deleteLocalAction when no locally deletable files", () => {
-            component.selectedFiles = new Set(["file1", "file3"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1", "file3"]));
             spyOn(component.deleteLocalAction, "emit");
 
             component.onDeleteLocalClick();
@@ -291,7 +310,7 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should not emit deleteRemoteAction when no remotely deletable files", () => {
-            component.selectedFiles = new Set(["file3", "file4"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file3", "file4"]));
             spyOn(component.deleteRemoteAction, "emit");
 
             component.onDeleteRemoteClick();
@@ -306,15 +325,14 @@ describe("BulkActionsBarComponent", () => {
 
     describe("Edge cases", () => {
         it("should handle empty visible files list", () => {
-            component.visibleFiles = List();
-            component.selectedFiles = new Set(["file1"]);
+            setInputsAndDetectChanges(List(), new Set(["file1"]));
 
             expect(component.selectedViewFiles).toEqual([]);
             expect(component.actionCounts.queueable).toBe(0);
         });
 
         it("should handle single file selection", () => {
-            component.selectedFiles = new Set(["file1"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file1"]));
             const counts = component.actionCounts;
 
             expect(counts.queueable).toBe(1);
@@ -325,13 +343,113 @@ describe("BulkActionsBarComponent", () => {
         });
 
         it("should return selected view files correctly", () => {
-            component.selectedFiles = new Set(["file2", "file4"]);
+            setInputsAndDetectChanges(testFiles, new Set(["file2", "file4"]));
 
             const selectedViewFiles = component.selectedViewFiles;
 
             expect(selectedViewFiles.length).toBe(2);
             expect(selectedViewFiles.map(f => f.name)).toContain("file2");
             expect(selectedViewFiles.map(f => f.name)).toContain("file4");
+        });
+    });
+
+    // =========================================================================
+    // Performance Tests
+    // =========================================================================
+
+    describe("Performance with large file counts", () => {
+        it("should compute action counts efficiently with 500 files", () => {
+            // Create 500 files with mixed action eligibility
+            const largeFileList: ViewFile[] = [];
+            for (let i = 0; i < 500; i++) {
+                largeFileList.push(new ViewFile({
+                    name: `file${i}`,
+                    isQueueable: i % 2 === 0,
+                    isStoppable: i % 3 === 0,
+                    isExtractable: i % 4 === 0,
+                    isLocallyDeletable: i % 5 === 0,
+                    isRemotelyDeletable: i % 6 === 0
+                }));
+            }
+
+            // Select all 500 files
+            const allFileNames = new Set(largeFileList.map(f => f.name));
+
+            // Measure computation time
+            const start = performance.now();
+            setInputsAndDetectChanges(List(largeFileList), allFileNames);
+            const elapsed = performance.now() - start;
+
+            // Should complete in under 50ms
+            expect(elapsed).toBeLessThan(50);
+
+            // Verify counts are computed correctly
+            expect(component.actionCounts.queueable).toBe(250); // 0, 2, 4, ...
+            expect(component.actionCounts.stoppable).toBe(167); // 0, 3, 6, ...
+        });
+
+        it("should handle multiple getter accesses without recomputation", () => {
+            // Create 100 files
+            const files: ViewFile[] = [];
+            for (let i = 0; i < 100; i++) {
+                files.push(new ViewFile({
+                    name: `file${i}`,
+                    isQueueable: true,
+                    isStoppable: true,
+                    isExtractable: true,
+                    isLocallyDeletable: true,
+                    isRemotelyDeletable: true
+                }));
+            }
+            const allFileNames = new Set(files.map(f => f.name));
+            setInputsAndDetectChanges(List(files), allFileNames);
+
+            // Access all getters multiple times
+            const start = performance.now();
+            for (let i = 0; i < 100; i++) {
+                // These should all return cached values
+                component.actionCounts;
+                component.queueableFiles;
+                component.stoppableFiles;
+                component.extractableFiles;
+                component.locallyDeletableFiles;
+                component.remotelyDeletableFiles;
+                component.selectedViewFiles;
+            }
+            const elapsed = performance.now() - start;
+
+            // 700 getter accesses should complete in under 10ms (cached)
+            expect(elapsed).toBeLessThan(10);
+        });
+
+        it("should only recompute when inputs change", () => {
+            // Create 100 files
+            const files: ViewFile[] = [];
+            for (let i = 0; i < 100; i++) {
+                files.push(new ViewFile({
+                    name: `file${i}`,
+                    isQueueable: true
+                }));
+            }
+            const filesList = List(files);
+            const selectedFiles = new Set(files.map(f => f.name));
+            setInputsAndDetectChanges(filesList, selectedFiles);
+
+            const initialCounts = component.actionCounts;
+
+            // Simulate no input changes (just trigger ngOnChanges with operationInProgress)
+            component.operationInProgress = true;
+            component.ngOnChanges({
+                operationInProgress: {
+                    previousValue: false,
+                    currentValue: true,
+                    firstChange: false,
+                    isFirstChange: () => false
+                }
+            });
+
+            // Should still return the same cached counts
+            expect(component.actionCounts).toBe(initialCounts);
         });
     });
 });
