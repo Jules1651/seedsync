@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy} from "@angular/core";
+import {Component, ChangeDetectionStrategy, HostListener} from "@angular/core";
 import {NgFor, NgIf, AsyncPipe} from "@angular/common";
 import {Observable, combineLatest} from "rxjs";
 import {map} from "rxjs/operators";
@@ -35,6 +35,11 @@ export class FileListComponent {
     public selectedFiles$: Observable<Set<string>>;
     public selectAllMatchingFilter$: Observable<boolean>;
 
+    // Track last clicked file index for shift+click range selection
+    private _lastClickedIndex: number | null = null;
+    // Cache of current files list for range selection (updated on each observable emission)
+    private _currentFiles: List<ViewFile> = List();
+
     constructor(private _logger: LoggerService,
                 private viewFileService: ViewFileService,
                 private viewFileOptionsService: ViewFileOptionsService,
@@ -45,6 +50,15 @@ export class FileListComponent {
         // Selection state observables for banner
         this.selectedFiles$ = this.fileSelectionService.selectedFiles$;
         this.selectAllMatchingFilter$ = this.fileSelectionService.selectAllMatchingFilter$;
+
+        // Keep a cached copy of files for range selection
+        this.files.subscribe(files => {
+            this._currentFiles = files;
+            // Reset last clicked index if it's now out of range
+            if (this._lastClickedIndex !== null && this._lastClickedIndex >= files.size) {
+                this._lastClickedIndex = null;
+            }
+        });
 
         // Calculate header checkbox state based on selection and visible files
         this.headerCheckboxState$ = combineLatest([
@@ -65,6 +79,45 @@ export class FileListComponent {
                 }
             })
         );
+    }
+
+    // =========================================================================
+    // Keyboard Shortcuts
+    // =========================================================================
+
+    /**
+     * Handle Ctrl/Cmd+A to select all visible files.
+     * Handle Escape to clear selection.
+     */
+    @HostListener("document:keydown", ["$event"])
+    onKeyDown(event: KeyboardEvent): void {
+        // Ctrl/Cmd+A: Select all visible files
+        if ((event.ctrlKey || event.metaKey) && event.key === "a") {
+            // Only handle if not in an input/textarea
+            if (!this._isInputElement(event.target)) {
+                event.preventDefault();
+                this.fileSelectionService.selectAllVisible(this._currentFiles.toArray());
+            }
+        }
+
+        // Escape: Clear selection
+        if (event.key === "Escape") {
+            if (!this._isInputElement(event.target)) {
+                this.fileSelectionService.clearSelection();
+                this._lastClickedIndex = null;
+            }
+        }
+    }
+
+    /**
+     * Check if the event target is an input element where we shouldn't intercept shortcuts.
+     */
+    private _isInputElement(target: EventTarget | null): boolean {
+        if (!target) {
+            return false;
+        }
+        const tagName = (target as HTMLElement).tagName?.toLowerCase();
+        return tagName === "input" || tagName === "textarea" || tagName === "select";
     }
 
     // noinspection JSUnusedLocalSymbols
@@ -156,6 +209,40 @@ export class FileListComponent {
      */
     onClearSelection(): void {
         this.fileSelectionService.clearSelection();
+        this._lastClickedIndex = null;
+    }
+
+    /**
+     * Handle checkbox toggle with support for shift+click range selection.
+     * @param event The event containing the file and shift key state
+     */
+    onCheckboxToggle(event: {file: ViewFile, shiftKey: boolean}): void {
+        const currentIndex = this._currentFiles.findIndex(f => f.name === event.file.name);
+
+        if (event.shiftKey && this._lastClickedIndex !== null && currentIndex !== -1) {
+            // Shift+click: select range from last clicked to current
+            const start = Math.min(this._lastClickedIndex, currentIndex);
+            const end = Math.max(this._lastClickedIndex, currentIndex);
+
+            // Get file names in range
+            const rangeNames: string[] = [];
+            for (let i = start; i <= end; i++) {
+                const file = this._currentFiles.get(i);
+                if (file) {
+                    rangeNames.push(file.name);
+                }
+            }
+
+            // Replace selection with range
+            this.fileSelectionService.setSelection(rangeNames);
+        } else {
+            // Normal click: toggle the single file
+            this.fileSelectionService.toggle(event.file.name);
+            // Update last clicked index for future range selections
+            if (currentIndex !== -1) {
+                this._lastClickedIndex = currentIndex;
+            }
+        }
     }
 
 }

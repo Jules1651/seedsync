@@ -28,7 +28,7 @@
             [options]="options"
             [bulkSelected]="isBulkSelected(file)"
             (click)="onSelect(file)"
-            (checkboxToggle)="fileSelectionService.toggle($event.name)"
+            (checkboxToggle)="onCheckboxToggle($event)"
             (queueEvent)="onQueue($event)"
             (stopEvent)="onStop($event)"
             (extractEvent)="onExtract($event)"

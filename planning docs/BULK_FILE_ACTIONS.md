@@ -4,9 +4,9 @@
 
 | Item | Value |
 |------|-------|
-| **Latest Branch** | `claude/review-bulk-file-actions-olN0F` |
+| **Latest Branch** | `claude/review-bulk-file-actions-yVpO3` |
 | **Status** | 🟢 In Progress |
-| **Current Session** | Session 5 Complete |
+| **Current Session** | Session 6 Complete |
 | **Total Sessions** | 10 estimated |
 
 > **Claude Code Branch Management:**
@@ -32,7 +32,8 @@
 > - `claude/review-bulk-file-actions-2KjKN` - Sessions 1-2 (original)
 > - `claude/review-bulk-file-actions-UM3bn` - Sessions 1-3 (merged from above)
 > - `claude/review-bulk-file-actions-1jrQG` - Sessions 1-4 (merged from above)
-> - `claude/review-bulk-file-actions-olN0F` - Sessions 1-5 (current, merged from above)
+> - `claude/review-bulk-file-actions-olN0F` - Sessions 1-5 (merged from above)
+> - `claude/review-bulk-file-actions-yVpO3` - Sessions 1-6 (current, merged from above)
 
 ---
 
@@ -191,12 +192,12 @@ Response: { "results": [...], "summary": { "total": 3, "succeeded": 2, "failed":
 **Dependencies:** Session 4
 
 **Tasks:**
-- [ ] Add `@HostListener` for keyboard events in file list
-- [ ] Implement `Ctrl/Cmd+A` to select all visible
-- [ ] Implement `Escape` to clear selection
-- [ ] Track last clicked row index
-- [ ] Implement `Shift+click` for range selection
-- [ ] Add unit tests
+- [x] Add `@HostListener` for keyboard events in file list
+- [x] Implement `Ctrl/Cmd+A` to select all visible
+- [x] Implement `Escape` to clear selection
+- [x] Track last clicked row index
+- [x] Implement `Shift+click` for range selection
+- [x] Add unit tests
 
 **Context to read:**
 - `src/angular/src/app/pages/files/file-list.component.ts`
@@ -331,6 +332,7 @@ _Record completed sessions here with date, outcome, and learnings._
 | Session 3 | 2026-01-31 | ✅ Complete | Wired selection clear to filter/sort changes, 4 unit tests |
 | Session 4 | 2026-01-31 | ✅ Complete | Checkbox UI for header and rows, wired to FileSelectionService |
 | Session 5 | 2026-02-01 | ✅ Complete | Selection banner with count, "select all matching", and clear button |
+| Session 6 | 2026-02-01 | ✅ Complete | Keyboard shortcuts (Ctrl+A, Escape) and Shift+click range selection |
 
 ---
 
@@ -349,6 +351,11 @@ _Document technical discoveries, gotchas, and decisions made during implementati
 - Used `ng-container` with `*ngIf` to avoid async pipes in event handlers (Angular restriction)
 - Used `.bulk-selected` class (not `.selected`) to differentiate from detail panel selection
 - Header checkbox uses `indeterminate` property for partial selection state
+- `@HostListener('document:keydown')` captures keyboard events at document level
+- Keyboard shortcuts skip when target is input/textarea/select elements to avoid conflicts
+- Shift+click range selection replaces current selection (per UAT spec TS-4.5)
+- Last clicked index tracked separately and reset on clear/escape to prevent stale anchors
+- Files observable subscribed to keep `_currentFiles` cache for range selection logic
 
 ### Gotchas
 - Standalone components require explicit imports for all directives used in templates (e.g., `NgIf`, `NgFor`). Missing imports cause silent template failures rather than compile errors.
@@ -375,6 +382,7 @@ _Track any blockers encountered._
 ```
 src/angular/src/app/services/files/file-selection.service.ts  # Session 2
 src/angular/src/app/pages/files/selection-banner.component.ts  # Session 5
+src/angular/src/app/tests/unittests/pages/files/file-list.component.spec.ts  # Session 6
 ```
 
 ### New Files to Create
