@@ -4,9 +4,9 @@
 
 | Item | Value |
 |------|-------|
-| **Latest Branch** | `claude/review-bulk-file-actions-yVpO3` |
+| **Latest Branch** | `claude/review-bulk-file-actions-Fmk5U` |
 | **Status** | 🟢 In Progress |
-| **Current Session** | Session 6 Complete |
+| **Current Session** | Session 7 Complete |
 | **Total Sessions** | 10 estimated |
 
 > **Claude Code Branch Management:**
@@ -33,7 +33,8 @@
 > - `claude/review-bulk-file-actions-UM3bn` - Sessions 1-3 (merged from above)
 > - `claude/review-bulk-file-actions-1jrQG` - Sessions 1-4 (merged from above)
 > - `claude/review-bulk-file-actions-olN0F` - Sessions 1-5 (merged from above)
-> - `claude/review-bulk-file-actions-yVpO3` - Sessions 1-6 (current, merged from above)
+> - `claude/review-bulk-file-actions-yVpO3` - Sessions 1-6 (merged from above)
+> - `claude/review-bulk-file-actions-Fmk5U` - Sessions 1-7 (current, merged from above)
 
 ---
 
@@ -216,13 +217,14 @@ Response: { "results": [...], "summary": { "total": 3, "succeeded": 2, "failed":
 **Dependencies:** Session 5
 
 **Tasks:**
-- [ ] Create `src/angular/src/app/pages/files/bulk-actions-bar.component.ts`
-- [ ] Calculate counts: queueable, stoppable, extractable, deletable
-- [ ] Display buttons with counts: `[Queue (3)]`
-- [ ] Disable buttons when count is 0
-- [ ] Wire up click handlers (no API calls yet)
-- [ ] Integrate into file list page
-- [ ] Style the action bar
+- [x] Create `src/angular/src/app/pages/files/bulk-actions-bar.component.ts`
+- [x] Calculate counts: queueable, stoppable, extractable, deletable
+- [x] Display buttons with counts: `[Queue (3)]`
+- [x] Disable buttons when count is 0
+- [x] Wire up click handlers (no API calls yet)
+- [x] Integrate into file list page
+- [x] Style the action bar
+- [x] Add unit tests
 
 **Context to read:**
 - `src/angular/src/app/services/files/view-file.service.ts` (action eligibility flags)
@@ -333,6 +335,7 @@ _Record completed sessions here with date, outcome, and learnings._
 | Session 4 | 2026-01-31 | ✅ Complete | Checkbox UI for header and rows, wired to FileSelectionService |
 | Session 5 | 2026-02-01 | ✅ Complete | Selection banner with count, "select all matching", and clear button |
 | Session 6 | 2026-02-01 | ✅ Complete | Keyboard shortcuts (Ctrl+A, Escape) and Shift+click range selection |
+| Session 7 | 2026-02-01 | ✅ Complete | Bulk actions bar with Queue, Stop, Extract, Delete Local, Delete Remote buttons showing eligible counts |
 
 ---
 
@@ -356,6 +359,9 @@ _Document technical discoveries, gotchas, and decisions made during implementati
 - Shift+click range selection replaces current selection (per UAT spec TS-4.5)
 - Last clicked index tracked separately and reset on clear/escape to prevent stale anchors
 - Files observable subscribed to keep `_currentFiles` cache for range selection logic
+- BulkActionsBarComponent uses getter properties (`actionCounts`, `queueableFiles`, etc.) for computed values
+- Click handlers check count before emitting to prevent events when no eligible files
+- Bootstrap btn classes used with appropriate variants: primary (Queue), warning (Stop), info (Extract), outline-danger (Delete Local), danger (Delete Remote)
 
 ### Gotchas
 - Standalone components require explicit imports for all directives used in templates (e.g., `NgIf`, `NgFor`). Missing imports cause silent template failures rather than compile errors.
@@ -383,14 +389,16 @@ _Track any blockers encountered._
 src/angular/src/app/services/files/file-selection.service.ts  # Session 2
 src/angular/src/app/pages/files/selection-banner.component.ts  # Session 5
 src/angular/src/app/tests/unittests/pages/files/file-list.component.spec.ts  # Session 6
+src/angular/src/app/pages/files/bulk-actions-bar.component.ts  # Session 7
+src/angular/src/app/pages/files/bulk-actions-bar.component.html  # Session 7
+src/angular/src/app/pages/files/bulk-actions-bar.component.scss  # Session 7
+src/angular/src/app/tests/unittests/pages/files/bulk-actions-bar.component.spec.ts  # Session 7
 ```
 
 ### New Files to Create
 ```
-src/angular/src/app/pages/files/bulk-actions-bar.component.ts
 src/angular/src/app/common/confirmation-dialog/confirmation-dialog.component.ts
 src/angular/src/app/services/server/bulk-command.service.ts
-src/python/tests/unittests/test_controller/test_controller_bulk.py
 src/e2e/tests/bulk-actions.spec.ts
 ```
 

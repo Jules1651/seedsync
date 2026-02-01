@@ -7,6 +7,7 @@ import {List} from "immutable";
 
 import {FileComponent} from "./file.component";
 import {SelectionBannerComponent} from "./selection-banner.component";
+import {BulkActionsBarComponent} from "./bulk-actions-bar.component";
 import {ViewFileService} from "../../services/files/view-file.service";
 import {ViewFile} from "../../services/files/view-file";
 import {LoggerService} from "../../services/utils/logger.service";
@@ -21,7 +22,7 @@ import {FileSelectionService} from "../../services/files/file-selection.service"
     styleUrls: ["./file-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent]
+    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent, BulkActionsBarComponent]
 })
 export class FileListComponent {
     public files: Observable<List<ViewFile>>;
@@ -243,6 +244,55 @@ export class FileListComponent {
                 this._lastClickedIndex = currentIndex;
             }
         }
+    }
+
+    // =========================================================================
+    // Bulk Action Handlers
+    // =========================================================================
+
+    /**
+     * Handle bulk Queue action.
+     * @param fileNames Array of file names to queue
+     */
+    onBulkQueue(fileNames: string[]): void {
+        this._logger.info(`Bulk queue requested for ${fileNames.length} files:`, fileNames);
+        // API call will be implemented in Session 9
+    }
+
+    /**
+     * Handle bulk Stop action.
+     * @param fileNames Array of file names to stop
+     */
+    onBulkStop(fileNames: string[]): void {
+        this._logger.info(`Bulk stop requested for ${fileNames.length} files:`, fileNames);
+        // API call will be implemented in Session 9
+    }
+
+    /**
+     * Handle bulk Extract action.
+     * @param fileNames Array of file names to extract
+     */
+    onBulkExtract(fileNames: string[]): void {
+        this._logger.info(`Bulk extract requested for ${fileNames.length} files:`, fileNames);
+        // API call will be implemented in Session 9
+    }
+
+    /**
+     * Handle bulk Delete Local action.
+     * @param fileNames Array of file names to delete locally
+     */
+    onBulkDeleteLocal(fileNames: string[]): void {
+        this._logger.info(`Bulk delete local requested for ${fileNames.length} files:`, fileNames);
+        // API call will be implemented in Session 9
+    }
+
+    /**
+     * Handle bulk Delete Remote action.
+     * @param fileNames Array of file names to delete remotely
+     */
+    onBulkDeleteRemote(fileNames: string[]): void {
+        this._logger.info(`Bulk delete remote requested for ${fileNames.length} files:`, fileNames);
+        // API call will be implemented in Session 9
     }
 
 }
