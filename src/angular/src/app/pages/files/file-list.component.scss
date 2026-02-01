@@ -1,17 +1,19 @@
 @use '../../common/common' as *;
 
+/* Virtual scroll viewport */
+.file-viewport {
+    /* Fill available height - header is ~37px, selection banner ~50px, bulk actions ~50px */
+    height: calc(100vh - 200px);
+    width: 100%;
+    min-height: 300px;
+}
+
 #file-list #header {
     display: none;
 }
 
-/* striped rows */
-#file-list > div:nth-child(even){
-    background-color: $primary-lighter-color;
-}
-
-/* list separator */
-#file-list > div {border-bottom: 1px solid #ddd;}
-#file-list > div:last-child{border-bottom: none;}
+/* Striped rows and separators are now handled in file.component.scss */
+/* using .even-row class for virtual scrolling compatibility */
 
 
 /* Medium and large screens */

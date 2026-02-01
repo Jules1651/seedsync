@@ -32,11 +32,13 @@
         <div class="eta">ETA</div>
         <div class="size">Size</div>
     </div>
-    <div *ngFor="let file of vm.files; trackBy: identify">
+    <cdk-virtual-scroll-viewport itemSize="83" class="file-viewport">
         <app-file
+            *cdkVirtualFor="let file of vm.files; trackBy: identify; let even = even"
             [file]="file"
             [options]="options"
             [bulkSelected]="file.name | isSelected:vm.selectedFiles"
+            [class.even-row]="even"
             (click)="onSelect(file)"
             (checkboxToggle)="onCheckboxToggle($event)"
             (queueEvent)="onQueue($event)"
@@ -45,6 +47,6 @@
             (deleteLocalEvent)="onDeleteLocal($event)"
             (deleteRemoteEvent)="onDeleteRemote($event)">
         </app-file>
-    </div>
+    </cdk-virtual-scroll-viewport>
 </div>
 </ng-container>

@@ -1,5 +1,19 @@
 @use '../../common/common' as *;
 
+/* Host element styling for virtual scroll compatibility */
+:host {
+    display: block;
+    border-bottom: 1px solid #ddd;
+}
+
+:host:last-child {
+    border-bottom: none;
+}
+
+:host.even-row {
+    background-color: $primary-lighter-color;
+}
+
 .file {
     padding: 10px;
 }

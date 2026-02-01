@@ -1,5 +1,6 @@
 import {Component, ChangeDetectionStrategy, HostListener} from "@angular/core";
-import {NgFor, NgIf, AsyncPipe} from "@angular/common";
+import {NgIf, AsyncPipe} from "@angular/common";
+import {CdkVirtualScrollViewport, CdkVirtualForOf} from "@angular/cdk/scrolling";
 import {Observable, combineLatest} from "rxjs";
 import {map} from "rxjs/operators";
 
@@ -28,7 +29,10 @@ import {IsSelectedPipe} from "../../common/is-selected.pipe";
     styleUrls: ["./file-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, AsyncPipe, FileComponent, SelectionBannerComponent, BulkActionsBarComponent, IsSelectedPipe]
+    imports: [
+        NgIf, AsyncPipe, CdkVirtualScrollViewport, CdkVirtualForOf, FileComponent,
+        SelectionBannerComponent, BulkActionsBarComponent, IsSelectedPipe
+    ]
 })
 export class FileListComponent {
     public files: Observable<List<ViewFile>>;
