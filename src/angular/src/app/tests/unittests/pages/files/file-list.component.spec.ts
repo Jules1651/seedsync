@@ -1,4 +1,5 @@
 import {ComponentFixture, TestBed, fakeAsync, tick} from "@angular/core/testing";
+import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {of} from "rxjs";
 import {List} from "immutable";
 
@@ -7,6 +8,8 @@ import {FileSelectionService} from "../../../../services/files/file-selection.se
 import {ViewFileService} from "../../../../services/files/view-file.service";
 import {ViewFileOptionsService} from "../../../../services/files/view-file-options.service";
 import {LoggerService} from "../../../../services/utils/logger.service";
+import {ConfirmModalService} from "../../../../services/utils/confirm-modal.service";
+import {NotificationService} from "../../../../services/utils/notification.service";
 import {ViewFile} from "../../../../services/files/view-file";
 
 
@@ -17,6 +20,8 @@ describe("FileListComponent - Keyboard Shortcuts and Range Selection", () => {
     let mockViewFileService: jasmine.SpyObj<ViewFileService>;
     let mockViewFileOptionsService: jasmine.SpyObj<ViewFileOptionsService>;
     let mockLoggerService: jasmine.SpyObj<LoggerService>;
+    let mockConfirmModalService: jasmine.SpyObj<ConfirmModalService>;
+    let mockNotificationService: jasmine.SpyObj<NotificationService>;
 
     // Test files
     const testFiles = List([
@@ -54,14 +59,18 @@ describe("FileListComponent - Keyboard Shortcuts and Range Selection", () => {
         });
 
         mockLoggerService = jasmine.createSpyObj("LoggerService", ["info", "debug", "error"]);
+        mockConfirmModalService = jasmine.createSpyObj("ConfirmModalService", ["confirm"]);
+        mockNotificationService = jasmine.createSpyObj("NotificationService", ["show", "hide"]);
 
         await TestBed.configureTestingModule({
-            imports: [FileListComponent],
+            imports: [FileListComponent, HttpClientTestingModule],
             providers: [
                 FileSelectionService,
                 {provide: ViewFileService, useValue: mockViewFileService},
                 {provide: ViewFileOptionsService, useValue: mockViewFileOptionsService},
-                {provide: LoggerService, useValue: mockLoggerService}
+                {provide: LoggerService, useValue: mockLoggerService},
+                {provide: ConfirmModalService, useValue: mockConfirmModalService},
+                {provide: NotificationService, useValue: mockNotificationService}
             ]
         }).compileComponents();
 
