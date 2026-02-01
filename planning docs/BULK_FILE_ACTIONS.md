@@ -349,7 +349,7 @@ _Document technical discoveries, gotchas, and decisions made during implementati
 - Header checkbox uses `indeterminate` property for partial selection state
 
 ### Gotchas
-- (none yet)
+- Standalone components require explicit imports for all directives used in templates (e.g., `NgIf`, `NgFor`). Missing imports cause silent template failures rather than compile errors.
 
 ### Design Decisions Made During Implementation
 - Bulk endpoint always returns 200 status (even on partial/full failure) - success/failure is in the response body
