@@ -220,16 +220,15 @@ test.describe('Bulk File Actions', () => {
         });
 
         test('1.5 - selection count in banner matches selected files', async () => {
-            // Click checkboxes and wait for each to be checked
+            // Click checkboxes and wait for banner count to update after each
             await dashboardPage.clickFileCheckbox(0);
-            await expect(dashboardPage.getFileCheckbox(0)).toBeChecked();
-            await dashboardPage.clickFileCheckbox(1);
-            await expect(dashboardPage.getFileCheckbox(1)).toBeChecked();
-            await dashboardPage.clickFileCheckbox(2);
-            await expect(dashboardPage.getFileCheckbox(2)).toBeChecked();
+            await expect(dashboardPage.selectionCount).toContainText('1');
 
-            const countText = await dashboardPage.selectionCount.textContent();
-            expect(countText).toContain('3');
+            await dashboardPage.clickFileCheckbox(1);
+            await expect(dashboardPage.selectionCount).toContainText('2');
+
+            await dashboardPage.clickFileCheckbox(2);
+            await expect(dashboardPage.selectionCount).toContainText('3');
         });
     });
 
@@ -290,14 +289,11 @@ test.describe('Bulk File Actions', () => {
         });
 
         test('3.2 - selecting 5 files shows correct count', async () => {
-            // Click checkboxes and wait for each to be checked
+            // Click checkboxes and wait for banner count to update after each
             for (let i = 0; i < 5; i++) {
                 await dashboardPage.clickFileCheckbox(i);
-                await expect(dashboardPage.getFileCheckbox(i)).toBeChecked();
+                await expect(dashboardPage.selectionCount).toContainText(`${i + 1}`);
             }
-
-            const text = await dashboardPage.selectionCount.textContent();
-            expect(text).toContain('5');
         });
 
         test('3.3 - clicking Clear button clears selection', async () => {
@@ -359,16 +355,18 @@ test.describe('Bulk File Actions', () => {
             await expect(dashboardPage.selectionBanner).not.toBeVisible();
         });
 
-        test('4.3-4.5 - Shift+click selects range', async () => {
-            // Click on file 1 and wait for it to be checked (sets _lastClickedIndex)
+        test('4.3-4.5 - Shift+click selects range', async ({ page }) => {
+            // Click on file 1 and wait for banner to show 1 selected
             await dashboardPage.clickFileCheckbox(1);
-            await expect(dashboardPage.getFileCheckbox(1)).toBeChecked();
+            await expect(dashboardPage.selectionCount).toContainText('1');
 
-            // Shift+click on file 4 to select range [1-4]
-            await dashboardPage.shiftClickFileCheckbox(4);
+            // Hold shift and click on file 4 to select range [1-4]
+            await page.keyboard.down('Shift');
+            await dashboardPage.clickFileCheckbox(4);
+            await page.keyboard.up('Shift');
 
-            // Wait for selection to update, then check all files in range
-            await expect(dashboardPage.getFileCheckbox(4)).toBeChecked();
+            // Wait for banner to show 4 files selected (range of 4 files)
+            await expect(dashboardPage.selectionCount).toContainText('4');
 
             // Files 1, 2, 3, 4 should all be selected
             expect(await dashboardPage.getFileCheckbox(1).isChecked()).toBe(true);
