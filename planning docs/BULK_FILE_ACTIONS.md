@@ -342,7 +342,7 @@ _Record completed sessions here with date, outcome, and learnings._
 | Session 7 | 2026-02-01 | ✅ Complete | Bulk actions bar with Queue, Stop, Extract, Delete Local, Delete Remote buttons showing eligible counts |
 | Session 8 | 2026-02-01 | ✅ Complete | Extended ConfirmModalService with skipCount for bulk confirmations, added 18 unit tests, added bulk localization messages |
 | Session 9 | 2026-02-01 | ✅ Complete | BulkCommandService calling API, wired to actions bar, confirmation dialogs for delete, toast notifications, selection clear after action, progress indicator for 50+ files, 18 unit tests |
-| Session 10 | 2026-02-01 | ✅ Complete | E2E tests for bulk actions: checkbox selection, header checkbox, selection banner, keyboard shortcuts, shift+click range selection, bulk actions, confirmation dialogs, toast notifications, edge cases |
+| Session 10 | 2026-02-01 | ✅ Complete | E2E tests for bulk actions: 27 tests covering checkbox selection, header checkbox, selection banner, keyboard shortcuts, shift+click range selection, bulk actions bar, confirmation dialogs, edge cases. Fixed timing issues with banner-based waits. |
 
 ---
 
@@ -379,8 +379,16 @@ _Document technical discoveries, gotchas, and decisions made during implementati
 - Progress indicator uses Bootstrap's `spinner-border-sm` for consistency with framework styling
 - Buttons are disabled during operation to prevent double-clicks (debounce alternative)
 
+### E2E Testing Notes
+- Wait for banner text updates (`toContainText`) instead of checkbox state for reliable Angular change detection sync
+- Use `page.keyboard.down('Shift')` / `keyboard.up('Shift')` around clicks for shift+click range selection
+- Click on non-input element before pressing Escape (keyboard shortcuts skip input elements per `_isInputElement` check)
+- Wait for bulk actions bar to be visible before querying button texts
+- Tests that modify file state (queue, delete) can pollute subsequent tests - prefer UI verification without executing actions
+
 ### Gotchas
 - Standalone components require explicit imports for all directives used in templates (e.g., `NgIf`, `NgFor`). Missing imports cause silent template failures rather than compile errors.
+- E2E tests run alphabetically; state-modifying tests can affect later tests in the same run
 
 ### Design Decisions Made During Implementation
 - Bulk endpoint always returns 200 status (even on partial/full failure) - success/failure is in the response body
