@@ -80,6 +80,11 @@ class BulkActionsDashboardPage extends DashboardPage {
         return this.page.locator('.modal.show .modal-footer .btn-primary, .modal.show .modal-footer .btn-danger');
     }
 
+    // Alias for linter compatibility
+    get confirmationModalOkButton() {
+        return this.confirmModalOkButton;
+    }
+
     get confirmModalCancelButton() {
         return this.page.locator('.modal.show .modal-footer .btn-secondary');
     }
@@ -170,8 +175,8 @@ test.describe('Bulk File Actions', () => {
     test.beforeEach(async ({ page }) => {
         dashboardPage = new BulkActionsDashboardPage(page);
         await dashboardPage.navigateTo();
-        // Wait for files to load
-        await dashboardPage.waitForFileCount(5);
+        // Wait for all 9 files to load (based on test remote server content)
+        await dashboardPage.waitForFileCount(9);
     });
 
     test.describe('TS-1: Checkbox Selection Basics', () => {
