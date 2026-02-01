@@ -9,6 +9,7 @@ import {List} from "immutable";
 import {FileComponent} from "./file.component";
 import {SelectionBannerComponent} from "./selection-banner.component";
 import {BulkActionsBarComponent} from "./bulk-actions-bar.component";
+import {FileActionsBarComponent} from "./file-actions-bar.component";
 import {ViewFileService} from "../../services/files/view-file.service";
 import {ViewFile} from "../../services/files/view-file";
 import {LoggerService} from "../../services/utils/logger.service";
@@ -31,7 +32,7 @@ import {IsSelectedPipe} from "../../common/is-selected.pipe";
     standalone: true,
     imports: [
         NgIf, AsyncPipe, CdkVirtualScrollViewport, CdkVirtualForOf, FileComponent,
-        SelectionBannerComponent, BulkActionsBarComponent, IsSelectedPipe
+        SelectionBannerComponent, BulkActionsBarComponent, FileActionsBarComponent, IsSelectedPipe
     ]
 })
 export class FileListComponent {
@@ -45,6 +46,9 @@ export class FileListComponent {
     // Selection state for banner
     public selectedFiles$: Observable<Set<string>>;
     public selectAllMatchingFilter$: Observable<boolean>;
+
+    // Single selected file for actions bar (detail panel selection)
+    public selectedFile$: Observable<ViewFile | null>;
 
     // Track last clicked file index for shift+click range selection
     private _lastClickedIndex: number | null = null;
@@ -66,6 +70,11 @@ export class FileListComponent {
         // Selection state observables for banner
         this.selectedFiles$ = this.fileSelectionService.selectedFiles$;
         this.selectAllMatchingFilter$ = this.fileSelectionService.selectAllMatchingFilter$;
+
+        // Single selected file for actions bar (derived from files list)
+        this.selectedFile$ = this.files.pipe(
+            map(files => files.find(f => f.isSelected) || null)
+        );
 
         // Keep a cached copy of files for range selection
         this.files.subscribe(files => {

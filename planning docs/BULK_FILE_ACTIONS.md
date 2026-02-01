@@ -432,6 +432,15 @@ _Document technical discoveries, gotchas, and decisions made during implementati
 - `trackBy: identify` function still works with `*cdkVirtualFor` (same API as `*ngFor`)
 - Immutable.js `List` works directly with CDK virtual scroll (implements iterable protocol)
 
+### Fixed Row Height Solution (Session 14 - Part 2)
+- **Problem**: CDK virtual scroll requires fixed row heights, but inline actions/details cause variable heights
+- **Solution**: Move variable-height content outside the virtual scroll viewport:
+  1. **FileActionsBarComponent**: New component showing single-file actions outside virtual scroll
+  2. **Inline actions hidden**: `.actions { display: none }` - never shown in row
+  3. **Filename truncation**: CSS `text-overflow: ellipsis` prevents wrapping
+  4. **Details hidden**: `.details { display: none }` in row - show in external panel if needed
+- This maintains fixed 83px row height for all files regardless of selection state
+
 ### E2E Testing Notes
 - Wait for banner text updates (`toContainText`) instead of checkbox state for reliable Angular change detection sync
 - Use `page.keyboard.down('Shift')` / `keyboard.up('Shift')` around clicks for shift+click range selection
@@ -475,6 +484,9 @@ src/angular/src/app/services/server/bulk-command.service.ts  # Session 9
 src/angular/src/app/tests/unittests/services/server/bulk-command.service.spec.ts  # Session 9
 src/angular/src/app/common/is-selected.pipe.ts  # Session 11
 src/angular/src/app/tests/unittests/common/is-selected.pipe.spec.ts  # Session 11
+src/angular/src/app/pages/files/file-actions-bar.component.ts  # Session 14
+src/angular/src/app/pages/files/file-actions-bar.component.html  # Session 14
+src/angular/src/app/pages/files/file-actions-bar.component.scss  # Session 14
 ```
 
 ### E2E Test Files
@@ -1074,11 +1086,11 @@ Virtual scrolling is the **correct architectural solution** because it reduces t
 
 **Risks and Mitigations:**
 
-| Risk | Mitigation |
-|------|------------|
-| Variable row heights (details expanded) | Use `autosize` strategy or fixed collapsed height |
-| Keyboard navigation edge cases | Test shift+click across viewport boundaries |
-| E2E test selectors for off-screen items | Use `scrollToIndex` before assertions |
+| Risk | Mitigation | Status |
+|------|------------|--------|
+| Variable row heights (details expanded) | ✅ Fixed: External FileActionsBarComponent, CSS truncation, hidden details | Resolved |
+| Keyboard navigation edge cases | Test shift+click across viewport boundaries | Pending |
+| E2E test selectors for off-screen items | Use `scrollToIndex` before assertions | Pending |
 
 ---
 
@@ -1089,4 +1101,4 @@ Virtual scrolling is the **correct architectural solution** because it reduces t
 | Session 11 | 2026-02-01 | ✅ Complete | Frontend selection performance optimized: cached BulkActionsBar computations, created IsSelectedPipe, added 15 performance tests |
 | Session 12 | 2026-02-01 | ✅ Complete | Backend bulk endpoint performance: parallel command queuing, timeout handling (5s/file, 300s max), performance logging, 6 new unit tests |
 | Session 13 | 2026-02-01 | ✅ Complete | Memory/GC verification: lazy selection and pruning already implemented, added 13 tests for 5000-file scale, serialization support |
-| Session 14 | 2026-02-01 | ✅ Complete | Virtual scrolling via @angular/cdk implemented: CdkVirtualScrollViewport with itemSize=83, striped rows via .even-row class |
+| Session 14 | 2026-02-01 | ✅ Complete | Virtual scrolling + fixed row heights: CDK viewport, FileActionsBarComponent for external actions, CSS truncation for filenames |
