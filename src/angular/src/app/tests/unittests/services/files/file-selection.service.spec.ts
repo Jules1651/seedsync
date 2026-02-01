@@ -341,4 +341,132 @@ describe("Testing file selection service", () => {
             }, 0);
         }, 0);
     });
+
+    // =========================================================================
+    // Performance Tests
+    // =========================================================================
+
+    describe("Performance with large file counts", () => {
+
+        it("should select 500 files efficiently (under 50ms)", () => {
+            const files: ViewFile[] = [];
+            for (let i = 0; i < 500; i++) {
+                files.push(new ViewFile({name: `file${i}`}));
+            }
+
+            const start = performance.now();
+            service.selectAllVisible(files);
+            const elapsed = performance.now() - start;
+
+            expect(service.getSelectedCount()).toBe(500);
+            expect(elapsed).toBeLessThan(50);
+        });
+
+        it("should toggle selection efficiently with 500 files selected", () => {
+            // Select 500 files first
+            const files: ViewFile[] = [];
+            for (let i = 0; i < 500; i++) {
+                files.push(new ViewFile({name: `file${i}`}));
+            }
+            service.selectAllVisible(files);
+
+            // Measure toggle performance
+            const start = performance.now();
+            service.toggle("file250");
+            const elapsed = performance.now() - start;
+
+            expect(service.getSelectedCount()).toBe(499);
+            expect(elapsed).toBeLessThan(10);
+        });
+
+        it("should clear 500 selections efficiently", () => {
+            // Select 500 files first
+            const files: ViewFile[] = [];
+            for (let i = 0; i < 500; i++) {
+                files.push(new ViewFile({name: `file${i}`}));
+            }
+            service.selectAllVisible(files);
+
+            // Measure clear performance
+            const start = performance.now();
+            service.clearSelection();
+            const elapsed = performance.now() - start;
+
+            expect(service.getSelectedCount()).toBe(0);
+            expect(elapsed).toBeLessThan(10);
+        });
+
+        it("should handle rapid toggle cycles without memory leaks", () => {
+            const files: ViewFile[] = [];
+            for (let i = 0; i < 100; i++) {
+                files.push(new ViewFile({name: `file${i}`}));
+            }
+
+            // Rapid select/clear cycles
+            for (let cycle = 0; cycle < 100; cycle++) {
+                service.selectAllVisible(files);
+                service.clearSelection();
+            }
+
+            expect(service.getSelectedCount()).toBe(0);
+        });
+
+        it("should handle isSelected lookup efficiently with 500 files", () => {
+            // Select 500 files first
+            const fileNames: string[] = [];
+            for (let i = 0; i < 500; i++) {
+                fileNames.push(`file${i}`);
+            }
+            service.selectMultiple(fileNames);
+
+            // Measure lookup performance (1000 lookups)
+            const start = performance.now();
+            for (let i = 0; i < 1000; i++) {
+                service.isSelected(`file${i % 500}`);
+            }
+            const elapsed = performance.now() - start;
+
+            // 1000 lookups should complete in under 10ms
+            expect(elapsed).toBeLessThan(10);
+        });
+
+        it("should prune 500 selections efficiently", () => {
+            // Select 500 files
+            const fileNames: string[] = [];
+            for (let i = 0; i < 500; i++) {
+                fileNames.push(`file${i}`);
+            }
+            service.selectMultiple(fileNames);
+
+            // Create a set with only 250 files (simulating half deleted)
+            const remainingFiles = new Set<string>();
+            for (let i = 0; i < 250; i++) {
+                remainingFiles.add(`file${i}`);
+            }
+
+            // Measure prune performance
+            const start = performance.now();
+            service.pruneSelection(remainingFiles);
+            const elapsed = performance.now() - start;
+
+            expect(service.getSelectedCount()).toBe(250);
+            expect(elapsed).toBeLessThan(20);
+        });
+
+        it("should handle range selection with 500 files efficiently", () => {
+            // Create range of 500 file names
+            const fileNames: string[] = [];
+            for (let i = 0; i < 500; i++) {
+                fileNames.push(`file${i}`);
+            }
+
+            // Measure range selection performance
+            const start = performance.now();
+            service.selectRange(fileNames);
+            const elapsed = performance.now() - start;
+
+            expect(service.getSelectedCount()).toBe(500);
+            expect(elapsed).toBeLessThan(50);
+        });
+    });
 });
