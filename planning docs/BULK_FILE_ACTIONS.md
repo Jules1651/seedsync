@@ -4,9 +4,9 @@
 
 | Item | Value |
 |------|-------|
-| **Latest Branch** | `claude/review-bulk-file-actions-Fmk5U` |
+| **Latest Branch** | `claude/review-bulk-file-actions-rRra3` |
 | **Status** | 🟢 In Progress |
-| **Current Session** | Session 7 Complete |
+| **Current Session** | Session 8 Complete |
 | **Total Sessions** | 10 estimated |
 
 > **Claude Code Branch Management:**
@@ -34,7 +34,8 @@
 > - `claude/review-bulk-file-actions-1jrQG` - Sessions 1-4 (merged from above)
 > - `claude/review-bulk-file-actions-olN0F` - Sessions 1-5 (merged from above)
 > - `claude/review-bulk-file-actions-yVpO3` - Sessions 1-6 (merged from above)
-> - `claude/review-bulk-file-actions-Fmk5U` - Sessions 1-7 (current, merged from above)
+> - `claude/review-bulk-file-actions-Fmk5U` - Sessions 1-7 (merged from above)
+> - `claude/review-bulk-file-actions-rRra3` - Sessions 1-8 (current, merged from above)
 
 ---
 
@@ -244,12 +245,12 @@ Response: { "results": [...], "summary": { "total": 3, "succeeded": 2, "failed":
 **Dependencies:** None (can run in parallel with others)
 
 **Tasks:**
-- [ ] Create `src/angular/src/app/common/confirmation-dialog/` component
-- [ ] Accept: title, message, skipCount, confirmText, isDangerous
-- [ ] Return Promise<boolean> for confirm/cancel
-- [ ] Style with Bootstrap modal classes
-- [ ] Use danger button style for destructive actions
-- [ ] Add unit tests
+- [x] ~~Create `src/angular/src/app/common/confirmation-dialog/` component~~ Extended existing `ConfirmModalService`
+- [x] Accept: title, message, skipCount, confirmText, isDangerous (via `ConfirmModalOptions`)
+- [x] Return Promise<boolean> for confirm/cancel
+- [x] Style with Bootstrap modal classes
+- [x] Use danger button style for destructive actions (via `okBtnClass`)
+- [x] Add unit tests (18 tests for ConfirmModalService)
 
 **Context to read:**
 - Existing modal usage in the app (if any)
@@ -282,7 +283,7 @@ Response: { "results": [...], "summary": { "total": 3, "succeeded": 2, "failed":
 **Context to read:**
 - `src/angular/src/app/services/server/server-command.service.ts` (pattern reference)
 - `src/angular/src/app/pages/files/bulk-actions-bar.component.ts`
-- `src/angular/src/app/common/confirmation-dialog/`
+- `src/angular/src/app/services/utils/confirm-modal.service.ts` (extended with skipCount)
 
 **Acceptance criteria:**
 - Actions call bulk API
@@ -336,6 +337,7 @@ _Record completed sessions here with date, outcome, and learnings._
 | Session 5 | 2026-02-01 | ✅ Complete | Selection banner with count, "select all matching", and clear button |
 | Session 6 | 2026-02-01 | ✅ Complete | Keyboard shortcuts (Ctrl+A, Escape) and Shift+click range selection |
 | Session 7 | 2026-02-01 | ✅ Complete | Bulk actions bar with Queue, Stop, Extract, Delete Local, Delete Remote buttons showing eligible counts |
+| Session 8 | 2026-02-01 | ✅ Complete | Extended ConfirmModalService with skipCount for bulk confirmations, added 18 unit tests, added bulk localization messages |
 
 ---
 
@@ -362,6 +364,9 @@ _Document technical discoveries, gotchas, and decisions made during implementati
 - BulkActionsBarComponent uses getter properties (`actionCounts`, `queueableFiles`, etc.) for computed values
 - Click handlers check count before emitting to prevent events when no eligible files
 - Bootstrap btn classes used with appropriate variants: primary (Queue), warning (Stop), info (Extract), outline-danger (Delete Local), danger (Delete Remote)
+- Existing `ConfirmModalService` already provides Promise-based confirmation dialogs - extended instead of creating new component
+- `ConfirmModalOptions.skipCount` displays a muted message showing how many files will be skipped (not eligible for action)
+- Localization messages use function parameters for dynamic content (e.g., file counts with proper pluralization)
 
 ### Gotchas
 - Standalone components require explicit imports for all directives used in templates (e.g., `NgIf`, `NgFor`). Missing imports cause silent template failures rather than compile errors.
@@ -389,6 +394,7 @@ _Track any blockers encountered._
 src/angular/src/app/services/files/file-selection.service.ts  # Session 2
 src/angular/src/app/pages/files/selection-banner.component.ts  # Session 5
 src/angular/src/app/tests/unittests/pages/files/file-list.component.spec.ts  # Session 6
+src/angular/src/app/tests/unittests/services/utils/confirm-modal.service.spec.ts  # Session 8
 src/angular/src/app/pages/files/bulk-actions-bar.component.ts  # Session 7
 src/angular/src/app/pages/files/bulk-actions-bar.component.html  # Session 7
 src/angular/src/app/pages/files/bulk-actions-bar.component.scss  # Session 7
@@ -397,20 +403,21 @@ src/angular/src/app/tests/unittests/pages/files/bulk-actions-bar.component.spec.
 
 ### New Files to Create
 ```
-src/angular/src/app/common/confirmation-dialog/confirmation-dialog.component.ts
-src/angular/src/app/services/server/bulk-command.service.ts
-src/e2e/tests/bulk-actions.spec.ts
+src/angular/src/app/services/server/bulk-command.service.ts  # Session 9
+src/e2e/tests/bulk-actions.spec.ts  # Session 10
 ```
 
-### Files to Modify
+### Files Modified
 ```
-src/python/web/handler/controller.py
-src/python/controller/controller.py
-src/angular/src/app/pages/files/file-list.component.html
-src/angular/src/app/pages/files/file-list.component.ts
-src/angular/src/app/pages/files/file.component.html
-src/angular/src/app/pages/files/file.component.ts
-src/angular/src/app/services/files/view-file.service.ts
+src/python/web/handler/controller.py  # Session 1
+src/python/web/web_app.py  # Session 1
+src/angular/src/app/pages/files/file-list.component.html  # Session 4
+src/angular/src/app/pages/files/file-list.component.ts  # Session 4, 6
+src/angular/src/app/pages/files/file.component.html  # Session 4
+src/angular/src/app/pages/files/file.component.ts  # Session 4
+src/angular/src/app/services/files/view-file.service.ts  # Session 3
+src/angular/src/app/services/utils/confirm-modal.service.ts  # Session 8 (added skipCount)
+src/angular/src/app/common/localization.ts  # Session 8 (added bulk messages)
 ```
 
 ---
