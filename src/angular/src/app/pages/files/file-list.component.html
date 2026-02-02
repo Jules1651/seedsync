@@ -42,7 +42,7 @@
     </div>
     <cdk-virtual-scroll-viewport itemSize="83" class="file-viewport">
         <app-file
-            *cdkVirtualFor="let file of vm.files; trackBy: identify; let even = even"
+            *cdkVirtualFor="let file of vm.files?.toArray(); trackBy: identify; let even = even"
             [file]="file"
             [options]="options"
             [bulkSelected]="file.name | isSelected:vm.selectedFiles"
