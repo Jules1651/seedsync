@@ -430,7 +430,9 @@ _Document technical discoveries, gotchas, and decisions made during implementati
 - Border styling moved to `:host` selector in file.component.scss for virtual scroll compatibility
 - Viewport height uses `calc(100vh - 200px)` to fill available space (minus header/banner/actions)
 - `trackBy: identify` function still works with `*cdkVirtualFor` (same API as `*ngFor`)
-- Immutable.js `List` works directly with CDK virtual scroll (implements iterable protocol)
+- **IMPORTANT**: CDK virtual scroll requires an array, NOT Immutable.js List
+  - Despite List implementing iterable protocol, CDK's `coerceArray` uses `Array.isArray()` check
+  - Must convert with `.toArray()`: `*cdkVirtualFor="let file of vm.files?.toArray()"`
 
 ### Fixed Row Height Solution (Session 14 - Part 2)
 - **Problem**: CDK virtual scroll requires fixed row heights, but inline actions/details cause variable heights
