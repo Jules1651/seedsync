@@ -29,10 +29,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. All pages render with identical visual appearance to pre-migration state
   3. SCSS import order follows Bootstrap requirements (functions → variables → overrides → Bootstrap)
   4. Angular unit tests pass after migration
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- TBD
+- [ ] 01-01-PLAN.md — Migrate from pre-compiled Bootstrap CSS to SCSS source imports
 
 ### Phase 2: Color Variable Consolidation
 **Goal**: Single source of truth for colors using Bootstrap theme variables
@@ -102,7 +102,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Bootstrap SCSS Setup | 0/TBD | Not started | - |
+| 1. Bootstrap SCSS Setup | 0/1 | Planned | - |
 | 2. Color Variable Consolidation | 0/TBD | Not started | - |
 | 3. Selection Color Unification | 0/TBD | Not started | - |
 | 4. Button Standardization - File Actions | 0/TBD | Not started | - |
