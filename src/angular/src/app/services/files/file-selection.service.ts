@@ -22,6 +22,11 @@ import {ViewFile} from "./view-file";
  * - FileComponent uses computed() to derive its own selection state
  * - Only components whose selection actually changed will re-render
  * - Eliminates cascading checkbox effect on select-all
+ *
+ * Thread Safety (Session 18):
+ * - operationInProgress signal prevents race conditions during bulk operations
+ * - pruneSelection() is skipped while bulk operations are in progress
+ * - Prevents selection state corruption when file list updates mid-operation
  */
 @Injectable({
     providedIn: "root"
@@ -36,6 +41,11 @@ export class FileSelectionService {
     // When true, the selection logically includes all files matching the current filter,
     // even if not all are explicitly in the selectedFiles set
     readonly selectAllMatchingFilterMode = signal<boolean>(false);
+
+    // Flag indicating a bulk operation is in progress
+    // When true, pruneSelection() will be skipped to prevent race conditions
+    private readonly _operationInProgress = signal<boolean>(false);
+    readonly operationInProgress = this._operationInProgress.asReadonly();
 
     // Computed signals for derived state
     readonly selectedCount = computed(() => this.selectedFiles().size);
@@ -220,9 +230,18 @@ export class FileSelectionService {
     /**
      * Remove files from selection that no longer exist.
      * Called when the file list updates to clean up stale selections.
+     *
+     * NOTE: This method is skipped while a bulk operation is in progress
+     * to prevent race conditions where the file list updates mid-operation.
+     *
      * @param existingFileNames Set of file names that currently exist
      */
     pruneSelection(existingFileNames: Set<string>): void {
+        // Skip pruning during bulk operations to prevent race conditions
+        if (this._operationInProgress()) {
+            return;
+        }
+
         const currentSet = this.selectedFiles();
         const toRemove = Array.from(currentSet).filter(f => !existingFileNames.has(f));
         if (toRemove.length > 0) {
@@ -235,6 +254,26 @@ export class FileSelectionService {
                 this._clearSelectAllMatchingMode();
             }
         }
+    }
+
+    // =========================================================================
+    // Bulk Operation Lock Methods
+    // =========================================================================
+
+    /**
+     * Mark the start of a bulk operation.
+     * While in progress, pruneSelection() will be skipped to prevent race conditions.
+     */
+    beginOperation(): void {
+        this._operationInProgress.set(true);
+    }
+
+    /**
+     * Mark the end of a bulk operation.
+     * Allows pruneSelection() to run again on subsequent file list updates.
+     */
+    endOperation(): void {
+        this._operationInProgress.set(false);
     }
 
     // =========================================================================

@@ -1,5 +1,6 @@
-import {Component, ChangeDetectionStrategy, HostListener} from "@angular/core";
+import {Component, ChangeDetectionStrategy, HostListener, DestroyRef, inject} from "@angular/core";
 import {NgIf, NgFor, AsyncPipe} from "@angular/common";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 // CDK virtual scroll temporarily disabled for E2E debugging
 // import {CdkVirtualScrollViewport, CdkVirtualForOf} from "@angular/cdk/scrolling";
 import {Observable, combineLatest} from "rxjs";
@@ -37,6 +38,9 @@ import {Localization} from "../../common/localization";
     ]
 })
 export class FileListComponent {
+    // Inject DestroyRef for automatic subscription cleanup
+    private destroyRef = inject(DestroyRef);
+
     public files: Observable<List<ViewFile>>;
     public identify = FileListComponent.identify;
     public options: Observable<ViewFileOptions>;
@@ -78,7 +82,10 @@ export class FileListComponent {
         );
 
         // Keep a cached copy of files for range selection
-        this.files.subscribe(files => {
+        // Uses takeUntilDestroyed to automatically unsubscribe when component is destroyed
+        this.files.pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(files => {
             this._currentFiles = files;
             // Reset last clicked index if it's now out of range
             if (this._lastClickedIndex !== null && this._lastClickedIndex >= files.size) {
@@ -362,6 +369,9 @@ export class FileListComponent {
 
     /**
      * Execute a bulk action and handle the response with notifications.
+     *
+     * Uses beginOperation/endOperation to prevent race conditions with
+     * pruneSelection() when the file list updates during the operation.
      */
     private _executeBulkAction(
         action: BulkAction,
@@ -371,6 +381,9 @@ export class FileListComponent {
             partialMsg: (succeeded: number, failed: number) => string;
         }
     ): void {
+        // Lock selection state to prevent pruneSelection race conditions
+        this.fileSelectionService.beginOperation();
+
         // Show progress indicator for large selections
         const showProgress = fileNames.length >= 50;
         if (showProgress) {
@@ -380,6 +393,8 @@ export class FileListComponent {
         this.bulkCommandService.executeBulkAction(action, fileNames).subscribe({
             next: (result: BulkActionResult) => {
                 this.bulkOperationInProgress = false;
+                // Release the lock before clearing selection
+                this.fileSelectionService.endOperation();
                 this._handleBulkResult(result, messages);
                 // Clear selection after action (even on partial failure)
                 this.fileSelectionService.clearSelection();
@@ -387,6 +402,8 @@ export class FileListComponent {
             },
             error: (err) => {
                 this.bulkOperationInProgress = false;
+                // Release the lock on error
+                this.fileSelectionService.endOperation();
                 this._logger.error("Bulk action error:", err);
                 this._showNotification(
                     Notification.Level.DANGER,

@@ -759,4 +759,128 @@ describe("Testing file selection service", () => {
             expect(selectedFiles).toEqual(["file1"]);
         });
     });
+
+    // =========================================================================
+    // Operation Lock Tests (Session 18 - Race Condition Prevention)
+    // =========================================================================
+
+    describe("Operation lock for race condition prevention", () => {
+
+        it("should expose operationInProgress as a readonly signal", () => {
+            expect(service.operationInProgress).toBeDefined();
+            expect(service.operationInProgress()).toBe(false);
+        });
+
+        it("should set operationInProgress to true when beginOperation is called", () => {
+            service.beginOperation();
+
+            expect(service.operationInProgress()).toBe(true);
+        });
+
+        it("should set operationInProgress to false when endOperation is called", () => {
+            service.beginOperation();
+            service.endOperation();
+
+            expect(service.operationInProgress()).toBe(false);
+        });
+
+        it("should skip pruneSelection when operation is in progress", () => {
+            // Select some files
+            service.selectMultiple(["file1", "file2", "file3"]);
+            expect(service.getSelectedCount()).toBe(3);
+
+            // Start an operation
+            service.beginOperation();
+
+            // Try to prune (simulating file list update during bulk operation)
+            // Only file1 "exists" - file2 and file3 would normally be pruned
+            service.pruneSelection(new Set(["file1"]));
+
+            // Selection should be unchanged because operation is in progress
+            expect(service.getSelectedCount()).toBe(3);
+            expect(service.isSelected("file1")).toBe(true);
+            expect(service.isSelected("file2")).toBe(true);
+            expect(service.isSelected("file3")).toBe(true);
+        });
+
+        it("should allow pruneSelection after operation ends", () => {
+            // Select some files
+            service.selectMultiple(["file1", "file2", "file3"]);
+
+            // Start and end an operation
+            service.beginOperation();
+            service.endOperation();
+
+            // Now prune should work
+            service.pruneSelection(new Set(["file1"]));
+
+            expect(service.getSelectedCount()).toBe(1);
+            expect(service.isSelected("file1")).toBe(true);
+            expect(service.isSelected("file2")).toBe(false);
+            expect(service.isSelected("file3")).toBe(false);
+        });
+
+        it("should handle multiple begin/end cycles correctly", () => {
+            service.selectMultiple(["file1", "file2"]);
+
+            // First cycle
+            service.beginOperation();
+            expect(service.operationInProgress()).toBe(true);
+            service.pruneSelection(new Set(["file1"])); // Should be skipped
+            expect(service.getSelectedCount()).toBe(2);
+            service.endOperation();
+            expect(service.operationInProgress()).toBe(false);
+
+            // Second cycle
+            service.beginOperation();
+            expect(service.operationInProgress()).toBe(true);
+            service.pruneSelection(new Set(["file1"])); // Should be skipped
+            expect(service.getSelectedCount()).toBe(2);
+            service.endOperation();
+            expect(service.operationInProgress()).toBe(false);
+
+            // Now prune should work
+            service.pruneSelection(new Set(["file1"]));
+            expect(service.getSelectedCount()).toBe(1);
+        });
+
+        it("should not block other selection operations during operation", () => {
+            service.beginOperation();
+
+            // These should still work
+            service.select("file1");
+            expect(service.isSelected("file1")).toBe(true);
+
+            service.deselect("file1");
+            expect(service.isSelected("file1")).toBe(false);
+
+            service.selectMultiple(["file2", "file3"]);
+            expect(service.getSelectedCount()).toBe(2);
+
+            service.clearSelection();
+            expect(service.getSelectedCount()).toBe(0);
+
+            service.endOperation();
+        });
+
+        it("should preserve selectAllMatchingFilter mode during skipped prune", () => {
+            const files = [
+                new ViewFile({name: "file1"}),
+                new ViewFile({name: "file2"})
+            ];
+            service.enableSelectAllMatchingFilter(files);
+            expect(service.isSelectAllMatchingFilter()).toBe(true);
+
+            service.beginOperation();
+
+            // Prune all files - normally this would clear selectAllMatchingFilter
+            service.pruneSelection(new Set<string>());
+
+            // Mode should be preserved because prune was skipped
+            expect(service.isSelectAllMatchingFilter()).toBe(true);
+            expect(service.getSelectedCount()).toBe(2);
+
+            service.endOperation();
+        });
+    });
 });
