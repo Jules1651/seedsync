@@ -281,108 +281,102 @@ describe("Testing file selection service", () => {
 
     // =========================================================================
     // Observable Tests (backwards compatibility)
+    // Note: toObservable() uses Angular's effect system internally, which requires
+    // TestBed.flushEffects() to trigger emissions in tests.
     // =========================================================================
 
-    it("should emit on selectedFiles$ when selection changes", fakeAsync(() => {
+    it("should emit on selectedFiles$ when selection changes", () => {
         const emissions: Set<string>[] = [];
 
         service.selectedFiles$.subscribe(files => {
             emissions.push(files);
         });
 
-        // Wait for initial emission
-        tick();
+        // Flush effects to get initial emission
+        TestBed.flushEffects();
         expect(emissions.length).toBe(1);
         expect(emissions[0].size).toBe(0);
 
         service.select("file1");
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(2);
         expect(emissions[1].size).toBe(1);
         expect(emissions[1].has("file1")).toBe(true);
 
         service.deselect("file1");
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(3);
         expect(emissions[2].size).toBe(0);
+    });
 
-        flush();
-    }));
-
-    it("should emit on selectedCount$ when selection changes", fakeAsync(() => {
+    it("should emit on selectedCount$ when selection changes", () => {
         const emissions: number[] = [];
 
         service.selectedCount$.subscribe(count => {
             emissions.push(count);
         });
 
-        // Wait for initial emission
-        tick();
+        // Flush effects to get initial emission
+        TestBed.flushEffects();
         expect(emissions.length).toBe(1);
         expect(emissions[0]).toBe(0);
 
         service.selectMultiple(["file1", "file2"]);
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(2);
         expect(emissions[1]).toBe(2);
 
         service.clearSelection();
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(3);
         expect(emissions[2]).toBe(0);
+    });
 
-        flush();
-    }));
-
-    it("should emit on hasSelection$ when selection changes", fakeAsync(() => {
+    it("should emit on hasSelection$ when selection changes", () => {
         const emissions: boolean[] = [];
 
         service.hasSelection$.subscribe(has => {
             emissions.push(has);
         });
 
-        // Wait for initial emission
-        tick();
+        // Flush effects to get initial emission
+        TestBed.flushEffects();
         expect(emissions.length).toBe(1);
         expect(emissions[0]).toBe(false);
 
         service.select("file1");
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(2);
         expect(emissions[1]).toBe(true);
 
         service.clearSelection();
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(3);
         expect(emissions[2]).toBe(false);
+    });
 
-        flush();
-    }));
-
-    it("should emit on selectAllMatchingFilter$ when mode changes", fakeAsync(() => {
+    it("should emit on selectAllMatchingFilter$ when mode changes", () => {
         const emissions: boolean[] = [];
 
         service.selectAllMatchingFilter$.subscribe(mode => {
             emissions.push(mode);
         });
 
-        // Wait for initial emission
-        tick();
+        // Flush effects to get initial emission
+        TestBed.flushEffects();
         expect(emissions.length).toBe(1);
         expect(emissions[0]).toBe(false);
 
         service.enableSelectAllMatchingFilter([new ViewFile({name: "file1"})]);
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(2);
         expect(emissions[1]).toBe(true);
 
         service.clearSelection();
-        tick();
+        TestBed.flushEffects();
         expect(emissions.length).toBe(3);
         expect(emissions[2]).toBe(false);
-
-        flush();
-    }));
+    });
 
     // =========================================================================
     // Edge Cases
@@ -412,25 +406,23 @@ describe("Testing file selection service", () => {
         expect(service.getSelectedCount()).toBe(1);
     });
 
-    it("should not emit when no actual change occurs", fakeAsync(() => {
+    it("should not emit when no actual change occurs", () => {
         let emissionCount = 0;
 
         service.selectedFiles$.subscribe(() => {
             emissionCount++;
         });
 
-        // Wait for initial emission
-        tick();
+        // Flush effects to get initial emission
+        TestBed.flushEffects();
         expect(emissionCount).toBe(1);
 
         // Try to deselect non-existent file - should not emit
         service.deselect("nonexistent");
-        tick();
+        TestBed.flushEffects();
 
         expect(emissionCount).toBe(1);  // Still 1
-
-        flush();
-    }));
+    });
 
     // =========================================================================
     // Performance Tests
