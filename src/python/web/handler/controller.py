@@ -69,7 +69,7 @@ class ControllerHandler(IHandler):
         web_app.add_handler("/server/command/delete_remote/<file_name>", self.__handle_action_delete_remote)
         web_app.add_post_handler("/server/command/bulk", self.__handle_bulk_command)
 
-    def __handle_action_queue(self, file_name: str):
+    def __handle_action_queue(self, file_name: str) -> HTTPResponse:
         """
         Request a QUEUE action
         :param file_name:
@@ -88,7 +88,7 @@ class ControllerHandler(IHandler):
         else:
             return HTTPResponse(body=callback.error, status=callback.error_code)
 
-    def __handle_action_stop(self, file_name: str):
+    def __handle_action_stop(self, file_name: str) -> HTTPResponse:
         """
         Request a STOP action
         :param file_name:
@@ -107,7 +107,7 @@ class ControllerHandler(IHandler):
         else:
             return HTTPResponse(body=callback.error, status=callback.error_code)
 
-    def __handle_action_extract(self, file_name: str):
+    def __handle_action_extract(self, file_name: str) -> HTTPResponse:
         """
         Request a EXTRACT action
         :param file_name:
@@ -126,7 +126,7 @@ class ControllerHandler(IHandler):
         else:
             return HTTPResponse(body=callback.error, status=callback.error_code)
 
-    def __handle_action_delete_local(self, file_name: str):
+    def __handle_action_delete_local(self, file_name: str) -> HTTPResponse:
         """
         Request a DELETE LOCAL action
         :param file_name:
@@ -145,7 +145,7 @@ class ControllerHandler(IHandler):
         else:
             return HTTPResponse(body=callback.error, status=callback.error_code)
 
-    def __handle_action_delete_remote(self, file_name: str):
+    def __handle_action_delete_remote(self, file_name: str) -> HTTPResponse:
         """
         Request a DELETE REMOTE action
         :param file_name:
@@ -183,7 +183,7 @@ class ControllerHandler(IHandler):
     # Rate limiting for bulk endpoint (DoS prevention)
     _BULK_RATE_LIMIT = 10  # Max requests per window
     _BULK_RATE_WINDOW = 60.0  # Window size in seconds
-    _bulk_request_times: list = []  # Timestamps of recent bulk requests
+    _bulk_request_times: List[float] = []  # Timestamps of recent bulk requests
     _bulk_rate_lock = Lock()  # Thread-safe access to rate limit state
 
     def _check_bulk_rate_limit(self) -> bool:
@@ -210,7 +210,7 @@ class ControllerHandler(IHandler):
             ControllerHandler._bulk_request_times.append(now)
             return True
 
-    def __handle_bulk_command(self):
+    def __handle_bulk_command(self) -> HTTPResponse:
         """
         Handle bulk command requests for multiple files.
 

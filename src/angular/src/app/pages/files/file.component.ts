@@ -1,6 +1,6 @@
 import {
     Component, Input, Output, ChangeDetectionStrategy,
-    EventEmitter, OnChanges, SimpleChanges, ViewChild,
+    EventEmitter, OnChanges, SimpleChanges, ViewChild, ElementRef,
     inject, computed, AfterViewInit
 } from "@angular/core";
 import {NgIf, DatePipe} from "@angular/common";
@@ -49,7 +49,7 @@ export class FileComponent implements OnChanges, AfterViewInit {
     min = Math.min;
 
     // Entire div element
-    @ViewChild("fileElement", {static: false}) fileElement: any;
+    @ViewChild("fileElement", {static: false}) fileElement!: ElementRef<HTMLDivElement>;
 
     @Input() file: ViewFile;
     @Input() options: ViewFileOptions;
@@ -63,7 +63,7 @@ export class FileComponent implements OnChanges, AfterViewInit {
     @Output() checkboxToggle = new EventEmitter<{file: ViewFile, shiftKey: boolean}>();
 
     // Indicates an active action on-going
-    activeAction: FileAction = null;
+    activeAction: FileAction | null = null;
 
     // Track whether view has been initialized (ViewChild availability)
     private viewInitialized = false;
@@ -104,7 +104,8 @@ export class FileComponent implements OnChanges, AfterViewInit {
 
             // Scroll into view if this file is selected and not already in viewport
             // Only access ViewChild after view has been initialized
-            if (this.viewInitialized && newFile.isSelected && this.fileElement?.nativeElement &&
+            // Use the computed signal value instead of ViewFile.isSelected to ensure consistency
+            if (this.viewInitialized && this.isSelected() && this.fileElement?.nativeElement &&
                 !FileComponent.isElementInViewport(this.fileElement.nativeElement)) {
                 this.fileElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
             }
@@ -194,7 +195,7 @@ export class FileComponent implements OnChanges, AfterViewInit {
     }
 
     // Source: https://stackoverflow.com/a/7557433
-    private static isElementInViewport (el) {
+    private static isElementInViewport(el: HTMLElement): boolean {
         const rect = el.getBoundingClientRect();
         return (
             rect.top >= 0 &&

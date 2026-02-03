@@ -382,7 +382,9 @@ export class FileListComponent {
         // Show progress indicator for all bulk operations
         this.bulkOperationInProgress = true;
 
-        this.bulkCommandService.executeBulkAction(action, fileNames).subscribe({
+        this.bulkCommandService.executeBulkAction(action, fileNames).pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe({
             next: (result: BulkActionResult) => {
                 this.bulkOperationInProgress = false;
                 // Release the lock before clearing selection
@@ -397,13 +399,28 @@ export class FileListComponent {
                 // Release the lock on error
                 this.fileSelectionService.endOperation();
                 this._logger.error("Bulk action error:", err);
-                // Clear selection on error so user can retry fresh
-                this.fileSelectionService.clearSelection();
-                this._lastClickedFileName = null;
-                this._showNotification(
-                    Notification.Level.DANGER,
-                    Localization.Bulk.ERROR_RETRY("Request failed.")
-                );
+
+                // Check if this is a transient error where retry makes sense
+                // - Network errors (status 0)
+                // - Rate limiting (status 429)
+                // - Server errors (status >= 500)
+                const isTransientError = !err.status || err.status === 429 || err.status >= 500;
+
+                if (isTransientError) {
+                    // Preserve selection for retry on transient errors
+                    this._showNotification(
+                        Notification.Level.DANGER,
+                        Localization.Bulk.ERROR_RETRY("Request failed. Selection preserved for retry.")
+                    );
+                } else {
+                    // Clear selection on validation errors (400) - user needs to fix something
+                    this.fileSelectionService.clearSelection();
+                    this._lastClickedFileName = null;
+                    this._showNotification(
+                        Notification.Level.DANGER,
+                        Localization.Bulk.ERROR_RETRY("Request failed.")
+                    );
+                }
             }
         });
     }

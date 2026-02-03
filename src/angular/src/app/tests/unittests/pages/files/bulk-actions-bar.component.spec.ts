@@ -25,6 +25,7 @@ describe("BulkActionsBarComponent", () => {
             isQueueable: true,
             isStoppable: false,
             isExtractable: true,
+            isArchive: true,  // Required for extraction
             isLocallyDeletable: true,
             isRemotelyDeletable: true
         }),
@@ -41,6 +42,7 @@ describe("BulkActionsBarComponent", () => {
             isQueueable: false,
             isStoppable: true,
             isExtractable: true,
+            isArchive: true,  // Required for extraction
             isLocallyDeletable: true,
             isRemotelyDeletable: false
         }),
@@ -49,6 +51,7 @@ describe("BulkActionsBarComponent", () => {
             isQueueable: true,
             isStoppable: false,
             isExtractable: true,
+            isArchive: true,  // Required for extraction
             isLocallyDeletable: true,
             isRemotelyDeletable: true
         })
