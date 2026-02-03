@@ -14,8 +14,6 @@ import {ViewFile} from "./view-file";
  *
  * Selection state:
  * - Selected files are tracked by name in a Set<string>
- * - "Select all matching filter" mode tracks intent to select all matching files,
- *   even those not currently visible (e.g., due to pagination)
  *
  * Angular Signals Architecture (Session 16):
  * - Uses signals for fine-grained reactivity
@@ -37,11 +35,6 @@ export class FileSelectionService {
     // Each mutation creates a new Set for immutability
     readonly selectedFiles = signal<Set<string>>(new Set());
 
-    // Flag indicating "select all matching filter" mode
-    // When true, the selection logically includes all files matching the current filter,
-    // even if not all are explicitly in the selectedFiles set
-    readonly selectAllMatchingFilterMode = signal<boolean>(false);
-
     // Flag indicating a bulk operation is in progress
     // When true, pruneSelection() will be skipped to prevent race conditions
     private readonly _operationInProgress = signal<boolean>(false);
@@ -54,7 +47,6 @@ export class FileSelectionService {
     // Observable for backwards compatibility with existing subscribers
     // Uses toObservable() to convert signal to RxJS observable
     readonly selectedFiles$ = toObservable(this.selectedFiles);
-    readonly selectAllMatchingFilter$ = toObservable(this.selectAllMatchingFilterMode);
 
     constructor() {}
 
@@ -106,13 +98,6 @@ export class FileSelectionService {
         return this.selectedFiles().has(fileName);
     }
 
-    /**
-     * Check if "select all matching filter" mode is active.
-     */
-    isSelectAllMatchingFilter(): boolean {
-        return this.selectAllMatchingFilterMode();
-    }
-
     // =========================================================================
     // Selection Modification Methods
     // =========================================================================
@@ -142,8 +127,6 @@ export class FileSelectionService {
                 newSet.delete(fileName);
                 return newSet;
             });
-            // Deselecting any file clears "select all matching" mode
-            this._clearSelectAllMatchingMode();
         }
     }
 
@@ -177,7 +160,6 @@ export class FileSelectionService {
 
     /**
      * Select all visible files (those currently in the filtered view).
-     * This does NOT set "select all matching" mode - only selects the provided files.
      * @param visibleFiles List of currently visible ViewFiles
      */
     selectAllVisible(visibleFiles: ViewFile[]): void {
@@ -186,36 +168,20 @@ export class FileSelectionService {
     }
 
     /**
-     * Enable "select all matching filter" mode.
-     * This indicates the user wants to select ALL files matching the current filter,
-     * including those not currently visible (e.g., due to pagination).
-     * @param visibleFiles List of currently visible ViewFiles to add to selection
-     */
-    enableSelectAllMatchingFilter(visibleFiles: ViewFile[]): void {
-        // First select all visible files
-        this.selectAllVisible(visibleFiles);
-        // Then set the flag
-        this.selectAllMatchingFilterMode.set(true);
-    }
-
-    /**
      * Clear all selections and reset to initial state.
      */
     clearSelection(): void {
-        if (this.selectedFiles().size > 0 || this.selectAllMatchingFilterMode()) {
+        if (this.selectedFiles().size > 0) {
             this.selectedFiles.set(new Set());
-            this._clearSelectAllMatchingMode();
         }
     }
 
     /**
      * Replace the current selection with a new set of files.
-     * Clears "select all matching" mode.
      * @param fileNames Array of file names that should be selected
      */
     setSelection(fileNames: string[]): void {
         this.selectedFiles.set(new Set(fileNames));
-        this._clearSelectAllMatchingMode();
     }
 
     /**
@@ -250,9 +216,6 @@ export class FileSelectionService {
                 toRemove.forEach(f => newSet.delete(f));
                 return newSet;
             });
-            if (this.selectedFiles().size === 0) {
-                this._clearSelectAllMatchingMode();
-            }
         }
     }
 
@@ -274,18 +237,5 @@ export class FileSelectionService {
      */
     endOperation(): void {
         this._operationInProgress.set(false);
-    }
-
-    // =========================================================================
-    // Private Helpers
-    // =========================================================================
-
-    /**
-     * Clear the "select all matching filter" mode flag.
-     */
-    private _clearSelectAllMatchingMode(): void {
-        if (this.selectAllMatchingFilterMode()) {
-            this.selectAllMatchingFilterMode.set(false);
-        }
     }
 }

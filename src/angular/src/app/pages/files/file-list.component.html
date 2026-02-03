@@ -1,11 +1,7 @@
-<ng-container *ngIf="{files: files | async, state: headerCheckboxState$ | async, selectedFiles: selectedFiles$ | async, selectAllMatchingFilter: selectAllMatchingFilter$ | async, selectedFile: selectedFile$ | async} as vm">
+<ng-container *ngIf="{files: files | async, state: headerCheckboxState$ | async, selectedFiles: selectedFiles$ | async, selectedFile: selectedFile$ | async} as vm">
 <app-selection-banner
-    [visibleFiles]="vm.files!"
-    [totalMatchingCount]="vm.files!.size"
     [selectedFiles]="vm.selectedFiles!"
-    [selectAllMatchingFilterActive]="vm.selectAllMatchingFilter!"
-    (clearSelection)="onClearSelection()"
-    (selectAllMatchingFilter)="onSelectAllMatchingFilter(vm.files!)">
+    (clearSelection)="onClearSelection()">
 </app-selection-banner>
 <app-bulk-actions-bar
     [visibleFiles]="vm.files!"
@@ -25,6 +21,13 @@
     (deleteLocalEvent)="onDeleteLocal($event)"
     (deleteRemoteEvent)="onDeleteRemote($event)">
 </app-file-actions-bar>
+<!-- Progress overlay during bulk operations -->
+<div class="bulk-progress-overlay" *ngIf="bulkOperationInProgress">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Processing...</span>
+    </div>
+    <div class="progress-text">Processing files...</div>
+</div>
 <div id="file-list">
     <div id="header">
         <div class="checkbox">

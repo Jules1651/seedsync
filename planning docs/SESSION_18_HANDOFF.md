@@ -1,7 +1,7 @@
 # Session 18 Handoff: Bulk Actions Critical Fixes
 
 **Date:** 2026-02-03
-**Status:** Phase 1 Complete, Phases 2-5 Remaining
+**Status:** All Phases Complete (1-5)
 
 ---
 
@@ -13,7 +13,7 @@ A code review identified critical issues in the bulk file actions implementation
 
 ## What Was Completed (Phase 1)
 
-### C1: Race Condition Fix ✓
+### C1: Race Condition Fix
 
 **Problem:** `pruneSelection()` could run during bulk operations, corrupting selection state.
 
@@ -33,7 +33,7 @@ src/angular/src/app/pages/files/file-list.component.ts
 - `_executeBulkAction()` calls `beginOperation()` before HTTP request
 - Calls `endOperation()` in both success and error handlers
 
-### C3: Memory Leak Fix ✓
+### C3: Memory Leak Fix
 
 **Problem:** Observable subscription in constructor never unsubscribed.
 
@@ -44,122 +44,153 @@ src/angular/src/app/pages/files/file-list.component.ts
 - Added `DestroyRef` injection via `inject()`
 - Added `takeUntilDestroyed(this.destroyRef)` to files subscription
 
-### Tests Added ✓
+---
 
-```
-src/angular/src/app/tests/unittests/services/files/file-selection.service.spec.ts
-```
-- 8 new tests in "Operation lock for race condition prevention" describe block
-- Tests verify lock behavior, skipped pruning, and multiple cycles
+## What Was Completed (Phase 2)
 
-### Build Verification
-- TypeScript compilation: **Passed**
-- Unit tests: Could not run locally (ARM64/Chrome Docker issue - CI should work)
+### C2: Remove Misleading `selectAllMatchingFilterMode`
+
+**Problem:** The feature claimed to select "all files matching filter" but only operated on visible files.
+
+**Solution:** Removed the feature entirely (Option B).
+
+Files modified:
+- `src/angular/src/app/services/files/file-selection.service.ts`
+- `src/angular/src/app/pages/files/file-list.component.ts`
+- `src/angular/src/app/pages/files/file-list.component.html`
+- `src/angular/src/app/pages/files/selection-banner.component.ts`
+- `src/angular/src/app/pages/files/selection-banner.component.html`
+
+### H1: Fix Error Handling
+
+**Problem:** On HTTP error, selection remained but user had no idea what succeeded/failed.
+
+**Solution:** Clear selection on error so user can retry fresh.
+
+Files modified:
+- `src/angular/src/app/pages/files/file-list.component.ts`
+- `src/angular/src/app/common/localization.ts` - Added `ERROR_RETRY` message
 
 ---
 
-## What Remains
+## What Was Completed (Phase 3)
 
-### Phase 2: C2 + H1 (2-3 hours)
+### C4: Rate Limiting for Bulk Endpoint
 
-**C2: Remove misleading `selectAllMatchingFilterMode`**
+**Problem:** No rate limiting on bulk endpoint - attacker could flood the controller command queue.
 
-The feature claims to select "all files matching filter" but only operates on visible files. Options:
-- **Option A:** Implement backend support (complex)
-- **Option B (Recommended):** Remove the feature entirely
+**Solution:** Added sliding window rate limiting to the bulk endpoint.
 
-Files to modify:
-- `src/angular/src/app/services/files/file-selection.service.ts` - Remove `selectAllMatchingFilterMode` signal
-- `src/angular/src/app/pages/files/file-list.component.ts` - Remove `onSelectAllMatchingFilter()`
-- `src/angular/src/app/pages/files/file-list.component.html` - Remove banner link
-- `src/angular/src/app/pages/files/selection-banner.component.ts` - Remove related UI
+File modified: `src/python/web/handler/controller.py`
 
-**H1: Fix error handling**
+Added:
+- `_BULK_RATE_LIMIT = 10` - Max 10 requests per window
+- `_BULK_RATE_WINDOW = 60.0` - 60-second sliding window
+- `_bulk_request_times` - Class-level list tracking request timestamps
+- `_bulk_rate_lock` - Threading lock for thread-safe access
+- `_check_bulk_rate_limit()` - Sliding window rate limit check
+- Returns HTTP 429 with JSON error when rate exceeded
 
-On HTTP error, selection should be cleared so user can retry fresh.
+Tests added: `src/python/tests/unittests/test_web/test_handler/test_controller_handler.py`
+- `test_rate_limit_allows_requests_under_limit`
+- `test_rate_limit_blocks_requests_over_limit`
+- `test_rate_limit_resets_after_window`
+- `test_rate_limit_response_content_type_is_json`
 
-Files to modify:
-- `src/angular/src/app/pages/files/file-list.component.ts` - Add `clearSelection()` in error handler
-- `src/angular/src/app/common/localization.ts` - Add `ERROR_RETRY` message
+---
 
-### Phase 3: C4 - Rate Limiting (1-2 hours)
+## What Was Completed (Phase 4)
 
-Add rate limiting to bulk endpoint to prevent DoS.
+### H2: Fix Shift+Click with Filter Changes
 
-File to modify:
-- `src/python/web/handler/controller.py`
+**Problem:** `_lastClickedIndex` became stale when filter changes or virtual scrolling shifted the list.
 
-Add:
-- `_bulk_request_times` list
-- `_bulk_rate_lock` threading lock
-- `_check_rate_limit()` method
-- Return 429 if rate exceeded
+**Solution:** Changed from index-based to name-based anchor tracking.
 
-### Phase 4: H2 + H3 (2-3 hours)
+File modified: `src/angular/src/app/pages/files/file-list.component.ts`
 
-**H2: Fix shift+click with filter changes**
+Changes:
+- Renamed `_lastClickedIndex` to `_lastClickedFileName`
+- Updated `onCheckboxToggle()` to find indices by name at shift+click time
+- Added fallback: if anchor is no longer visible, just toggle the clicked file and set new anchor
+- Removed the index reset logic from the files subscription (anchor persists across filter changes)
+- Updated all references (Escape handler, `onClearSelection`, `_executeBulkAction`)
 
-Change from index-based to name-based anchor tracking.
+### H3: Fix Inconsistent `isExtractable` Check
 
-File to modify:
-- `src/angular/src/app/pages/files/file-list.component.ts`
-- Change `_lastClickedIndex` to `_lastClickedFileName`
+**Problem:** Bulk check only checked `isExtractable`, but single-file check included `&& file.isArchive`.
 
-**H3: Fix inconsistent `isExtractable` check**
+**Solution:** Added `&& file.isArchive` to bulk check to match single-file logic.
 
-Bulk check missing `&& file.isArchive`.
+File modified: `src/angular/src/app/pages/files/bulk-actions-bar.component.ts`
+- Line 103: Changed `if (file.isExtractable)` to `if (file.isExtractable && file.isArchive)`
 
-File to modify:
-- `src/angular/src/app/pages/files/bulk-actions-bar.component.ts` line ~103
+---
 
-### Phase 5: H4 - Progress Indicator (1 hour)
+## What Was Completed (Phase 5)
 
-Show progress overlay during bulk operations.
+### H4: Progress Indicator During Bulk Operations
 
-Files to modify:
-- `src/angular/src/app/pages/files/file-list.component.html` - Add overlay div
-- `src/angular/src/app/pages/files/file-list.component.scss` - Add overlay styles
-- `src/angular/src/app/pages/files/file-list.component.ts` - Always set `bulkOperationInProgress`
+**Problem:** `bulkOperationInProgress` flag existed but wasn't used in the template.
+
+**Solution:** Added visual progress overlay during bulk operations.
+
+Files modified:
+- `src/angular/src/app/pages/files/file-list.component.html` - Added overlay div with spinner
+- `src/angular/src/app/pages/files/file-list.component.scss` - Added overlay styles
+- `src/angular/src/app/pages/files/file-list.component.ts` - Always set `bulkOperationInProgress` (removed 50+ threshold)
+
+---
+
+## Build Verification
+
+- **TypeScript compilation:** Passed
+- **Python syntax:** Passed (Phase 3)
+- **Unit tests:** Docker build issue (unrelated `rar` package) - tests should pass in CI
 
 ---
 
 ## Files Modified This Session
 
+### Phase 1-2 (Angular)
 ```
 src/angular/src/app/services/files/file-selection.service.ts
 src/angular/src/app/pages/files/file-list.component.ts
+src/angular/src/app/pages/files/file-list.component.html
+src/angular/src/app/pages/files/selection-banner.component.ts
+src/angular/src/app/pages/files/selection-banner.component.html
+src/angular/src/app/common/localization.ts
 src/angular/src/app/tests/unittests/services/files/file-selection.service.spec.ts
-planning docs/BULK_ACTIONS_FIXES.md (created)
-planning docs/SESSION_18_HANDOFF.md (this file)
+src/angular/src/app/tests/unittests/services/files/view-file.service.spec.ts
+```
+
+### Phase 3 (Python)
+```
+src/python/web/handler/controller.py
+src/python/tests/unittests/test_web/test_handler/test_controller_handler.py
+```
+
+### Phase 4-5 (Angular)
+```
+src/angular/src/app/pages/files/file-list.component.ts
+src/angular/src/app/pages/files/file-list.component.html
+src/angular/src/app/pages/files/file-list.component.scss
+src/angular/src/app/pages/files/bulk-actions-bar.component.ts
 ```
 
 ---
 
-## How to Resume
+## Summary of All Fixes
 
-1. Read this handoff note
-2. Read `planning docs/BULK_ACTIONS_FIXES.md` for full technical details
-3. Start with Phase 2 (C2 + H1)
-4. Run `make run-tests-angular` after each phase (may need CI for ARM64 Macs)
+| Issue | Type | Description | Status |
+|-------|------|-------------|--------|
+| C1 | Critical | Race condition in selection management | Done |
+| C2 | Critical | Misleading "select all matching" feature | Done (removed) |
+| C3 | Critical | Memory leak from unsubscribed observable | Done |
+| C4 | Critical | No rate limiting on bulk endpoint | Done |
+| H1 | High | Error handling doesn't clear selection | Done |
+| H2 | High | Shift+click breaks with filter changes | Done |
+| H3 | High | Inconsistent isExtractable check | Done |
+| H4 | High | No progress indication during bulk ops | Done |
 
----
-
-## Known Issues
-
-- **Test infrastructure:** `make run-tests-angular` fails on ARM64 Macs due to Chrome package architecture mismatch. Tests should pass in CI (GitHub Actions uses AMD64 runners). TypeScript compilation can verify syntax locally.
-
----
-
-## Quick Test Commands
-
-```bash
-# Verify TypeScript compiles
-cd /Users/julianamacbook/seedsync
-docker run --rm -v "$(pwd)/src/angular:/app/src" -w /app seedsync/test/angular:latest npx tsc --noEmit --project /app/tsconfig.json
-
-# Run all Angular tests (needs CI or AMD64 machine)
-make run-tests-angular
-
-# Run Python tests
-make run-tests-python
-```
+All 8 issues from the code review have been addressed.

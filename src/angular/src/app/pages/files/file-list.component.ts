@@ -50,13 +50,12 @@ export class FileListComponent {
 
     // Selection state for banner
     public selectedFiles$: Observable<Set<string>>;
-    public selectAllMatchingFilter$: Observable<boolean>;
 
     // Single selected file for actions bar (detail panel selection)
     public selectedFile$: Observable<ViewFile | null>;
 
-    // Track last clicked file index for shift+click range selection
-    private _lastClickedIndex: number | null = null;
+    // Track last clicked file name for shift+click range selection (name-based for filter resilience)
+    private _lastClickedFileName: string | null = null;
     // Cache of current files list for range selection (updated on each observable emission)
     private _currentFiles: List<ViewFile> = List();
     // Track whether a bulk operation is in progress (for UI feedback)
@@ -72,9 +71,8 @@ export class FileListComponent {
         this.files = viewFileService.filteredFiles;
         this.options = this.viewFileOptionsService.options;
 
-        // Selection state observables for banner
+        // Selection state observable for banner
         this.selectedFiles$ = this.fileSelectionService.selectedFiles$;
-        this.selectAllMatchingFilter$ = this.fileSelectionService.selectAllMatchingFilter$;
 
         // Single selected file for actions bar (derived from files list)
         this.selectedFile$ = this.files.pipe(
@@ -87,10 +85,9 @@ export class FileListComponent {
             takeUntilDestroyed(this.destroyRef)
         ).subscribe(files => {
             this._currentFiles = files;
-            // Reset last clicked index if it's now out of range
-            if (this._lastClickedIndex !== null && this._lastClickedIndex >= files.size) {
-                this._lastClickedIndex = null;
-            }
+            // Note: We intentionally do NOT reset _lastClickedFileName here.
+            // The anchor persists even if the file is temporarily filtered out,
+            // allowing shift+click to work correctly when the filter changes back.
         });
 
         // Calculate header checkbox state based on selection and visible files
@@ -137,7 +134,7 @@ export class FileListComponent {
         if (event.key === "Escape") {
             if (!this._isInputElement(event.target)) {
                 this.fileSelectionService.clearSelection();
-                this._lastClickedIndex = null;
+                this._lastClickedFileName = null;
             }
         }
     }
@@ -224,50 +221,48 @@ export class FileListComponent {
     }
 
     /**
-     * Handle "Select all matching filter" from banner.
-     */
-    onSelectAllMatchingFilter(files: List<ViewFile>): void {
-        this.fileSelectionService.enableSelectAllMatchingFilter(files.toArray());
-    }
-
-    /**
      * Handle "Clear" from banner.
      */
     onClearSelection(): void {
         this.fileSelectionService.clearSelection();
-        this._lastClickedIndex = null;
+        this._lastClickedFileName = null;
     }
 
     /**
      * Handle checkbox toggle with support for shift+click range selection.
+     * Uses name-based anchor tracking so shift+click works correctly even
+     * when filters change or virtual scrolling shifts the list.
      * @param event The event containing the file and shift key state
      */
     onCheckboxToggle(event: {file: ViewFile, shiftKey: boolean}): void {
-        const currentIndex = this._currentFiles.findIndex(f => f.name === event.file.name);
+        if (event.shiftKey && this._lastClickedFileName !== null) {
+            // Shift+click: select range from anchor to current
+            // Find both indices by name (handles filter/scroll changes)
+            const lastIndex = this._currentFiles.findIndex(f => f.name === this._lastClickedFileName);
+            const currentIndex = this._currentFiles.findIndex(f => f.name === event.file.name);
 
-        if (event.shiftKey && this._lastClickedIndex !== null && currentIndex !== -1) {
-            // Shift+click: select range from last clicked to current
-            const start = Math.min(this._lastClickedIndex, currentIndex);
-            const end = Math.max(this._lastClickedIndex, currentIndex);
+            if (lastIndex !== -1 && currentIndex !== -1) {
+                // Both anchor and target are visible - select the range
+                const start = Math.min(lastIndex, currentIndex);
+                const end = Math.max(lastIndex, currentIndex);
 
-            // Get file names in range
-            const rangeNames: string[] = [];
-            for (let i = start; i <= end; i++) {
-                const file = this._currentFiles.get(i);
-                if (file) {
-                    rangeNames.push(file.name);
+                const rangeNames: string[] = [];
+                for (let i = start; i <= end; i++) {
+                    const file = this._currentFiles.get(i);
+                    if (file) {
+                        rangeNames.push(file.name);
+                    }
                 }
+                this.fileSelectionService.setSelection(rangeNames);
+            } else {
+                // Anchor no longer visible - just toggle the clicked file and set new anchor
+                this.fileSelectionService.toggle(event.file.name);
+                this._lastClickedFileName = event.file.name;
             }
-
-            // Replace selection with range
-            this.fileSelectionService.setSelection(rangeNames);
         } else {
-            // Normal click: toggle the single file
+            // Normal click: toggle the single file and update anchor
             this.fileSelectionService.toggle(event.file.name);
-            // Update last clicked index for future range selections
-            if (currentIndex !== -1) {
-                this._lastClickedIndex = currentIndex;
-            }
+            this._lastClickedFileName = event.file.name;
         }
     }
 
@@ -384,11 +379,8 @@ export class FileListComponent {
         // Lock selection state to prevent pruneSelection race conditions
         this.fileSelectionService.beginOperation();
 
-        // Show progress indicator for large selections
-        const showProgress = fileNames.length >= 50;
-        if (showProgress) {
-            this.bulkOperationInProgress = true;
-        }
+        // Show progress indicator for all bulk operations
+        this.bulkOperationInProgress = true;
 
         this.bulkCommandService.executeBulkAction(action, fileNames).subscribe({
             next: (result: BulkActionResult) => {
@@ -398,16 +390,19 @@ export class FileListComponent {
                 this._handleBulkResult(result, messages);
                 // Clear selection after action (even on partial failure)
                 this.fileSelectionService.clearSelection();
-                this._lastClickedIndex = null;
+                this._lastClickedFileName = null;
             },
             error: (err) => {
                 this.bulkOperationInProgress = false;
                 // Release the lock on error
                 this.fileSelectionService.endOperation();
                 this._logger.error("Bulk action error:", err);
+                // Clear selection on error so user can retry fresh
+                this.fileSelectionService.clearSelection();
+                this._lastClickedFileName = null;
                 this._showNotification(
                     Notification.Level.DANGER,
-                    Localization.Bulk.ERROR("Unexpected error occurred")
+                    Localization.Bulk.ERROR_RETRY("Request failed.")
                 );
             }
         });

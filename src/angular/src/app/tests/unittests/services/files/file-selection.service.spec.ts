@@ -25,7 +25,6 @@ describe("Testing file selection service", () => {
     it("should start with no selections", () => {
         expect(service.getSelectedCount()).toBe(0);
         expect(service.getSelectedFiles().size).toBe(0);
-        expect(service.isSelectAllMatchingFilter()).toBe(false);
     });
 
     it("should select a file", () => {
@@ -106,20 +105,6 @@ describe("Testing file selection service", () => {
         expect(service.isSelected("file1")).toBe(true);
         expect(service.isSelected("file2")).toBe(true);
         expect(service.isSelected("file3")).toBe(true);
-        // Should NOT set selectAllMatching mode
-        expect(service.isSelectAllMatchingFilter()).toBe(false);
-    });
-
-    it("should set selectAllMatchingFilter mode", () => {
-        const files = [
-            new ViewFile({name: "file1"}),
-            new ViewFile({name: "file2"})
-        ];
-
-        service.enableSelectAllMatchingFilter(files);
-
-        expect(service.getSelectedCount()).toBe(2);
-        expect(service.isSelectAllMatchingFilter()).toBe(true);
     });
 
     // =========================================================================
@@ -133,28 +118,6 @@ describe("Testing file selection service", () => {
 
         expect(service.getSelectedCount()).toBe(0);
         expect(service.isSelected("file1")).toBe(false);
-    });
-
-    it("should clear selectAllMatchingFilter mode on clear", () => {
-        const files = [new ViewFile({name: "file1"})];
-        service.enableSelectAllMatchingFilter(files);
-
-        service.clearSelection();
-
-        expect(service.isSelectAllMatchingFilter()).toBe(false);
-    });
-
-    it("should clear selectAllMatchingFilter mode on deselect", () => {
-        const files = [
-            new ViewFile({name: "file1"}),
-            new ViewFile({name: "file2"})
-        ];
-        service.enableSelectAllMatchingFilter(files);
-
-        service.deselect("file1");
-
-        expect(service.isSelectAllMatchingFilter()).toBe(false);
-        expect(service.isSelected("file2")).toBe(true);
     });
 
     // =========================================================================
@@ -171,15 +134,6 @@ describe("Testing file selection service", () => {
         expect(service.isSelected("file2")).toBe(false);
         expect(service.isSelected("file3")).toBe(true);
         expect(service.isSelected("file4")).toBe(true);
-    });
-
-    it("should clear selectAllMatchingFilter mode on setSelection", () => {
-        const files = [new ViewFile({name: "file1"})];
-        service.enableSelectAllMatchingFilter(files);
-
-        service.setSelection(["file2"]);
-
-        expect(service.isSelectAllMatchingFilter()).toBe(false);
     });
 
     it("should select range (for shift+click)", () => {
@@ -209,16 +163,6 @@ describe("Testing file selection service", () => {
         expect(service.isSelected("file3")).toBe(true);
     });
 
-    it("should clear selectAllMatchingFilter when all selections pruned", () => {
-        const files = [new ViewFile({name: "file1"})];
-        service.enableSelectAllMatchingFilter(files);
-
-        service.pruneSelection(new Set<string>());
-
-        expect(service.getSelectedCount()).toBe(0);
-        expect(service.isSelectAllMatchingFilter()).toBe(false);
-    });
-
     // =========================================================================
     // Signal Tests (Session 16)
     // =========================================================================
@@ -228,12 +172,6 @@ describe("Testing file selection service", () => {
             expect(service.selectedFiles).toBeDefined();
             // Read signal value
             expect(service.selectedFiles().size).toBe(0);
-        });
-
-        it("should expose selectAllMatchingFilterMode as a signal", () => {
-            expect(service.selectAllMatchingFilterMode).toBeDefined();
-            // Read signal value
-            expect(service.selectAllMatchingFilterMode()).toBe(false);
         });
 
         it("should expose computed selectedCount signal", () => {
@@ -345,29 +283,6 @@ describe("Testing file selection service", () => {
         expect(emissions[0]).toBe(false);
 
         service.select("file1");
-        TestBed.flushEffects();
-        expect(emissions.length).toBe(2);
-        expect(emissions[1]).toBe(true);
-
-        service.clearSelection();
-        TestBed.flushEffects();
-        expect(emissions.length).toBe(3);
-        expect(emissions[2]).toBe(false);
-    });
-
-    it("should emit on selectAllMatchingFilter$ when mode changes", () => {
-        const emissions: boolean[] = [];
-
-        service.selectAllMatchingFilter$.subscribe(mode => {
-            emissions.push(mode);
-        });
-
-        // Flush effects to get initial emission
-        TestBed.flushEffects();
-        expect(emissions.length).toBe(1);
-        expect(emissions[0]).toBe(false);
-
-        service.enableSelectAllMatchingFilter([new ViewFile({name: "file1"})]);
         TestBed.flushEffects();
         expect(emissions.length).toBe(2);
         expect(emissions[1]).toBe(true);
@@ -746,18 +661,6 @@ describe("Testing file selection service", () => {
             expect(service.isSelected("file2")).toBe(true);
             expect(service.isSelected("file3")).toBe(true);
         });
-
-        it("should export selectAllMatchingFilter state", () => {
-            const files = [new ViewFile({name: "file1"})];
-            service.enableSelectAllMatchingFilter(files);
-
-            // State can be captured
-            const isSelectAll = service.isSelectAllMatchingFilter();
-            const selectedFiles = Array.from(service.getSelectedFiles());
-
-            expect(isSelectAll).toBe(true);
-            expect(selectedFiles).toEqual(["file1"]);
-        });
     });
 
     // =========================================================================
@@ -859,26 +762,6 @@ describe("Testing file selection service", () => {
 
             service.clearSelection();
             expect(service.getSelectedCount()).toBe(0);
-
-            service.endOperation();
-        });
-
-        it("should preserve selectAllMatchingFilter mode during skipped prune", () => {
-            const files = [
-                new ViewFile({name: "file1"}),
-                new ViewFile({name: "file2"})
-            ];
-            service.enableSelectAllMatchingFilter(files);
-            expect(service.isSelectAllMatchingFilter()).toBe(true);
-
-            service.beginOperation();
-
-            // Prune all files - normally this would clear selectAllMatchingFilter
-            service.pruneSelection(new Set<string>());
-
-            // Mode should be preserved because prune was skipped
-            expect(service.isSelectAllMatchingFilter()).toBe(true);
-            expect(service.getSelectedCount()).toBe(2);
 
             service.endOperation();
         });

@@ -3,7 +3,7 @@
 import json
 import logging
 import time
-from threading import Event
+from threading import Event, Lock
 from typing import List, Tuple
 from urllib.parse import unquote
 
@@ -180,6 +180,36 @@ class ControllerHandler(IHandler):
     # Maximum number of files allowed in a single bulk request
     _MAX_BULK_FILES = 1000
 
+    # Rate limiting for bulk endpoint (DoS prevention)
+    _BULK_RATE_LIMIT = 10  # Max requests per window
+    _BULK_RATE_WINDOW = 60.0  # Window size in seconds
+    _bulk_request_times: list = []  # Timestamps of recent bulk requests
+    _bulk_rate_lock = Lock()  # Thread-safe access to rate limit state
+
+    def _check_bulk_rate_limit(self) -> bool:
+        """
+        Check if the bulk request rate limit has been exceeded.
+
+        Uses a sliding window algorithm to track recent requests.
+        Thread-safe via class-level lock.
+
+        Returns:
+            True if request is allowed, False if rate limited.
+        """
+        now = time.time()
+        with ControllerHandler._bulk_rate_lock:
+            # Remove timestamps outside the window
+            ControllerHandler._bulk_request_times = [
+                t for t in ControllerHandler._bulk_request_times
+                if now - t < self._BULK_RATE_WINDOW
+            ]
+            # Check if limit exceeded
+            if len(ControllerHandler._bulk_request_times) >= self._BULK_RATE_LIMIT:
+                return False
+            # Record this request
+            ControllerHandler._bulk_request_times.append(now)
+            return True
+
     def __handle_bulk_command(self):
         """
         Handle bulk command requests for multiple files.
@@ -203,6 +233,15 @@ class ControllerHandler(IHandler):
             }
         }
         """
+        # Rate limiting check
+        if not self._check_bulk_rate_limit():
+            logger.warning("Bulk endpoint rate limit exceeded")
+            return HTTPResponse(
+                body=json.dumps({"error": "Rate limit exceeded. Please try again later."}),
+                status=429,
+                content_type="application/json"
+            )
+
         # Parse JSON body
         try:
             body = request.json

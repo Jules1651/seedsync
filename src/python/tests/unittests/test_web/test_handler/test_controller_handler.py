@@ -40,6 +40,8 @@ class TestControllerHandlerBulkCommand(unittest.TestCase):
     def setUp(self):
         self.mock_controller = MagicMock(spec=Controller)
         self.handler = ControllerHandler(self.mock_controller)
+        # Reset rate limit state between tests
+        ControllerHandler._bulk_request_times = []
 
     def _mock_request(self, json_body):
         """Helper to mock the request object with a JSON body."""
@@ -557,3 +559,100 @@ class TestControllerHandlerBulkCommand(unittest.TestCase):
         # the callbacks are triggered immediately, so the order
         # should still show all commands were processed.
         self.assertEqual(3, self.mock_controller.queue_command.call_count)
+
+    # =========================================================================
+    # Rate Limiting Tests
+    # =========================================================================
+
+    def test_rate_limit_allows_requests_under_limit(self):
+        """Requests under the rate limit should succeed."""
+        self._setup_command_callback(success=True)
+
+        # Make requests up to the limit
+        for i in range(ControllerHandler._BULK_RATE_LIMIT):
+            response = self._call_bulk_handler({
+                "action": "queue",
+                "files": ["file{}".format(i)]
+            })
+            self.assertEqual(200, response.status_code)
+
+    def test_rate_limit_blocks_requests_over_limit(self):
+        """Requests exceeding the rate limit should return 429."""
+        self._setup_command_callback(success=True)
+
+        # Make requests up to the limit
+        for i in range(ControllerHandler._BULK_RATE_LIMIT):
+            response = self._call_bulk_handler({
+                "action": "queue",
+                "files": ["file{}".format(i)]
+            })
+            self.assertEqual(200, response.status_code)
+
+        # Next request should be rate limited
+        response = self._call_bulk_handler({
+            "action": "queue",
+            "files": ["one_more_file"]
+        })
+
+        self.assertEqual(429, response.status_code)
+        body = json.loads(response.body)
+        self.assertIn("error", body)
+        self.assertIn("Rate limit", body["error"])
+
+    def test_rate_limit_resets_after_window(self):
+        """Rate limit should reset after the time window expires."""
+        import time
+
+        self._setup_command_callback(success=True)
+
+        # Save original window and set a very short one for testing
+        original_window = ControllerHandler._BULK_RATE_WINDOW
+        ControllerHandler._BULK_RATE_WINDOW = 0.1  # 100ms
+
+        try:
+            # Exhaust the rate limit
+            for i in range(ControllerHandler._BULK_RATE_LIMIT):
+                response = self._call_bulk_handler({
+                    "action": "queue",
+                    "files": ["file{}".format(i)]
+                })
+                self.assertEqual(200, response.status_code)
+
+            # Verify we're rate limited
+            response = self._call_bulk_handler({
+                "action": "queue",
+                "files": ["blocked_file"]
+            })
+            self.assertEqual(429, response.status_code)
+
+            # Wait for the window to expire
+            time.sleep(0.15)
+
+            # Should be able to make requests again
+            response = self._call_bulk_handler({
+                "action": "queue",
+                "files": ["allowed_after_reset"]
+            })
+            self.assertEqual(200, response.status_code)
+        finally:
+            ControllerHandler._BULK_RATE_WINDOW = original_window
+
+    def test_rate_limit_response_content_type_is_json(self):
+        """Rate limit error response should have JSON content type."""
+        self._setup_command_callback(success=True)
+
+        # Exhaust the rate limit
+        for i in range(ControllerHandler._BULK_RATE_LIMIT):
+            self._call_bulk_handler({
+                "action": "queue",
+                "files": ["file{}".format(i)]
+            })
+
+        # Rate limited response
+        response = self._call_bulk_handler({
+            "action": "queue",
+            "files": ["blocked"]
+        })
+
+        self.assertEqual(429, response.status_code)
+        self.assertEqual("application/json", response.content_type)

@@ -4,6 +4,28 @@
 :host {
     display: block;
     min-height: 500px;
+    position: relative; /* For overlay positioning */
+}
+
+/* Progress overlay during bulk operations */
+.bulk-progress-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+
+    .progress-text {
+        margin-top: 1rem;
+        font-weight: 500;
+        color: #333;
+    }
 }
 
 /* Virtual scroll viewport */

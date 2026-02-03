@@ -69,9 +69,11 @@ export class Localization {
         public static readonly PARTIAL_DELETED_REMOTE = (succeeded: number, failed: number) =>
             `Deleted ${succeeded} remote file${succeeded === 1 ? "" : "s"}. ${failed} failed.`;
 
-        // Error message
+        // Error messages
         public static readonly ERROR = (message: string) =>
             `Bulk action failed: ${message}`;
+        public static readonly ERROR_RETRY = (message: string) =>
+            `${message} Please re-select files and try again.`;
     };
 
     static Log = class {

@@ -100,7 +100,8 @@ export class BulkActionsBarComponent implements OnChanges {
             if (file.isStoppable) {
                 stoppable.push(file.name);
             }
-            if (file.isExtractable) {
+            // Match single-file logic: isExtractable AND isArchive
+            if (file.isExtractable && file.isArchive) {
                 extractable.push(file.name);
             }
             if (file.isLocallyDeletable) {
