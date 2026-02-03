@@ -1,9 +1,13 @@
 @use '../../common/common' as *;
 
-/* Host element styling */
+/* Host element styling for virtual scroll compatibility */
+/* IMPORTANT: height must match itemSize in file-list.component.html (83px) */
 :host {
     display: block;
+    height: 82px; /* 83px - 1px border = 82px content height */
     min-height: 82px;
+    max-height: 82px;
+    overflow: hidden;
     border-bottom: 1px solid #ddd;
 
     /* content-visibility: auto skips rendering of off-screen elements */
@@ -244,13 +248,10 @@
     }
 }
 
-/* Show action toolbar only when file is selected */
-.file:not(.selected) .actions {
+/* Action toolbar always hidden - use external file-actions-bar instead */
+/* This maintains fixed row heights required for virtual scrolling */
+.actions {
     display: none;
-}
-
-.file.selected .actions {
-    display: flex;
 }
 
 

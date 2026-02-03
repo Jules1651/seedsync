@@ -4,10 +4,10 @@
 
 | Item | Value |
 |------|-------|
-| **Latest Branch** | `claude/bulk-file-actions-session-16-IbnC6` |
-| **Status** | ✅ All sessions complete |
-| **Current Session** | Session 16 complete |
-| **Total Sessions** | 16 (10 implementation + 6 performance) |
+| **Latest Branch** | `main` (Session 17 changes uncommitted) |
+| **Status** | 🔄 Session 17 in progress |
+| **Current Session** | Session 17: Virtual Scrolling Fix + Code Quality |
+| **Total Sessions** | 17 (10 implementation + 6 performance + 1 fix) |
 
 > **Claude Code Branch Management:**
 > Each Claude Code session can only push to branches matching its session ID.
@@ -1455,3 +1455,104 @@ The key difference is that with signals, Angular's change detection only marks a
 - `IsSelectedPipe` can be deleted if no longer used elsewhere (build warns it's unused)
 - `vm.selectedFiles` kept in template context for banner/bulk actions bar components
 - Update CLAUDE.md if architecture section needs updating
+
+---
+
+### Session 17: Virtual Scrolling Fix + Code Quality
+
+**Scope:** Fix virtual scrolling regression from Session 16 inline actions, address code review feedback
+**Estimated effort:** Medium
+**Dependencies:** Session 16
+
+**Background:**
+
+Session 16's commit `2a016f9` ("Move file action buttons into selected row") broke virtual scrolling compatibility by:
+1. Removing fixed height constraints (`height: 82px`, `max-height: 82px`, `overflow: hidden`) from `:host`
+2. Showing large 60x60px action buttons inline when a row is selected, causing variable row heights
+3. Hiding `file-actions-bar` component with CSS instead of removing it
+
+**Code Review Findings:**
+
+A thorough code review identified these issues:
+
+| Issue | Severity | Status |
+|-------|----------|--------|
+| Variable row heights break virtual scrolling | Critical | ✅ Fixed |
+| `file-actions-bar` hidden with CSS instead of removed | Medium | ✅ Fixed |
+| Optional chaining masks lifecycle timing bug | Low | Documented |
+| `scrollIntoView()` without smooth scrolling | Low | Open |
+| Pre-existing ESLint errors (63 errors, 220 warnings) | Medium | Open |
+| Missing curly braces in bulk-actions-bar.component.ts | Low | Open |
+
+**Tasks:**
+
+- [x] Restore fixed height constraints on `:host` in `file.component.scss`
+- [x] Restore `file-actions-bar` component visibility (remove `display: none`)
+- [x] Hide inline `.actions` div (revert to external actions bar pattern)
+- [x] Add back "IMPORTANT" comment about height matching itemSize
+- [x] Run unit tests - **334 tests pass**
+- [ ] Fix `scrollIntoView()` to use smooth scrolling with `{ behavior: 'smooth', block: 'nearest' }`
+- [ ] Fix lifecycle timing bug in `ngOnChanges` (ViewChild not available before ngAfterViewInit)
+- [ ] Fix ESLint errors in `bulk-actions-bar.component.ts` (missing curly braces)
+- [ ] Clean up pre-existing ESLint warnings (optional, large scope)
+- [ ] Delete `file-actions-bar` component if truly unused, or document why it's kept
+- [ ] Commit changes
+
+**Files Modified:**
+
+- `src/angular/src/app/pages/files/file.component.scss` - Restored fixed heights, hidden inline actions
+- `src/angular/src/app/pages/files/file-actions-bar.component.scss` - Removed `display: none`
+
+**Context to read:**
+- `src/angular/src/app/pages/files/file.component.ts` (ngOnChanges lifecycle issue)
+- `src/angular/src/app/pages/files/bulk-actions-bar.component.ts` (ESLint curly brace errors)
+- `src/angular/src/app/pages/files/file-list.component.html` (how file-actions-bar is used)
+
+**Acceptance criteria:**
+- [x] Fixed row heights (82px) maintained for virtual scroll compatibility
+- [x] `file-actions-bar` shows actions for selected file
+- [x] All 334 unit tests pass
+- [ ] ESLint passes with no errors (warnings acceptable)
+- [ ] E2E tests pass (requires Docker)
+
+**Testing Results (Session 17):**
+
+```
+Chrome Headless 144.0.0.0 (Mac OS 10.15.7): Executed 334 of 334 SUCCESS (0.205 secs / 0.183 secs)
+TOTAL: 334 SUCCESS
+```
+
+ESLint shows 63 errors and 220 warnings (pre-existing, not from this session's changes).
+
+---
+
+## Continuation Prompt for New Session
+
+```
+Continue working on SeedSync bulk file actions feature.
+
+**Current State:**
+- Session 17 virtual scrolling fix is complete but uncommitted
+- All 334 unit tests pass
+- ESLint has pre-existing errors that need fixing
+
+**Immediate Tasks:**
+1. Review uncommitted changes: `git diff`
+2. Fix remaining Session 17 items:
+   - Fix `scrollIntoView()` in file.component.ts to use `{ behavior: 'smooth', block: 'nearest' }`
+   - Fix lifecycle timing bug: move ViewChild access from ngOnChanges to ngAfterViewInit
+   - Fix ESLint curly brace errors in bulk-actions-bar.component.ts (lines 97-101)
+3. Run lint and tests: `npm run lint && npm test`
+4. Commit with descriptive message
+
+**Context Files:**
+- `planning docs/BULK_FILE_ACTIONS.md` - Full feature plan and session history
+- `src/angular/src/app/pages/files/file.component.ts` - scrollIntoView and lifecycle fix
+- `src/angular/src/app/pages/files/bulk-actions-bar.component.ts` - ESLint fixes
+
+**Commands:**
+cd ~/seedsync/src/angular
+export PATH="/opt/homebrew/bin:$PATH"
+npm test -- --watch=false --browsers=ChromeHeadless
+npm run lint
+```

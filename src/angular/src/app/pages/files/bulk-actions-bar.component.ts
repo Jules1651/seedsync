@@ -94,11 +94,21 @@ export class BulkActionsBarComponent implements OnChanges {
         const remotelyDeletable: string[] = [];
 
         for (const file of this._cachedSelectedViewFiles) {
-            if (file.isQueueable) queueable.push(file.name);
-            if (file.isStoppable) stoppable.push(file.name);
-            if (file.isExtractable) extractable.push(file.name);
-            if (file.isLocallyDeletable) locallyDeletable.push(file.name);
-            if (file.isRemotelyDeletable) remotelyDeletable.push(file.name);
+            if (file.isQueueable) {
+                queueable.push(file.name);
+            }
+            if (file.isStoppable) {
+                stoppable.push(file.name);
+            }
+            if (file.isExtractable) {
+                extractable.push(file.name);
+            }
+            if (file.isLocallyDeletable) {
+                locallyDeletable.push(file.name);
+            }
+            if (file.isRemotelyDeletable) {
+                remotelyDeletable.push(file.name);
+            }
         }
 
         this._cachedQueueableFiles = queueable;

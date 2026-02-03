@@ -1,7 +1,7 @@
 import {
     Component, Input, Output, ChangeDetectionStrategy,
     EventEmitter, OnChanges, SimpleChanges, ViewChild,
-    inject, computed
+    inject, computed, AfterViewInit
 } from "@angular/core";
 import {NgIf, DatePipe} from "@angular/common";
 
@@ -35,7 +35,7 @@ import {FileSelectionService} from "../../services/files/file-selection.service"
     standalone: true,
     imports: [NgIf, DatePipe, CapitalizePipe, EtaPipe, FileSizePipe, ClickStopPropagationDirective]
 })
-export class FileComponent implements OnChanges {
+export class FileComponent implements OnChanges, AfterViewInit {
     // Inject FileSelectionService for signal-based selection
     private selectionService = inject(FileSelectionService);
 
@@ -65,6 +65,9 @@ export class FileComponent implements OnChanges {
     // Indicates an active action on-going
     activeAction: FileAction = null;
 
+    // Track whether view has been initialized (ViewChild availability)
+    private viewInitialized = false;
+
     /**
      * Computed signal for selection state - fine-grained reactivity.
      * Only re-evaluates when THIS file's selection state changes.
@@ -87,6 +90,10 @@ export class FileComponent implements OnChanges {
 
     constructor(private confirmModal: ConfirmModalService) {}
 
+    ngAfterViewInit(): void {
+        this.viewInitialized = true;
+    }
+
     ngOnChanges(changes: SimpleChanges): void {
         // Check for status changes
         const oldFile: ViewFile = changes.file?.previousValue;
@@ -96,10 +103,10 @@ export class FileComponent implements OnChanges {
             this.activeAction = null;
 
             // Scroll into view if this file is selected and not already in viewport
-            // Note: fileElement may not be available on first ngOnChanges call (before ngAfterViewInit)
-            if (newFile.isSelected && this.fileElement?.nativeElement &&
+            // Only access ViewChild after view has been initialized
+            if (this.viewInitialized && newFile.isSelected && this.fileElement?.nativeElement &&
                 !FileComponent.isElementInViewport(this.fileElement.nativeElement)) {
-                this.fileElement.nativeElement.scrollIntoView();
+                this.fileElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "nearest" });
             }
         }
     }

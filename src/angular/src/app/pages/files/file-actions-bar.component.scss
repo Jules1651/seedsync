@@ -1,10 +1,5 @@
 @use '../../common/common' as *;
 
-/* Hide this component - actions are now shown inline in the selected row */
-:host {
-    display: none;
-}
-
 .file-actions-bar {
     display: flex;
     flex-wrap: wrap;
