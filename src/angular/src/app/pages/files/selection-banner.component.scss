@@ -23,16 +23,6 @@
     color: $primary-dark-color;
 }
 
-.select-all-link {
-    color: $primary-color;
-    text-decoration: underline;
-    cursor: pointer;
-
-    &:hover {
-        color: $primary-dark-color;
-    }
-}
-
 .clear-btn {
     flex-shrink: 0;
 }
