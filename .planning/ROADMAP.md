@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Color Variable Consolidation** - Replace hardcoded colors with Bootstrap theme variables
 - [x] **Phase 3: Selection Color Unification** - Standardize teal selection highlighting across components
 - [x] **Phase 4: Button Standardization - File Actions** - Migrate file action buttons to Bootstrap classes
-- [ ] **Phase 5: Button Standardization - Other Pages** - Complete button migration for all remaining pages
+- [x] **Phase 5: Button Standardization - Other Pages** - Complete button migration for all remaining pages
 
 ## Phase Details
 
@@ -95,8 +95,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Migrate Settings and AutoQueue buttons to Bootstrap
-- [ ] 05-02-PLAN.md — Remove %button placeholder and verify tests pass
+- [x] 05-01-PLAN.md — Migrate Settings and AutoQueue buttons to Bootstrap
+- [x] 05-02-PLAN.md — Remove %button placeholder and verify tests pass
 
 ## Progress
 
@@ -109,4 +109,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Color Variable Consolidation | 2/2 | Complete | 2026-02-03 |
 | 3. Selection Color Unification | 1/1 | Complete | 2026-02-03 |
 | 4. Button Standardization - File Actions | 2/2 | Complete | 2026-02-03 |
-| 5. Button Standardization - Other Pages | 0/2 | Not started | - |
+| 5. Button Standardization - Other Pages | 2/2 | Complete | 2026-02-03 |

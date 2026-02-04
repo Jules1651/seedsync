@@ -40,12 +40,12 @@ Requirements for styling unification. Phases map to original Sessions 1-4 plus f
 
 ### Button Standardization - Other Pages (Session 4)
 
-- [ ] **BTN-06**: Settings page buttons use Bootstrap classes
-- [ ] **BTN-07**: AutoQueue page buttons use Bootstrap classes
-- [ ] **BTN-08**: Logs page buttons use Bootstrap classes (if applicable)
-- [ ] **BTN-09**: Custom `%button` placeholder removed from `_common.scss`
-- [ ] **BTN-10**: Button heights consistent across all pages (target: 40px)
-- [ ] **BTN-11**: Angular unit tests pass after button migration
+- [x] **BTN-06**: Settings page buttons use Bootstrap classes
+- [x] **BTN-07**: AutoQueue page buttons use Bootstrap classes
+- [x] **BTN-08**: Logs page buttons use Bootstrap classes (if applicable)
+- [x] **BTN-09**: Custom `%button` placeholder removed from `_common.scss`
+- [x] **BTN-10**: Button heights consistent across all pages (target: 40px)
+- [x] **BTN-11**: Angular unit tests pass after button migration
 
 ## v2 Requirements
 
@@ -104,12 +104,12 @@ Deferred to future work (Sessions 5-7 from original plan).
 | BTN-03 | Phase 4 | Complete |
 | BTN-04 | Phase 4 | Complete |
 | BTN-05 | Phase 4 | Complete |
-| BTN-06 | Phase 5 | Not started |
-| BTN-07 | Phase 5 | Not started |
-| BTN-08 | Phase 5 | Not started |
-| BTN-09 | Phase 5 | Not started |
-| BTN-10 | Phase 5 | Not started |
-| BTN-11 | Phase 5 | Not started |
+| BTN-06 | Phase 5 | Complete |
+| BTN-07 | Phase 5 | Complete |
+| BTN-08 | Phase 5 | Complete |
+| BTN-09 | Phase 5 | Complete |
+| BTN-10 | Phase 5 | Complete |
+| BTN-11 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 21 total
@@ -118,4 +118,4 @@ Deferred to future work (Sessions 5-7 from original plan).
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 4 completion*
+*Last updated: 2026-02-03 after Phase 5 completion — v1 requirements COMPLETE*
