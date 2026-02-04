@@ -45,7 +45,8 @@ All v1.0 decisions logged in PROJECT.md Key Decisions table with outcomes marked
 
 ### Pending Todos
 
-None - v1.0 complete.
+1 pending todo:
+- Fix Safari URL bar color bleed (ui)
 
 ### Blockers/Concerns
 
