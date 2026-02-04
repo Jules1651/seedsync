@@ -43,34 +43,3 @@ $zindex-top-header: 200;
 $zindex-file-options: 201;
 $zindex-file-search: 100;
 
-// ============================================================================
-// Button Placeholder
-// ============================================================================
-%button {
-    background-color: $primary-color;
-    color: white;
-    border: 1px solid $primary-dark-color;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: default;
-    user-select: none;
-
-    &:active {
-        // Use Bootstrap's shade-color function (available globally from styles.scss)
-        // shade-color($primary-color, 20%) produces #286090 from #337BB7
-        background-color: shade-color($primary-color, 20%);
-    }
-
-    &[disabled] {
-        opacity: .65;
-        background-color: $primary-color;
-    }
-
-    &.selected {
-        background-color: $secondary-color;
-        border-color: $secondary-darker-color;
-    }
-}
