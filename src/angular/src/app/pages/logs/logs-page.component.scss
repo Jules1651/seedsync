@@ -22,12 +22,11 @@
     }
 
     .btn-scroll {
-        @extend %button;
         position: sticky;
         display: none;
 
         &.visible {
-            display: inherit;
+            display: block;
         }
     }
 
