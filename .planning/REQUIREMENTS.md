@@ -24,11 +24,11 @@ Requirements for styling unification. Phases map to original Sessions 1-4 plus f
 
 ### Selection Colors (Session 2)
 
-- [ ] **SELECT-01**: Selection banner uses secondary (teal) colors instead of primary (blue)
-- [ ] **SELECT-02**: Bulk actions bar uses same selection color scheme as banner
-- [ ] **SELECT-03**: File row `.selected` and `.bulk-selected` classes use consistent highlighting
-- [ ] **SELECT-04**: Selection-specific variables defined if needed (`$selection-bg`, `$selection-border`)
-- [ ] **SELECT-05**: All selection states visually verified
+- [x] **SELECT-01**: Selection banner uses secondary (teal) colors instead of primary (blue)
+- [x] **SELECT-02**: Bulk actions bar uses same selection color scheme as banner
+- [x] **SELECT-03**: File row `.selected` and `.bulk-selected` classes use consistent highlighting
+- [x] **SELECT-04**: Selection-specific variables defined if needed (`$selection-bg`, `$selection-border`)
+- [x] **SELECT-05**: All selection states visually verified
 
 ### Button Standardization - File Actions (Session 3)
 
@@ -94,11 +94,11 @@ Deferred to future work (Sessions 5-7 from original plan).
 | COLOR-03 | Phase 2 | Complete |
 | COLOR-04 | Phase 2 | Complete |
 | COLOR-05 | Phase 2 | Complete |
-| SELECT-01 | Phase 3 | Not started |
-| SELECT-02 | Phase 3 | Not started |
-| SELECT-03 | Phase 3 | Not started |
-| SELECT-04 | Phase 3 | Not started |
-| SELECT-05 | Phase 3 | Not started |
+| SELECT-01 | Phase 3 | Complete |
+| SELECT-02 | Phase 3 | Complete |
+| SELECT-03 | Phase 3 | Complete |
+| SELECT-04 | Phase 3 | Complete |
+| SELECT-05 | Phase 3 | Complete |
 | BTN-01 | Phase 4 | Not started |
 | BTN-02 | Phase 4 | Not started |
 | BTN-03 | Phase 4 | Not started |
@@ -118,4 +118,4 @@ Deferred to future work (Sessions 5-7 from original plan).
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 2 completion*
+*Last updated: 2026-02-03 after Phase 3 completion*
