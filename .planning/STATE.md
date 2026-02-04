@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-03)
 
 **Core value:** Consistent visual appearance across all pages while maintaining all existing functionality
-**Current focus:** Phase 5: Button Standardization - Other Pages
+**Current focus:** v1.0 complete - planning next milestone
 
 ## Current Position
 
 Phase: 5 of 5 (Button Standardization - Other Pages)
 Plan: 2 of 2 in current phase
-Status: Phase complete - ALL PHASES COMPLETE
-Last activity: 2026-02-04 — Completed 05-02-PLAN.md
+Status: v1.0 MILESTONE COMPLETE
+Last activity: 2026-02-03 - v1.0 milestone archived
 
-Progress: [██████████] 100%
+Progress: [##########] 100% (v1.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 3.3 min
 - Total execution time: 0.38 hours
 
@@ -37,77 +37,27 @@ Progress: [██████████] 100%
 - Last 5 plans: 03-01 (1min), 04-01 (3min), 04-02 (2min), 05-01 (2min), 05-02 (1min)
 - Trend: Accelerating (recent plans consistently under 3min)
 
-*Updated after each plan completion*
-
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-**From 05-02 (Button Placeholder Cleanup):**
-- Removed custom %button SCSS placeholder from _common.scss completely
-- Changed display: inherit to display: block in Logs page SCSS (more explicit)
-- Verified zero %button references remain in Angular codebase
-- All buttons now use Bootstrap btn system exclusively
-
-**From 05-01 (Settings and AutoQueue Button Standardization):**
-- Settings Restart button uses btn-primary (positive/primary action)
-- AutoQueue remove button uses btn-danger (destructive action)
-- AutoQueue add button uses btn-success (additive action)
-- Changed button dimensions from 35px to 40px for consistency with Phase 4
-- Removed all @extend %button usage from Settings and AutoQueue pages
-
-**From 04-02 (Hidden Actions Bootstrap Migration):**
-- Hidden .actions uses same Bootstrap patterns as visible action bars for consistency
-- Replaced custom @keyframes spin loader with Bootstrap spinner-border-sm
-- Maintained display: none on .actions for virtual scroll compatibility
-
-**From 04-01 (Button Standardization - File Actions):**
-- Stop buttons use btn-danger (red) instead of btn-warning (yellow)
-- Extract buttons use btn-secondary (gray) instead of btn-info (cyan)
-- Delete Local buttons use btn-danger (solid) instead of btn-outline-danger
-- All buttons use Bootstrap default sizing (no btn-sm)
-- Button variant mapping pattern: destructive=danger, neutral=secondary, positive=primary
-
-**From 03-01 (Selection Color Unification):**
-- Use graduated intensity: banner darkest ($secondary-color), bulk bar medium ($secondary-light-color), rows lightest (rgba)
-- Add 100ms transition only to hover states, not selection states (instant feedback)
-- Maintain existing bulk actions bar colors (already correct secondary palette)
-
-**From 02-02 (Component Color Migration):**
-- Re-export Bootstrap semantic variables in _common.scss to bridge @import/@use scopes
-- Use named colors (black/white) for true black/white values
-- Use shade-color() for button state variations instead of hardcoded variants
-
-**From 02-01 (Color Variable Consolidation):**
-- Keep @import approach for SCSS (mixing @use and @import creates namespace conflicts)
-- Move all color variables to _bootstrap-variables.scss (single source of truth)
-
-**From 01-01 (Bootstrap SCSS Setup):**
-- Two-layer Bootstrap customization: variables (pre-compilation) + overrides (post-compilation)
-- Use @import for Bootstrap (not migrated to @use yet)
-- Chromium on ARM64, Chrome on AMD64 (Chrome not available for ARM64 Linux)
-
-**From earlier planning:**
-- Migrate to Bootstrap `btn` classes — Reduces custom CSS, leverages Bootstrap's states (In Progress)
-- Sessions 1-4 first, 5-6 later — Delivers biggest visual impact first (Pending)
+All v1.0 decisions logged in PROJECT.md Key Decisions table with outcomes marked.
 
 ### Pending Todos
 
-None yet.
+None - v1.0 complete.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Session Continuity
 
-Last session: 2026-02-04 (plan execution)
-Stopped at: Completed 05-02-PLAN.md (Button Placeholder Cleanup)
+Last session: 2026-02-03 (milestone completion)
+Stopped at: v1.0 milestone archived
 Resume file: None
 
-**Next step:** ALL PHASES COMPLETE! UI unification project finished. All buttons now use consistent Bootstrap semantic variants across all pages. Custom %button placeholder completely removed.
+**Next step:** Run `/gsd:new-milestone` to start v2 work (dropdown migration, form input standardization, final polish).
 
-**Note:** Third-party deprecation warnings (Bootstrap, Font-Awesome) accepted as noise. Build succeeds.
+---
+*v1.0 shipped: 2026-02-03*
