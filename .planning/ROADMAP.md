@@ -60,10 +60,10 @@ Plans:
   3. Selected file rows highlight consistently with banner and bar
   4. File row selection, bulk selection, and banner selection are visually cohesive
   5. Selection states remain clearly distinguishable from unselected states
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- TBD
+- [ ] 03-01-PLAN.md — Migrate selection banner to teal and add hover transitions
 
 ### Phase 4: Button Standardization - File Actions
 **Goal**: File action buttons use Bootstrap classes with consistent sizing and states
@@ -105,6 +105,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Bootstrap SCSS Setup | 1/1 | Complete | 2026-02-03 |
 | 2. Color Variable Consolidation | 2/2 | Complete | 2026-02-03 |
-| 3. Selection Color Unification | 0/TBD | Not started | - |
+| 3. Selection Color Unification | 0/1 | Not started | - |
 | 4. Button Standardization - File Actions | 0/TBD | Not started | - |
 | 5. Button Standardization - Other Pages | 0/TBD | Not started | - |
