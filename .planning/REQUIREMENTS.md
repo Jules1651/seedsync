@@ -1,0 +1,72 @@
+# Requirements: Unify UI Styling
+
+**Defined:** 2026-02-04
+**Core Value:** Consistent visual appearance across all pages while maintaining all existing functionality
+
+## v1.1 Requirements
+
+Requirements for v1.1 Dropdown & Form Migration milestone.
+
+### Dropdowns
+
+- [ ] **DROP-01**: File options dropdowns use Bootstrap dropdown component
+- [ ] **DROP-02**: Custom `%dropdown` and `%toggle` placeholders removed
+- [ ] **DROP-03**: Dropdown positioning works correctly (z-index, overflow, flip behavior)
+
+### Form Inputs
+
+- [ ] **FORM-01**: All text inputs use consistent Bootstrap form styling
+- [ ] **FORM-02**: Checkboxes and toggles styled consistently
+- [ ] **FORM-03**: Form focus states use app color scheme
+
+### Polish
+
+- [ ] **POLISH-01**: Full E2E test suite passes
+- [ ] **POLISH-02**: Visual QA walkthrough complete
+- [ ] **POLISH-03**: Responsive breakpoints tested
+- [ ] **POLISH-04**: Unused CSS/SCSS removed
+
+## Validated (v1.0)
+
+Shipped 2026-02-03:
+
+- ✓ **SCSS-01**: Bootstrap SCSS infrastructure with customizable variables — v1.0
+- ✓ **COLOR-01**: All colors consolidated to Bootstrap theme variables — v1.0
+- ✓ **SELECT-01**: Selection highlighting unified with teal (secondary) palette — v1.0
+- ✓ **BTN-01**: All buttons standardized to Bootstrap semantic variants — v1.0
+- ✓ **BTN-02**: Custom %button SCSS placeholder removed — v1.0
+- ✓ **BTN-03**: 40px consistent button sizing across all pages — v1.0
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Adding new UI features | This is purely CSS/component refactoring |
+| Changing component behavior | Styling and component migration only |
+| Major layout restructuring | Preserve existing layouts |
+| Dark mode | Not part of current unification work |
+| Full @use migration | Bootstrap Sass @import approach maintained |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| DROP-01 | — | Pending |
+| DROP-02 | — | Pending |
+| DROP-03 | — | Pending |
+| FORM-01 | — | Pending |
+| FORM-02 | — | Pending |
+| FORM-03 | — | Pending |
+| POLISH-01 | — | Pending |
+| POLISH-02 | — | Pending |
+| POLISH-03 | — | Pending |
+| POLISH-04 | — | Pending |
+
+**Coverage:**
+- v1.1 requirements: 10 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 10 ⚠️
+
+---
+*Requirements defined: 2026-02-04*
+*Last updated: 2026-02-04 after v1.1 milestone start*
