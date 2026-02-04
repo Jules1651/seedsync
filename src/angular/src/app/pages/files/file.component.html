@@ -93,7 +93,7 @@
 
     <!-- actions div, hidden for virtual scroll but migrated to Bootstrap for consistency -->
     <div class="actions">
-        <button class="btn btn-primary action-button" appClickStopPropagation
+        <button class="btn btn-primary action-button"
                 [disabled]="!isQueueable()"
                 (click)="onQueue(file)"
                 [class.loading]="activeAction === FileAction.QUEUE">
@@ -104,7 +104,7 @@
                  src="assets/icons/queue.svg" alt="" />
             <span class="text">Queue</span>
         </button>
-        <button class="btn btn-danger action-button" appClickStopPropagation
+        <button class="btn btn-danger action-button"
                 [disabled]="!isStoppable()"
                 (click)="onStop(file)"
                 [class.loading]="activeAction === FileAction.STOP">
@@ -115,7 +115,7 @@
                  src="assets/icons/stop.svg" alt="" />
             <span class="text">Stop</span>
         </button>
-        <button class="btn btn-secondary action-button" appClickStopPropagation
+        <button class="btn btn-secondary action-button"
                 [disabled]="!isExtractable()"
                 (click)="onExtract(file)"
                 [class.loading]="activeAction === FileAction.EXTRACT">
@@ -126,7 +126,7 @@
                  src="assets/icons/extract.svg" alt="" />
             <span class="text">Extract</span>
         </button>
-        <button class="btn btn-danger action-button" appClickStopPropagation
+        <button class="btn btn-danger action-button"
                 [disabled]="!isLocallyDeletable()"
                 (click)="onDeleteLocal(file)"
                 [class.loading]="activeAction === FileAction.DELETE_LOCAL">
@@ -137,7 +137,7 @@
                  src="assets/icons/delete-local.svg" alt="" />
             <span class="text">Delete Local</span>
         </button>
-        <button class="btn btn-danger action-button" appClickStopPropagation
+        <button class="btn btn-danger action-button"
                 [disabled]="!isRemotelyDeletable()"
                 (click)="onDeleteRemote(file)"
                 [class.loading]="activeAction === FileAction.DELETE_REMOTE">

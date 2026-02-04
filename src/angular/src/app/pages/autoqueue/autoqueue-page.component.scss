@@ -8,7 +8,7 @@
     }
 
     #controls {
-        &[disabled] {
+        &.controls-disabled {
             opacity: .65;
         }
 

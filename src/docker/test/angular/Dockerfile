@@ -7,11 +7,13 @@ RUN apt-get update && \
     ARCH=$(dpkg --print-architecture) && \
     if [ "$ARCH" = "arm64" ]; then \
         apt-get install -y chromium chromium-driver && \
-        ln -s /usr/bin/chromium /usr/bin/google-chrome; \
+        ln -sf /usr/bin/chromium /usr/bin/google-chrome; \
     else \
         apt-get install -y wget gnupg && \
-        wget -nv -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-        dpkg -i /tmp/chrome.deb || apt-get -fy install; \
+        wget -qO - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg && \
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list && \
+        apt-get update && \
+        apt-get install -y google-chrome-stable; \
     fi
 
 COPY \

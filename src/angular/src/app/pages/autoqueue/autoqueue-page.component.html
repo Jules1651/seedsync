@@ -17,7 +17,7 @@
             Enable AutoQueue in Settings to queue files automatically.
         </ng-container>
     </span>
-    <div id="controls" [attr.disabled]="enabled && patternsOnly ? null : true">
+    <div id="controls" [class.controls-disabled]="!(enabled && patternsOnly)">
         <div *ngFor="let pattern of patterns | async"
              class="pattern">
             <button class="btn btn-danger" type="button"
@@ -36,7 +36,7 @@
             <label>
                 <input type="search"
                        class="form-control"
-                       (keyup.enter)="!(newPattern && enabled && patternsOnly) || onAddPattern()"
+                       (keyup.enter)="(newPattern && enabled && patternsOnly) && onAddPattern()"
                        [(ngModel)]="newPattern"
                        [disabled]="!connected || !enabled || !patternsOnly"/>
             </label>
