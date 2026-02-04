@@ -92,10 +92,11 @@ Plans:
   4. All buttons across the application have consistent sizing
   5. Custom `%button` placeholder no longer exists in `_common.scss`
   6. Angular unit tests pass after complete button migration
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- TBD
+- [ ] 05-01-PLAN.md — Migrate Settings and AutoQueue buttons to Bootstrap
+- [ ] 05-02-PLAN.md — Remove %button placeholder and verify tests pass
 
 ## Progress
 
@@ -108,4 +109,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Color Variable Consolidation | 2/2 | Complete | 2026-02-03 |
 | 3. Selection Color Unification | 1/1 | Complete | 2026-02-03 |
 | 4. Button Standardization - File Actions | 2/2 | Complete | 2026-02-03 |
-| 5. Button Standardization - Other Pages | 0/TBD | Not started | - |
+| 5. Button Standardization - Other Pages | 0/2 | Not started | - |
