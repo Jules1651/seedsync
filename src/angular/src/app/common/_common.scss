@@ -1,19 +1,9 @@
-$primary-color: #337BB7;
-$primary-dark-color: #2e6da4;
-$primary-light-color: #D7E7F4;
-$primary-lighter-color: #F6F6F6;
+// Import Bootstrap variables (makes them available to this file and components that import this file)
+@import 'bootstrap-variables';
 
-$secondary-color: #79DFB6;
-$secondary-light-color: #C5F0DE;
-$secondary-dark-color: #32AD7B;
-$secondary-darker-color: #077F4F;
-
-$header-color: #DDDDDD;
-$header-dark-color: #D3D3D3;
-
-$logo-color: #118247;
-$logo-font: 'Arial Black', Gadget, sans-serif;
-
+// ============================================================================
+// Layout Variables
+// ============================================================================
 $small-max-width: 600px;
 $medium-min-width: 601px;
 $medium-max-width: 992px;
@@ -21,11 +11,17 @@ $large-min-width: 993px;
 
 $sidebar-width: 170px;
 
+// ============================================================================
+// Z-index Variables
+// ============================================================================
 $zindex-sidebar: 300;
 $zindex-top-header: 200;
 $zindex-file-options: 201;
 $zindex-file-search: 100;
 
+// ============================================================================
+// Button Placeholder
+// ============================================================================
 %button {
     background-color: $primary-color;
     color: white;
@@ -39,7 +35,9 @@ $zindex-file-search: 100;
     user-select: none;
 
     &:active {
-        background-color: #286090;
+        // Use Bootstrap's shade-color function (available globally from styles.scss)
+        // shade-color($primary-color, 20%) produces #286090 from #337BB7
+        background-color: shade-color($primary-color, 20%);
     }
 
     &[disabled] {
