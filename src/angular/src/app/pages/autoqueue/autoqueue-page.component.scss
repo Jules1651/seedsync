@@ -20,15 +20,16 @@
             align-items: center;
             margin: 10px;
 
-            .button {
-                @extend %button;
-
+            .btn {
                 flex-grow: 0;
+                display: flex;
                 flex-direction: row;
+                align-items: center;
+                justify-content: center;
                 padding: 8px;
                 margin-right: 12px;
-                height: 35px;
-                width: 35px;
+                height: 40px;
+                width: 40px;
 
                 span {
                     font-size: 220%;
@@ -48,37 +49,9 @@
                 hyphens: auto;
                 word-break: break-all;
             }
-
-            .button {
-                background-color: $danger;
-                border-color: shade-color($danger, 20%);
-
-                &:active {
-                    background-color: shade-color($danger, 20%);
-                }
-
-                &[disabled] {
-                    opacity: .65;
-                    background-color: $danger;
-                }
-            }
         }
 
         #add-pattern {
-            .button {
-                background-color: $success;
-                border-color: shade-color($success, 20%);
-
-                &:active {
-                    background-color: shade-color($success, 20%);
-                }
-
-                &[disabled] {
-                    opacity: .65;
-                    background-color: $success;
-                }
-            }
-
             label {
                 margin-bottom: 0;
             }
