@@ -13,7 +13,7 @@ This roadmap transforms SeedSync's Angular frontend from fragmented styling patt
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Bootstrap SCSS Setup** - Establish customizable SCSS compilation infrastructure
-- [ ] **Phase 2: Color Variable Consolidation** - Replace hardcoded colors with Bootstrap theme variables
+- [x] **Phase 2: Color Variable Consolidation** - Replace hardcoded colors with Bootstrap theme variables
 - [ ] **Phase 3: Selection Color Unification** - Standardize teal selection highlighting across components
 - [ ] **Phase 4: Button Standardization - File Actions** - Migrate file action buttons to Bootstrap classes
 - [ ] **Phase 5: Button Standardization - Other Pages** - Complete button migration for all remaining pages
@@ -47,8 +47,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Define Bootstrap theme colors and update _common.scss
-- [ ] 02-02-PLAN.md — Migrate component SCSS files to Bootstrap variables
+- [x] 02-01-PLAN.md — Define Bootstrap theme colors and update _common.scss
+- [x] 02-02-PLAN.md — Migrate component SCSS files to Bootstrap variables
 
 ### Phase 3: Selection Color Unification
 **Goal**: Consistent teal selection highlighting across all components
@@ -104,7 +104,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Bootstrap SCSS Setup | 1/1 | Complete | 2026-02-03 |
-| 2. Color Variable Consolidation | 0/2 | Not started | - |
+| 2. Color Variable Consolidation | 2/2 | Complete | 2026-02-03 |
 | 3. Selection Color Unification | 0/TBD | Not started | - |
 | 4. Button Standardization - File Actions | 0/TBD | Not started | - |
 | 5. Button Standardization - Other Pages | 0/TBD | Not started | - |

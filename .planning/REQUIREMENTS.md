@@ -16,11 +16,11 @@ Requirements for styling unification. Phases map to original Sessions 1-4 plus f
 
 ### Color Variables (Session 1)
 
-- [ ] **COLOR-01**: All hardcoded hex colors in component SCSS replaced with variables
-- [ ] **COLOR-02**: File list header (`file-list.component.scss`) uses color variables
-- [ ] **COLOR-03**: AutoQueue page (`autoqueue-page.component.scss`) uses color variables for status buttons
-- [ ] **COLOR-04**: Missing color variables added to `_common.scss` (danger, success states)
-- [ ] **COLOR-05**: Angular unit tests pass after color migration
+- [x] **COLOR-01**: All hardcoded hex colors in component SCSS replaced with variables
+- [x] **COLOR-02**: File list header (`file-list.component.scss`) uses color variables
+- [x] **COLOR-03**: AutoQueue page (`autoqueue-page.component.scss`) uses color variables for status buttons
+- [x] **COLOR-04**: Missing color variables added to `_common.scss` (danger, success states)
+- [x] **COLOR-05**: Angular unit tests pass after color migration
 
 ### Selection Colors (Session 2)
 
@@ -89,11 +89,11 @@ Deferred to future work (Sessions 5-7 from original plan).
 | FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 1 | Complete |
-| COLOR-01 | Phase 2 | Not started |
-| COLOR-02 | Phase 2 | Not started |
-| COLOR-03 | Phase 2 | Not started |
-| COLOR-04 | Phase 2 | Not started |
-| COLOR-05 | Phase 2 | Not started |
+| COLOR-01 | Phase 2 | Complete |
+| COLOR-02 | Phase 2 | Complete |
+| COLOR-03 | Phase 2 | Complete |
+| COLOR-04 | Phase 2 | Complete |
+| COLOR-05 | Phase 2 | Complete |
 | SELECT-01 | Phase 3 | Not started |
 | SELECT-02 | Phase 3 | Not started |
 | SELECT-03 | Phase 3 | Not started |
@@ -118,4 +118,4 @@ Deferred to future work (Sessions 5-7 from original plan).
 
 ---
 *Requirements defined: 2026-02-03*
-*Last updated: 2026-02-03 after Phase 1 completion*
+*Last updated: 2026-02-03 after Phase 2 completion*
