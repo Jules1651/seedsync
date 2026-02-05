@@ -26,15 +26,15 @@ export class ServerCommandService extends BaseWebService implements OnDestroy {
         return this._restService.sendRequest(this.RESTART_URL);
     }
 
-    protected onConnected() {
+    protected onConnected(): void {
         // Nothing to do
     }
 
-    protected onDisconnected() {
+    protected onDisconnected(): void {
         // Nothing to do
     }
 
-    override ngOnDestroy() {
+    override ngOnDestroy(): void {
         super.ngOnDestroy();
     }
 }
@@ -45,7 +45,7 @@ export class ServerCommandService extends BaseWebService implements OnDestroy {
 export const serverCommandServiceFactory = (
     _streamServiceRegistry: StreamServiceRegistry,
     _restService: RestService
-) => {
+): ServerCommandService => {
   const serverCommandService = new ServerCommandService(_streamServiceRegistry, _restService);
   serverCommandService.onInit();
   return serverCommandService;

@@ -116,21 +116,21 @@ export class AutoQueueService extends BaseWebService implements OnDestroy {
         }
     }
 
-    protected onConnected() {
+    protected onConnected(): void {
         // Retry the get
         this.getPatterns();
     }
 
-    protected onDisconnected() {
+    protected onDisconnected(): void {
         // Send empty list
         this._patterns.next(Immutable.List([]));
     }
 
-    override ngOnDestroy() {
+    override ngOnDestroy(): void {
         super.ngOnDestroy();
     }
 
-    private getPatterns() {
+    private getPatterns(): void {
         this._logger.debug("Getting autoqueue patterns...");
         this._restService.sendRequest(this.AUTOQUEUE_GET_URL).pipe(takeUntil(this.destroy$)).subscribe({
             next: reaction => {
@@ -158,7 +158,7 @@ export const autoQueueServiceFactory = (
     _streamServiceRegistry: StreamServiceRegistry,
     _restService: RestService,
     _logger: LoggerService
-) => {
+): AutoQueueService => {
   const autoQueueService = new AutoQueueService(_streamServiceRegistry, _restService, _logger);
   autoQueueService.onInit();
   return autoQueueService;

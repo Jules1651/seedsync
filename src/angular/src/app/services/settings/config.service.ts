@@ -77,21 +77,21 @@ export class ConfigService extends BaseWebService implements OnDestroy {
         }
     }
 
-    protected onConnected() {
+    protected onConnected(): void {
         // Retry the get
         this.getConfig();
     }
 
-    protected onDisconnected() {
+    protected onDisconnected(): void {
         // Send null config
         this._config.next(null);
     }
 
-    override ngOnDestroy() {
+    override ngOnDestroy(): void {
         super.ngOnDestroy();
     }
 
-    private getConfig() {
+    private getConfig(): void {
         this._logger.debug("Getting config...");
         this._restService.sendRequest(this.CONFIG_GET_URL).pipe(takeUntil(this.destroy$)).subscribe({
             next: reaction => {
@@ -113,7 +113,7 @@ export const configServiceFactory = (
     _streamServiceRegistry: StreamServiceRegistry,
     _restService: RestService,
     _logger: LoggerService
-) => {
+): ConfigService => {
   const configService = new ConfigService(_streamServiceRegistry, _restService, _logger);
   configService.onInit();
   return configService;

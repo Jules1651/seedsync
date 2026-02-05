@@ -104,12 +104,12 @@ export class ViewFileFilterService implements OnDestroy {
         });
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }
 
-    private buildFilterCriteria(): ViewFileFilterCriteria {
+    private buildFilterCriteria(): ViewFileFilterCriteria | null {
         if (this._statusFilter != null && this._nameFilter != null) {
             return new AndFilterCriteria(this._statusFilter, this._nameFilter);
         } else if (this._statusFilter != null) {

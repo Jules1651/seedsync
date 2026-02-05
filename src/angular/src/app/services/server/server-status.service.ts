@@ -27,15 +27,15 @@ export class ServerStatusService extends BaseStreamService implements OnDestroy 
         return this._status.asObservable();
     }
 
-    protected onEvent(eventName: string, data: string) {
+    protected onEvent(eventName: string, data: string): void {
         this.parseStatus(data);
     }
 
-    protected onConnected() {
+    protected onConnected(): void {
         // nothing to do
     }
 
-    protected onDisconnected() {
+    protected onDisconnected(): void {
         // Notify the clients
         this._status.next(new ServerStatus({
             server: {
@@ -45,7 +45,7 @@ export class ServerStatusService extends BaseStreamService implements OnDestroy 
         }));
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -54,7 +54,7 @@ export class ServerStatusService extends BaseStreamService implements OnDestroy 
      * Parse an event and notify subscribers
      * @param {string} data
      */
-    private parseStatus(data: string) {
+    private parseStatus(data: string): void {
         const statusJson: ServerStatusJson = JSON.parse(data);
         const status = ServerStatus.fromJson(statusJson);
         this._status.next(status);

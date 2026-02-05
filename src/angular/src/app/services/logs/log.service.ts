@@ -41,20 +41,20 @@ export class LogService extends BaseStreamService implements OnDestroy {
         return this._logs.asObservable();
     }
 
-    protected onEvent(eventName: string, data: string) {
+    protected onEvent(eventName: string, data: string): void {
         this._hasReceivedLogs = true;
         this._logs.next(LogRecord.fromJson(JSON.parse(data)));
     }
 
-    protected onConnected() {
+    protected onConnected(): void {
         // nothing to do
     }
 
-    protected onDisconnected() {
+    protected onDisconnected(): void {
         // nothing to do
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }

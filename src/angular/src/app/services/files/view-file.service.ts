@@ -108,12 +108,12 @@ export class ViewFileService implements OnDestroy {
         }
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }
 
-    private buildViewFromModelFiles(modelFiles: Immutable.Map<string, ModelFile>) {
+    private buildViewFromModelFiles(modelFiles: Immutable.Map<string, ModelFile>): void {
         this._logger.debug("Received next model files");
 
         // Diff the previous domain model with the current domain model, then apply
@@ -206,7 +206,7 @@ export class ViewFileService implements OnDestroy {
      * Set a file to be in selected state
      * @param {ViewFile} file
      */
-    public setSelected(file: ViewFile) {
+    public setSelected(file: ViewFile): void {
         // Find the selected file, if any
         // Note: we can optimize this by storing an additional
         //       state that tracks the selected file
@@ -244,7 +244,7 @@ export class ViewFileService implements OnDestroy {
     /**
      * Un-select the currently selected file
      */
-    public unsetSelected() {
+    public unsetSelected(): void {
         // Unset the previously selected file, if any
         let viewFiles = this._files;
         const unSelectIndex = viewFiles.findIndex(value => value.isSelected);
@@ -317,7 +317,7 @@ export class ViewFileService implements OnDestroy {
      * Clears bulk file selection when filter changes.
      * @param {ViewFileFilterCriteria} criteria
      */
-    public setFilterCriteria(criteria: ViewFileFilterCriteria) {
+    public setFilterCriteria(criteria: ViewFileFilterCriteria): void {
         this._filterCriteria = criteria;
         this._fileSelectionService.clearSelection();
         this.pushViewFiles();
@@ -328,7 +328,7 @@ export class ViewFileService implements OnDestroy {
      * Clears bulk file selection when sort changes.
      * @param {ViewFileComparator} comparator
      */
-    public setComparator(comparator: ViewFileComparator) {
+    public setComparator(comparator: ViewFileComparator): void {
         this._sortComparator = comparator;
         this._fileSelectionService.clearSelection();
 
@@ -472,7 +472,7 @@ export class ViewFileService implements OnDestroy {
         });
     }
 
-    private pushViewFiles() {
+    private pushViewFiles(): void {
         // Unfiltered files
         this._filesSubject.next(this._files);
 

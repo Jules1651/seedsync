@@ -42,7 +42,7 @@ export class ViewFileOptionsService {
         return this._options.asObservable();
     }
 
-    public setSortMethod(sortMethod: ViewFileOptions.SortMethod) {
+    public setSortMethod(sortMethod: ViewFileOptions.SortMethod): void {
         const options = this._options.getValue();
         if (options.sortMethod !== sortMethod) {
             const newOptions = new ViewFileOptions(options.set("sortMethod", sortMethod));
@@ -52,7 +52,7 @@ export class ViewFileOptionsService {
         }
     }
 
-    public setSelectedStatusFilter(status: ViewFile.Status) {
+    public setSelectedStatusFilter(status: ViewFile.Status): void {
         const options = this._options.getValue();
         if (options.selectedStatusFilter !== status) {
             const newOptions = new ViewFileOptions(options.set("selectedStatusFilter", status));
@@ -62,7 +62,7 @@ export class ViewFileOptionsService {
         }
     }
 
-    public setNameFilter(name: string) {
+    public setNameFilter(name: string): void {
         const options = this._options.getValue();
         if (options.nameFilter !== name) {
             const newOptions = new ViewFileOptions(options.set("nameFilter", name));

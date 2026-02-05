@@ -39,7 +39,7 @@ export class ModelFileService extends BaseStreamService implements OnDestroy {
         this.registerEventName(this.EVENT_REMOVED);
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -113,15 +113,15 @@ export class ModelFileService extends BaseStreamService implements OnDestroy {
         return this._restService.sendRequest(url);
     }
 
-    protected onEvent(eventName: string, data: string) {
+    protected onEvent(eventName: string, data: string): void {
         this.parseEvent(eventName, data);
     }
 
-    protected onConnected() {
+    protected onConnected(): void {
         // nothing to do
     }
 
-    protected onDisconnected() {
+    protected onDisconnected(): void {
         // Update clients by clearing the model
         this._files.next(this._files.getValue().clear());
     }
@@ -131,7 +131,7 @@ export class ModelFileService extends BaseStreamService implements OnDestroy {
      * @param {string} name
      * @param {string} data
      */
-    private parseEvent(name: string, data: string) {
+    private parseEvent(name: string, data: string): void {
         if (name === this.EVENT_INIT) {
             // Init event receives an array of ModelFiles
             let t0: number;
