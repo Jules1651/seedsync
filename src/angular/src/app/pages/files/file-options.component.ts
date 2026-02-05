@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit} from "@angular/core";
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit} from "@angular/core";
 import {NgIf, AsyncPipe} from "@angular/common";
 import {FormsModule} from "@angular/forms";
 import {Observable, Subject} from "rxjs";
@@ -11,6 +11,8 @@ import {ViewFileOptions} from "../../services/files/view-file-options";
 import {ViewFile} from "../../services/files/view-file";
 import {ViewFileService} from "../../services/files/view-file.service";
 import {DomService} from "../../services/utils/dom.service";
+
+declare var bootstrap: any;
 
 @Component({
     selector: "app-file-options",
@@ -39,10 +41,21 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
     private _latestOptions: ViewFileOptions;
     private destroy$ = new Subject<void>();
 
+    private scrollHandler = () => {
+        const openToggles = document.querySelectorAll('.dropdown-toggle.show');
+        openToggles.forEach(toggle => {
+            const dropdownInstance = bootstrap.Dropdown.getInstance(toggle);
+            if (dropdownInstance) {
+                dropdownInstance.hide();
+            }
+        });
+    };
+
     constructor(private _changeDetector: ChangeDetectorRef,
                 private viewFileOptionsService: ViewFileOptionsService,
                 private _viewFileService: ViewFileService,
-                private _domService: DomService) {
+                private _domService: DomService,
+                private _ngZone: NgZone) {
         this.options = this.viewFileOptionsService.options;
         this.headerHeight = this._domService.headerHeight;
     }
@@ -73,9 +86,15 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
 
         // Keep the latest options for toggle behaviour implementation
         this.viewFileOptionsService.options.pipe(takeUntil(this.destroy$)).subscribe(options => this._latestOptions = options);
+
+        // Close dropdowns on scroll to prevent orphaned menus
+        this._ngZone.runOutsideAngular(() => {
+            window.addEventListener('scroll', this.scrollHandler, { passive: true });
+        });
     }
 
     ngOnDestroy(): void {
+        window.removeEventListener('scroll', this.scrollHandler);
         this.destroy$.next();
         this.destroy$.complete();
     }
