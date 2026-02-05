@@ -11,11 +11,11 @@ export class MockStreamServiceRegistry {
     // Fake model file service
     modelFileService = new MockModelFileService();
 
-    connect() {
+    connect(): void {
         this.connectedService.notifyConnected();
     }
 
-    disconnect() {
+    disconnect(): void {
         this.connectedService.notifyDisconnected();
     }
 }

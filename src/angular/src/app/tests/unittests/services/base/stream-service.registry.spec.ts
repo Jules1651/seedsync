@@ -19,15 +19,15 @@ class MockStreamService implements IStreamService {
         throw new Error("Method not implemented.");
     }
 
-    notifyConnected() {
+    notifyConnected(): void {
         this.connectedSeq.push(true);
     }
 
-    notifyDisconnected() {
+    notifyDisconnected(): void {
         this.connectedSeq.push(false);
     }
 
-    notifyEvent(eventName: string, data: string) {
+    notifyEvent(eventName: string, data: string): void {
         this.eventList.push([eventName, data]);
     }
 }

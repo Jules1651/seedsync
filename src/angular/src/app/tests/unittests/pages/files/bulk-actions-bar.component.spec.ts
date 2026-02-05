@@ -60,7 +60,7 @@ describe("BulkActionsBarComponent", () => {
     /**
      * Helper to set inputs and trigger ngOnChanges for proper cache update.
      */
-    function setInputsAndDetectChanges(visibleFiles: List<ViewFile>, selectedFiles: Set<string>) {
+    function setInputsAndDetectChanges(visibleFiles: List<ViewFile>, selectedFiles: Set<string>): void {
         const changes: any = {};
         if (component.visibleFiles !== visibleFiles) {
             changes["visibleFiles"] = new SimpleChange(component.visibleFiles, visibleFiles, false);

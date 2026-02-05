@@ -8,20 +8,20 @@ import {EventSourceFactory} from "../../../../services/base/stream-service.regis
 class TestBaseStreamService extends BaseStreamService {
     eventList = [];
 
-    public registerEventName(eventName: string) {
+    public registerEventName(eventName: string): void {
         super.registerEventName(eventName);
     }
 
-    protected onEvent(eventName: string, data: string) {
+    protected onEvent(eventName: string, data: string): void {
         console.log(eventName, data);
         this.eventList.push([eventName, data]);
     }
 
-    public onConnected() {
+    public onConnected(): void {
         // Test stub - intentionally empty
     }
 
-    public onDisconnected() {
+    public onDisconnected(): void {
         // Test stub - intentionally empty
     }
 }
