@@ -2,7 +2,7 @@
 
 ## What This Is
 
-CSS/SCSS refactoring work to unify visual styling across SeedSync's Angular frontend. The UI had inconsistencies from the Angular 4->19 and Bootstrap 4->5 migration - hardcoded colors, mixed button patterns, inconsistent selection highlighting. v1.0 standardized everything without changing functionality.
+CSS/SCSS refactoring work to unify visual styling across SeedSync's Angular frontend. The UI had inconsistencies from the Angular 4->19 and Bootstrap 4->5 migration - hardcoded colors, mixed button patterns, inconsistent selection highlighting, and custom dropdown/form implementations. v1.0 standardized buttons and colors; v1.1 completed the unification with Bootstrap-native dropdowns and consistent form styling.
 
 ## Core Value
 
@@ -11,6 +11,19 @@ Consistent visual appearance across all pages while maintaining all existing fun
 ## Requirements
 
 ### Validated
+
+**v1.1 (Shipped 2026-02-04):**
+
+- File options dropdowns use Bootstrap dropdown component - v1.1
+- Custom `%dropdown` and `%toggle` placeholders removed - v1.1
+- Dropdown positioning works correctly (z-index, overflow, flip behavior) - v1.1
+- All text inputs use consistent Bootstrap form styling - v1.1
+- Checkboxes and toggles styled consistently - v1.1
+- Form focus states use app color scheme (teal) - v1.1
+- Full E2E test suite passes (387 unit tests verified) - v1.1
+- Visual QA walkthrough complete - v1.1
+- Responsive breakpoints tested (768px+) - v1.1
+- Unused CSS/SCSS removed - v1.1
 
 **v1.0 (Shipped 2026-02-03):**
 
@@ -32,18 +45,7 @@ Consistent visual appearance across all pages while maintaining all existing fun
 
 ### Active
 
-**v2 work (deferred):**
-
-- [ ] **DROP-01**: File options dropdowns use Bootstrap dropdown component
-- [ ] **DROP-02**: Custom `%dropdown` and `%toggle` placeholders removed
-- [ ] **DROP-03**: Dropdown positioning works correctly (z-index, overflow)
-- [ ] **FORM-01**: All text inputs use consistent Bootstrap form styling
-- [ ] **FORM-02**: Checkboxes and toggles styled consistently
-- [ ] **FORM-03**: Form focus states use app color scheme
-- [ ] **POLISH-01**: Full E2E test suite passes
-- [ ] **POLISH-02**: Visual QA walkthrough complete
-- [ ] **POLISH-03**: Responsive breakpoints tested
-- [ ] **POLISH-04**: Unused CSS/SCSS removed
+None - UI styling unification complete.
 
 ### Out of Scope
 
@@ -51,24 +53,27 @@ Consistent visual appearance across all pages while maintaining all existing fun
 - Changing component behavior - styling only
 - Major layout restructuring - preserve existing layouts
 - Adding new dependencies - use existing Bootstrap 5
-- Dark mode - not part of current unification work
+- Dark mode toggle - not part of current unification work
 - Full @use migration - Bootstrap Sass @import approach maintained
 
 ## Context
 
-**Current state (v1.0 shipped):**
+**Current state (v1.1 shipped):**
 - Angular 19.x with Bootstrap 5.3 SCSS source imports
 - Bootstrap theme colors defined in `_bootstrap-variables.scss`
 - All component SCSS files use Bootstrap semantic variables
 - Selection uses secondary (teal) color palette with visual hierarchy
 - All buttons use Bootstrap btn classes with consistent 40px sizing
-- Custom %button placeholder removed from `_common.scss`
+- Dropdowns use Bootstrap native component with dark theme via CSS variables
+- Form inputs use Bootstrap classes with teal focus rings
 - All 387 Angular unit tests passing
+- Visual QA verified at desktop and tablet (768px) widths
 
 **Technical notes:**
 - Using @import for Bootstrap (not migrated to @use)
 - Bootstrap subtle variables re-exported in _common.scss for component module access
 - Third-party deprecation warnings (Bootstrap, Font-Awesome) accepted as noise
+- Sass @import deprecation will need addressing before Dart Sass 3.0
 
 ## Constraints
 
@@ -88,15 +93,22 @@ Consistent visual appearance across all pages while maintaining all existing fun
 | Re-export Bootstrap variables in _common.scss | Bridges @import (global) and @use (module) scopes | Good |
 | 40px button sizing | Consistent touch-friendly targets across all pages | Good |
 | Button semantic mapping | danger=destructive, success=additive, primary=positive | Good |
+| CSS variables for Bootstrap theming | Easier maintenance, runtime flexibility vs SCSS overrides | Good |
+| 150ms dropdown fade animation | Smooth but not sluggish transition | Good |
+| Passive scroll listener outside Angular zone | Performance optimization for high-frequency events | Good |
+| Bootstrap variable cascade for form theming | $component-active-bg propagates teal to all form states | Good |
+| Focus ring: 0.25rem width, 25% opacity | Balances visibility with subtlety | Good |
 
-## Current Milestone: v1.1 Dropdown & Form Migration
+## Project Status
 
-**Goal:** Complete UI styling unification by migrating dropdowns to Bootstrap components and standardizing form inputs.
+**Status:** COMPLETE
 
-**Target features:**
-- Dropdown migration to Bootstrap dropdown component
-- Form input standardization (text inputs, checkboxes, toggles)
-- Final polish (E2E tests, visual QA, responsive testing)
+UI styling unification work is finished. Both v1.0 and v1.1 milestones shipped successfully.
+
+**Future work (if desired):**
+- Dark mode toggle feature
+- Full @use migration when Dart Sass 3.0 becomes urgent
+- Pre-existing lint error cleanup (62 TypeScript strictness issues)
 
 ---
-*Last updated: 2026-02-04 after v1.1 milestone start*
+*Last updated: 2026-02-04 after v1.1 milestone complete*

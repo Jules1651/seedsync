@@ -20,81 +20,16 @@ See `.planning/milestones/v1.0-ROADMAP.md` for full details.
 
 </details>
 
-### v1.1 Dropdown & Form Migration
+<details>
+<summary>v1.1 Dropdown & Form Migration (Phases 6-8) - SHIPPED 2026-02-04</summary>
 
-#### Phase 6: Dropdown Migration
+- [x] Phase 6: Dropdown Migration (1/1 plans) - completed 2026-02-04
+- [x] Phase 7: Form Input Standardization (1/1 plans) - completed 2026-02-04
+- [x] Phase 8: Final Polish (2/2 plans) - completed 2026-02-04
 
-**Goal:** File options dropdowns use Bootstrap's native dropdown component with correct positioning behavior
+See `.planning/milestones/v1.1-ROADMAP.md` for full details.
 
-**Dependencies:** None (builds on v1.0 Bootstrap SCSS infrastructure)
-
-**Requirements:**
-- DROP-01: File options dropdowns use Bootstrap dropdown component
-- DROP-02: Custom `%dropdown` and `%toggle` placeholders removed
-- DROP-03: Dropdown positioning works correctly (z-index, overflow, flip behavior)
-
-**Plans:** 1 plan
-
-Plans:
-- [x] 06-01-PLAN.md — Migrate dropdowns to Bootstrap native component with dark theme and close-on-scroll
-
-**Success Criteria:**
-1. User clicks file options button and dropdown appears below/above button (flip behavior when near viewport edge)
-2. User can see dropdown content without horizontal scrollbars or clipping
-3. Dropdown closes when user clicks outside or selects an option
-4. No `%dropdown` or `%toggle` SCSS placeholders exist in codebase
-
----
-
-#### Phase 7: Form Input Standardization
-
-**Goal:** All form inputs have consistent Bootstrap styling with app-appropriate focus states
-
-**Dependencies:** None (parallel to Phase 6)
-
-**Requirements:**
-- FORM-01: All text inputs use consistent Bootstrap form styling
-- FORM-02: Checkboxes and toggles styled consistently
-- FORM-03: Form focus states use app color scheme
-
-**Plans:** 1 plan
-
-Plans:
-- [x] 07-01-PLAN.md — Add Bootstrap form variable overrides and dark theme styling
-
-**Success Criteria:**
-1. User sees consistent input styling across Settings, AutoQueue, and any modal forms
-2. User sees consistent checkbox/toggle appearance on all pages
-3. User sees teal/secondary focus ring when clicking into any input field
-4. Tab navigation shows visible focus indicators on all form controls
-
----
-
-#### Phase 8: Final Polish
-
-**Goal:** Application passes full validation with no visual regressions or unused code
-
-**Dependencies:** Phase 6, Phase 7 (cleanup happens after feature work)
-
-**Requirements:**
-- POLISH-01: Full E2E test suite passes
-- POLISH-02: Visual QA walkthrough complete
-- POLISH-03: Responsive breakpoints tested
-- POLISH-04: Unused CSS/SCSS removed
-
-**Plans:** 2 plans
-
-Plans:
-- [x] 08-01-PLAN.md — Run tests, remove unused SCSS, verify build integrity
-- [x] 08-02-PLAN.md — Visual QA walkthrough at desktop and tablet widths
-
-**Success Criteria:**
-1. All E2E tests pass in CI environment
-2. Visual walkthrough confirms no regressions on Files, Settings, AutoQueue, Logs, About pages
-3. UI renders correctly at tablet (768px+) and desktop widths
-4. No unused SCSS placeholders or variables remain in codebase
-
----
+</details>
 
 ## Progress
 
@@ -111,4 +46,4 @@ Plans:
 
 ---
 
-*v1.1 roadmap created: 2026-02-04*
+*Project complete: 2026-02-04*
