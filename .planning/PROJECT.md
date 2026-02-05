@@ -1,12 +1,20 @@
-# Unify UI Styling
+# SeedSync UI Polish
 
 ## What This Is
 
-UI refinement work for SeedSync's Angular frontend. v1.0-v1.1 unified CSS/SCSS styling (Bootstrap migration, color consolidation, button standardization). v1.2 removes obsolete UI elements made redundant by virtual scrolling and sticky action bar changes.
+UI refinement and code quality work for SeedSync's Angular frontend. v1.0-v1.2 unified CSS/SCSS styling (Bootstrap migration, colors, buttons, dropdowns, forms, cleanup). v1.3 focuses on code quality (lint fixes) and UX clarity (status dropdown counts).
 
 ## Core Value
 
-Consistent visual appearance across all pages while maintaining all existing functionality.
+Clean, maintainable codebase with intuitive user interface.
+
+## Current Milestone: v1.3.0 Polish & Clarity
+
+**Goal:** Fix TypeScript lint errors and improve status dropdown usability
+
+**Target features:**
+- Fix 62 TypeScript strictness lint errors
+- Add file counts to status dropdown options (e.g., "Downloaded (5)")
 
 ## Requirements
 
@@ -50,7 +58,10 @@ Consistent visual appearance across all pages while maintaining all existing fun
 
 ### Active
 
-(None — start next milestone with `/gsd:new-milestone`)
+**v1.3 (In Progress):**
+
+- [ ] Fix TypeScript strictness lint errors (62 issues)
+- [ ] Status dropdown shows file counts per status
 
 ### Out of Scope
 
@@ -82,10 +93,9 @@ Consistent visual appearance across all pages while maintaining all existing fun
 
 ## Constraints
 
-- **Removal only**: v1.2 removes obsolete elements, doesn't add new features
-- **No functional regressions**: Remaining buttons must continue working
+- **No functional regressions**: All existing features must continue working
 - **Bootstrap 5 patterns**: Leverage Bootstrap classes where possible
-- **Clean removal**: Remove all associated code (template, component logic, styles)
+- **Incremental lint fixes**: Fix errors without major refactoring
 
 ## Key Decisions
 
@@ -106,14 +116,13 @@ Consistent visual appearance across all pages while maintaining all existing fun
 
 ## Project Status
 
-**Status:** COMPLETE — v1.2 UI Cleanup shipped
+**Status:** IN PROGRESS — v1.3.0 Polish & Clarity
 
-All UI refinement work complete. Dropdowns, forms, buttons, and cleanup all done.
+Working on code quality (lint fixes) and UX improvements (status dropdown counts).
 
 **Future work (if desired):**
 - Dark mode toggle feature
 - Full @use migration when Dart Sass 3.0 becomes urgent
-- Pre-existing lint error cleanup (62 TypeScript strictness issues)
 
 ---
-*Last updated: 2026-02-04 after v1.2 milestone completed*
+*Last updated: 2026-02-04 after v1.3.0 milestone started*
