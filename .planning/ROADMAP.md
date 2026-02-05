@@ -76,10 +76,10 @@ Plans:
   2. "All" option shows total file count across all statuses
   3. Counts update automatically when files change status (no refresh needed)
   4. Empty statuses show "(0)" count (visible but clearly empty)
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 11-01: TBD
+- [ ] 11-01-PLAN.md - Add count computation, formatting, and display to status dropdown
 
 ## Progress
 
@@ -95,7 +95,7 @@ Plans:
 | 8. Final Polish | v1.1 | 2/2 | Complete | 2026-02-04 |
 | 9. Remove Obsolete Buttons | v1.2 | 1/1 | Complete | 2026-02-04 |
 | 10. Lint Cleanup | v1.3 | 4/4 | Complete | 2026-02-04 |
-| 11. Status Dropdown Counts | v1.3 | 0/TBD | Not started | - |
+| 11. Status Dropdown Counts | v1.3 | 0/1 | Not started | - |
 
 ---
 
