@@ -1,4 +1,32 @@
-# Project Milestones: Unify UI Styling
+# Project Milestones: SeedSync UI Polish
+
+## v1.3 Polish & Clarity (Shipped: 2026-02-04)
+
+**Delivered:** Fixed 62 TypeScript lint errors and added file counts to status dropdown for at-a-glance clarity.
+
+**Phases completed:** 10-11 (5 plans total)
+
+**Key accomplishments:**
+
+- Eliminated all TypeScript lint errors (`npm run lint` exits clean)
+- All functions have explicit return types (~152 annotated)
+- Zero `any` types in application code (~49 replaced)
+- Non-null assertions replaced with optional chaining (~47 fixed)
+- Status dropdown shows file counts per status (e.g., "Downloaded (5)")
+- On-demand count refresh when dropdown opens
+
+**Stats:**
+
+- 77 files modified
+- 3,946 insertions, 320 deletions
+- 2 phases, 5 plans
+- Same-day completion (2026-02-04)
+
+**Git range:** `1cc4a97` → `921a63b`
+
+**What's next:** Project complete. Future work could include dark mode toggle or Sass @use migration.
+
+---
 
 ## v1.2 UI Cleanup (Shipped: 2026-02-04)
 

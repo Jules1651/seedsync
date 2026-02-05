@@ -2,23 +2,34 @@
 
 ## What This Is
 
-UI refinement and code quality work for SeedSync's Angular frontend. v1.0-v1.2 unified CSS/SCSS styling (Bootstrap migration, colors, buttons, dropdowns, forms, cleanup). v1.3 focuses on code quality (lint fixes) and UX clarity (status dropdown counts).
+UI refinement and code quality work for SeedSync's Angular frontend. v1.0-v1.2 unified CSS/SCSS styling (Bootstrap migration, colors, buttons, dropdowns, forms, cleanup). v1.3 added code quality (lint fixes) and UX clarity (status dropdown counts).
 
 ## Core Value
 
 Clean, maintainable codebase with intuitive user interface.
 
-## Current Milestone: v1.3.0 Polish & Clarity
+## Current State (v1.3 Shipped)
 
-**Goal:** Fix TypeScript lint errors and improve status dropdown usability
-
-**Target features:**
-- Fix 62 TypeScript strictness lint errors
-- Add file counts to status dropdown options (e.g., "Downloaded (5)")
+- Angular 19.x with Bootstrap 5.3 SCSS source imports
+- Bootstrap theme colors defined in `_bootstrap-variables.scss`
+- All component SCSS files use Bootstrap semantic variables
+- Selection uses secondary (teal) color palette with visual hierarchy
+- All buttons use Bootstrap btn classes with consistent 40px sizing
+- Dropdowns use Bootstrap native component with dark theme via CSS variables
+- Form inputs use Bootstrap classes with teal focus rings
+- **Zero TypeScript lint errors** (`npm run lint` exits clean)
+- **Status dropdown shows file counts** per status with on-demand refresh
+- All 381 Angular unit tests passing
+- Visual QA verified at desktop and tablet (768px) widths
 
 ## Requirements
 
 ### Validated
+
+**v1.3 (Shipped 2026-02-04):**
+
+- Fix TypeScript strictness lint errors (62 issues) - v1.3
+- Status dropdown shows file counts per status - v1.3
 
 **v1.2 (Shipped 2026-02-04):**
 
@@ -58,10 +69,7 @@ Clean, maintainable codebase with intuitive user interface.
 
 ### Active
 
-**v1.3 (In Progress):**
-
-- [ ] Fix TypeScript strictness lint errors (62 issues)
-- [ ] Status dropdown shows file counts per status
+(None - milestone complete. Run `/gsd:new-milestone` to define next work.)
 
 ### Out of Scope
 
@@ -73,17 +81,6 @@ Clean, maintainable codebase with intuitive user interface.
 - Full @use migration - Bootstrap Sass @import approach maintained
 
 ## Context
-
-**Current state (v1.1 shipped):**
-- Angular 19.x with Bootstrap 5.3 SCSS source imports
-- Bootstrap theme colors defined in `_bootstrap-variables.scss`
-- All component SCSS files use Bootstrap semantic variables
-- Selection uses secondary (teal) color palette with visual hierarchy
-- All buttons use Bootstrap btn classes with consistent 40px sizing
-- Dropdowns use Bootstrap native component with dark theme via CSS variables
-- Form inputs use Bootstrap classes with teal focus rings
-- All 387 Angular unit tests passing
-- Visual QA verified at desktop and tablet (768px) widths
 
 **Technical notes:**
 - Using @import for Bootstrap (not migrated to @use)
@@ -113,16 +110,26 @@ Clean, maintainable codebase with intuitive user interface.
 | Passive scroll listener outside Angular zone | Performance optimization for high-frequency events | Good |
 | Bootstrap variable cascade for form theming | $component-active-bg propagates teal to all form states | Good |
 | Focus ring: 0.25rem width, 25% opacity | Balances visibility with subtlety | Good |
+| Intent comment patterns for empty functions | Per typescript-eslint best practices | Good |
+| Variadic function types for logger getters | Return bound console methods or no-op functions | Good |
+| Use `as unknown as T` for test edge cases | Type-safe alternative to `as any` for invalid input tests | Good |
+| Optional chaining in tests instead of `!` | Tests fail on undefined anyway, avoids lint errors | Good |
+| Counts refresh on dropdown open | Performance: avoid continuous computation | Good |
+| Single-pass count computation | Efficiency: O(n) forEach instead of multiple passes | Good |
 
 ## Project Status
 
-**Status:** IN PROGRESS — v1.3.0 Polish & Clarity
+**Status:** COMPLETE — v1.3.0 Polish & Clarity shipped
 
-Working on code quality (lint fixes) and UX improvements (status dropdown counts).
+UI Polish project complete with 4 milestones shipped:
+- v1.0: Bootstrap SCSS infrastructure, colors, buttons
+- v1.1: Dropdowns, forms, final polish
+- v1.2: UI cleanup (removed obsolete buttons)
+- v1.3: Lint fixes, status dropdown counts
 
 **Future work (if desired):**
 - Dark mode toggle feature
 - Full @use migration when Dart Sass 3.0 becomes urgent
 
 ---
-*Last updated: 2026-02-04 after v1.3.0 milestone started*
+*Last updated: 2026-02-04 after v1.3 milestone complete*
