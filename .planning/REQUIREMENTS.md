@@ -35,21 +35,21 @@ Code quality improvements and UX clarity enhancements.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LINT-01 | TBD | Pending |
-| LINT-02 | TBD | Pending |
-| LINT-03 | TBD | Pending |
-| LINT-04 | TBD | Pending |
-| LINT-05 | TBD | Pending |
-| LINT-06 | TBD | Pending |
-| UX-01 | TBD | Pending |
-| UX-02 | TBD | Pending |
-| UX-03 | TBD | Pending |
+| LINT-01 | Phase 10 | Pending |
+| LINT-02 | Phase 10 | Pending |
+| LINT-03 | Phase 10 | Pending |
+| LINT-04 | Phase 10 | Pending |
+| LINT-05 | Phase 10 | Pending |
+| LINT-06 | Phase 10 | Pending |
+| UX-01 | Phase 11 | Pending |
+| UX-02 | Phase 11 | Pending |
+| UX-03 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9
+- Mapped to phases: 9
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 after initial definition*
+*Last updated: 2026-02-04 after roadmap creation*

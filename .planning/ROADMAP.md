@@ -1,10 +1,11 @@
-# Roadmap: UI Refinement
+# Roadmap: SeedSync UI Polish
 
 ## Milestones
 
 - **v1.0 Unify UI Styling** - Phases 1-5 (shipped 2026-02-03)
 - **v1.1 Dropdown & Form Migration** - Phases 6-8 (shipped 2026-02-04)
 - **v1.2 UI Cleanup** - Phase 9 (shipped 2026-02-04)
+- **v1.3 Polish & Clarity** - Phases 10-11 (in progress)
 
 ## Phases
 
@@ -41,6 +42,42 @@ See `.planning/milestones/v1.2-ROADMAP.md` for full details.
 
 </details>
 
+### v1.3 Polish & Clarity (In Progress)
+
+**Milestone Goal:** Fix TypeScript lint errors and improve status dropdown usability
+
+- [ ] **Phase 10: Lint Cleanup** - Fix all TypeScript lint errors for clean codebase
+- [ ] **Phase 11: Status Dropdown Counts** - Add file counts to status dropdown options
+
+#### Phase 10: Lint Cleanup
+**Goal**: Codebase passes all TypeScript lint checks with zero errors
+**Depends on**: Nothing (first phase of v1.3)
+**Requirements**: LINT-01, LINT-02, LINT-03, LINT-04, LINT-05, LINT-06
+**Success Criteria** (what must be TRUE):
+  1. `npm run lint` exits with zero errors and zero warnings
+  2. All functions have explicit return types (no implicit any returns)
+  3. No `any` types remain in application code (type-safe throughout)
+  4. No non-null assertions (`!`) without proper guards or justification
+  5. No empty functions without explicit `// intentionally empty` comments
+**Plans**: TBD
+
+Plans:
+- [ ] 10-01: TBD
+
+#### Phase 11: Status Dropdown Counts
+**Goal**: Users can see at a glance how many files are in each status category
+**Depends on**: Phase 10
+**Requirements**: UX-01, UX-02, UX-03
+**Success Criteria** (what must be TRUE):
+  1. Each status option displays count in parentheses (e.g., "Downloaded (5)")
+  2. "All" option shows total file count across all statuses
+  3. Counts update automatically when files change status (no refresh needed)
+  4. Empty statuses show "(0)" count (visible but clearly empty)
+**Plans**: TBD
+
+Plans:
+- [ ] 11-01: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -54,7 +91,10 @@ See `.planning/milestones/v1.2-ROADMAP.md` for full details.
 | 7. Form Input Standardization | v1.1 | 1/1 | Complete | 2026-02-04 |
 | 8. Final Polish | v1.1 | 2/2 | Complete | 2026-02-04 |
 | 9. Remove Obsolete Buttons | v1.2 | 1/1 | Complete | 2026-02-04 |
+| 10. Lint Cleanup | v1.3 | 0/TBD | Not started | - |
+| 11. Status Dropdown Counts | v1.3 | 0/TBD | Not started | - |
 
 ---
 
 *Last updated: 2026-02-04*
+*v1.3 roadmap created: 2026-02-04*
