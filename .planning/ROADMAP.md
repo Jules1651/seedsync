@@ -34,13 +34,16 @@ See `.planning/milestones/v1.1-ROADMAP.md` for full details.
 
 ### v1.2 UI Cleanup (Phase 9)
 
-- [ ] Phase 9: Remove Obsolete Buttons (0/1 plans)
+- [ ] Phase 9: Remove Obsolete Buttons (1 plan)
 
 **Phase 9: Remove Obsolete Buttons**
 
 Goal: Remove Details and Pin buttons that no longer serve a purpose after recent UI changes.
 
 Requirements: CLEAN-01, CLEAN-02
+
+Plans:
+- [ ] 09-01-PLAN.md - Remove Details button, Pin button, and all associated state/styles/tests
 
 Success criteria:
 1. Details button removed from file row UI
@@ -61,7 +64,7 @@ Success criteria:
 | 6. Dropdown Migration | v1.1 | 1/1 | Complete | 2026-02-04 |
 | 7. Form Input Standardization | v1.1 | 1/1 | Complete | 2026-02-04 |
 | 8. Final Polish | v1.1 | 2/2 | Complete | 2026-02-04 |
-| 9. Remove Obsolete Buttons | v1.2 | 0/1 | Pending | — |
+| 9. Remove Obsolete Buttons | v1.2 | 0/1 | Planned | — |
 
 ---
 
