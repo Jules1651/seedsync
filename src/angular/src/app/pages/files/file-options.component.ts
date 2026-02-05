@@ -12,7 +12,7 @@ import {ViewFile} from "../../services/files/view-file";
 import {ViewFileService} from "../../services/files/view-file.service";
 import {DomService} from "../../services/utils/dom.service";
 
-declare var bootstrap: any;
+declare let bootstrap: any;
 
 @Component({
     selector: "app-file-options",
@@ -42,7 +42,7 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
     private destroy$ = new Subject<void>();
 
     private scrollHandler = () => {
-        const openToggles = document.querySelectorAll('.dropdown-toggle.show');
+        const openToggles = document.querySelectorAll(".dropdown-toggle.show");
         openToggles.forEach(toggle => {
             const dropdownInstance = bootstrap.Dropdown.getInstance(toggle);
             if (dropdownInstance) {
@@ -89,12 +89,12 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
 
         // Close dropdowns on scroll to prevent orphaned menus
         this._ngZone.runOutsideAngular(() => {
-            window.addEventListener('scroll', this.scrollHandler, { passive: true });
+            window.addEventListener("scroll", this.scrollHandler, { passive: true });
         });
     }
 
     ngOnDestroy(): void {
-        window.removeEventListener('scroll', this.scrollHandler);
+        window.removeEventListener("scroll", this.scrollHandler);
         this.destroy$.next();
         this.destroy$.complete();
     }
