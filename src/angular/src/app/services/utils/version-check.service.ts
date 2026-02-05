@@ -30,12 +30,12 @@ export class VersionCheckService implements OnDestroy {
         this.checkVersion();
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }
 
-    private checkVersion() {
+    private checkVersion(): void {
         this._restService.sendRequest(this.GITHUB_LATEST_RELEASE_URL).pipe(takeUntil(this.destroy$)).subscribe({
             next: reaction => {
                 if (reaction.success) {

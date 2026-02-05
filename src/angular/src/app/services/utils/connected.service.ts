@@ -28,19 +28,19 @@ export class ConnectedService extends BaseStreamService implements OnDestroy {
         // Nothing to do
     }
 
-    protected onConnected() {
+    protected onConnected(): void {
         if(this._connectedSubject.getValue() === false) {
             this._connectedSubject.next(true);
         }
     }
 
-    protected onDisconnected() {
+    protected onDisconnected(): void {
         if(this._connectedSubject.getValue() === true) {
             this._connectedSubject.next(false);
         }
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }

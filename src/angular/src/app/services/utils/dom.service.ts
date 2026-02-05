@@ -14,7 +14,7 @@ export class DomService {
         return this._headerHeight.asObservable();
     }
 
-    public setHeaderHeight(height: number) {
+    public setHeaderHeight(height: number): void {
         if(height !== this._headerHeight.getValue()) {
             this._headerHeight.next(height);
         }

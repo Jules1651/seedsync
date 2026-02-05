@@ -83,7 +83,7 @@ export class ConfirmModalService {
         const cancelButton = this.modalElement.querySelector("[data-action=\"cancel\"]");
         const okButton = this.modalElement.querySelector("[data-action=\"ok\"]");
 
-        const closeModal = (result: boolean) => {
+        const closeModal = (result: boolean): void => {
             this.destroyModal();
             resolve(result);
         };

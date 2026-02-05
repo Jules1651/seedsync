@@ -9,40 +9,40 @@ export class LoggerService {
         this.level = LoggerService.Level.DEBUG;
     }
 
-    get debug() {
+    get debug(): (...args: unknown[]) => void {
         if (this.level >= LoggerService.Level.DEBUG) {
             return console.debug.bind(console);
         } else {
             // No-op when debug logging is disabled
-            return () => { /* Logging disabled at this level */ };
+            return (): void => { /* Logging disabled at this level */ };
         }
     }
 
-    get info() {
+    get info(): (...args: unknown[]) => void {
         if (this.level >= LoggerService.Level.INFO) {
             return console.log.bind(console);
         } else {
             // No-op when info logging is disabled
-            return () => { /* Logging disabled at this level */ };
+            return (): void => { /* Logging disabled at this level */ };
         }
     }
 
     // noinspection JSUnusedGlobalSymbols
-    get warn() {
+    get warn(): (...args: unknown[]) => void {
         if (this.level >= LoggerService.Level.WARN) {
             return console.warn.bind(console);
         } else {
             // No-op when warn logging is disabled
-            return () => { /* Logging disabled at this level */ };
+            return (): void => { /* Logging disabled at this level */ };
         }
     }
 
-    get error() {
+    get error(): (...args: unknown[]) => void {
         if (this.level >= LoggerService.Level.ERROR) {
             return console.error.bind(console);
         } else {
             // No-op when error logging is disabled
-            return () => { /* Logging disabled at this level */ };
+            return (): void => { /* Logging disabled at this level */ };
         }
     }
 }

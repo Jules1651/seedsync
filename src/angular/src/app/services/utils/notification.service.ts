@@ -43,7 +43,7 @@ export class NotificationService implements OnDestroy {
         return this._notificationsSubject.asObservable();
     }
 
-    public show(notification: Notification) {
+    public show(notification: Notification): void {
         const index = this._notifications.findIndex(value => Immutable.is(value, notification));
         if (index < 0) {
             const notifications = this._notifications.push(notification);
@@ -52,7 +52,7 @@ export class NotificationService implements OnDestroy {
         }
     }
 
-    public hide(notification: Notification) {
+    public hide(notification: Notification): void {
         const index = this._notifications.findIndex(value => Immutable.is(value, notification));
         if (index >= 0) {
             this._notifications = this._notifications.remove(index);
@@ -60,7 +60,7 @@ export class NotificationService implements OnDestroy {
         }
     }
 
-    ngOnDestroy() {
+    ngOnDestroy(): void {
         this.destroy$.next();
         this.destroy$.complete();
     }
