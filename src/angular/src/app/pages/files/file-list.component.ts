@@ -441,19 +441,19 @@ export class FileListComponent {
                 Notification.Level.DANGER,
                 Localization.Bulk.ERROR(result.errorMessage || "Unknown error")
             );
-        } else if (result.allSucceeded) {
+        } else if (result.allSucceeded && result.response) {
             // All succeeded
             this._showNotification(
                 Notification.Level.SUCCESS,
-                messages.successMsg(result.response!.summary.succeeded)
+                messages.successMsg(result.response.summary.succeeded)
             );
-        } else {
+        } else if (result.response) {
             // Partial failure
             this._showNotification(
                 Notification.Level.WARNING,
                 messages.partialMsg(
-                    result.response!.summary.succeeded,
-                    result.response!.summary.failed
+                    result.response.summary.succeeded,
+                    result.response.summary.failed
                 )
             );
         }

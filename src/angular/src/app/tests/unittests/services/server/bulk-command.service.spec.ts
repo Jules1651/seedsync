@@ -53,9 +53,9 @@ describe("BulkCommandService", () => {
                 tick();
 
                 expect(result).toBeDefined();
-                expect(result!.success).toBeTrue();
-                expect(result!.allSucceeded).toBeTrue();
-                expect(result!.response!.summary.succeeded).toBe(2);
+                expect(result?.success).toBeTrue();
+                expect(result?.allSucceeded).toBeTrue();
+                expect(result?.response?.summary.succeeded).toBe(2);
             }));
         });
 
@@ -77,12 +77,12 @@ describe("BulkCommandService", () => {
 
             tick();
 
-            expect(result!.success).toBeTrue();
-            expect(result!.allSucceeded).toBeTrue();
-            expect(result!.hasPartialFailure).toBeFalse();
-            expect(result!.response!.summary.total).toBe(3);
-            expect(result!.response!.summary.succeeded).toBe(3);
-            expect(result!.response!.summary.failed).toBe(0);
+            expect(result?.success).toBeTrue();
+            expect(result?.allSucceeded).toBeTrue();
+            expect(result?.hasPartialFailure).toBeFalse();
+            expect(result?.response?.summary.total).toBe(3);
+            expect(result?.response?.summary.succeeded).toBe(3);
+            expect(result?.response?.summary.failed).toBe(0);
         }));
 
         it("should handle partial failure response", fakeAsync(() => {
@@ -103,18 +103,18 @@ describe("BulkCommandService", () => {
 
             tick();
 
-            expect(result!.success).toBeTrue();
-            expect(result!.allSucceeded).toBeFalse();
-            expect(result!.hasPartialFailure).toBeTrue();
-            expect(result!.response!.summary.total).toBe(3);
-            expect(result!.response!.summary.succeeded).toBe(2);
-            expect(result!.response!.summary.failed).toBe(1);
+            expect(result?.success).toBeTrue();
+            expect(result?.allSucceeded).toBeFalse();
+            expect(result?.hasPartialFailure).toBeTrue();
+            expect(result?.response?.summary.total).toBe(3);
+            expect(result?.response?.summary.succeeded).toBe(2);
+            expect(result?.response?.summary.failed).toBe(1);
 
             // Check individual file results
-            const failedFile = result!.response!.results.find(r => r.file === "file2.txt");
-            expect(failedFile!.success).toBeFalse();
-            expect(failedFile!.error).toBe("File not found");
-            expect(failedFile!.error_code).toBe(404);
+            const failedFile = result?.response?.results.find(r => r.file === "file2.txt");
+            expect(failedFile?.success).toBeFalse();
+            expect(failedFile?.error).toBe("File not found");
+            expect(failedFile?.error_code).toBe(404);
         }));
 
         it("should handle all files failed response", fakeAsync(() => {
@@ -134,11 +134,11 @@ describe("BulkCommandService", () => {
 
             tick();
 
-            expect(result!.success).toBeTrue(); // Request succeeded, but operations failed
-            expect(result!.allSucceeded).toBeFalse();
-            expect(result!.hasPartialFailure).toBeTrue(); // failed > 0
-            expect(result!.response!.summary.succeeded).toBe(0);
-            expect(result!.response!.summary.failed).toBe(2);
+            expect(result?.success).toBeTrue(); // Request succeeded, but operations failed
+            expect(result?.allSucceeded).toBeFalse();
+            expect(result?.hasPartialFailure).toBeTrue(); // failed > 0
+            expect(result?.response?.summary.succeeded).toBe(0);
+            expect(result?.response?.summary.failed).toBe(2);
         }));
 
         it("should handle HTTP 400 error with JSON error body", fakeAsync(() => {
@@ -155,9 +155,9 @@ describe("BulkCommandService", () => {
 
             tick();
 
-            expect(result!.success).toBeFalse();
-            expect(result!.response).toBeNull();
-            expect(result!.errorMessage).toContain("Invalid action");
+            expect(result?.success).toBeFalse();
+            expect(result?.response).toBeNull();
+            expect(result?.errorMessage).toContain("Invalid action");
         }));
 
         it("should handle HTTP 400 error with invalid files array", fakeAsync(() => {
@@ -174,8 +174,8 @@ describe("BulkCommandService", () => {
 
             tick();
 
-            expect(result!.success).toBeFalse();
-            expect(result!.errorMessage).toContain("files array is required");
+            expect(result?.success).toBeFalse();
+            expect(result?.errorMessage).toContain("files array is required");
         }));
 
         it("should handle network error", fakeAsync(() => {
@@ -189,9 +189,9 @@ describe("BulkCommandService", () => {
 
             tick();
 
-            expect(result!.success).toBeFalse();
-            expect(result!.response).toBeNull();
-            expect(result!.errorMessage).toBeDefined();
+            expect(result?.success).toBeFalse();
+            expect(result?.response).toBeNull();
+            expect(result?.errorMessage).toBeDefined();
         }));
 
         it("should handle string error response", fakeAsync(() => {
@@ -208,8 +208,8 @@ describe("BulkCommandService", () => {
 
             tick();
 
-            expect(result!.success).toBeFalse();
-            expect(result!.errorMessage).toBe("Internal server error");
+            expect(result?.success).toBeFalse();
+            expect(result?.errorMessage).toBe("Internal server error");
         }));
 
         it("should log debug info on successful response", fakeAsync(() => {
