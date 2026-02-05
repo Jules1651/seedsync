@@ -18,9 +18,9 @@ Code quality improvements and UX clarity enhancements.
 
 ### Status Dropdown Clarity
 
-- [ ] **UX-01**: Status dropdown shows file count per status (e.g., "Downloaded (5)")
-- [ ] **UX-02**: "All" option shows total file count
-- [ ] **UX-03**: Counts update in real-time as files change status
+- [x] **UX-01**: Status dropdown shows file count per status (e.g., "Downloaded (5)") ✓
+- [x] **UX-02**: "All" option shows total file count ✓
+- [x] **UX-03**: Counts refresh when dropdown is opened (on-demand) ✓
 
 ## Out of Scope
 
@@ -41,15 +41,15 @@ Code quality improvements and UX clarity enhancements.
 | LINT-04 | Phase 10 | Complete |
 | LINT-05 | Phase 10 | Complete |
 | LINT-06 | Phase 10 | Complete |
-| UX-01 | Phase 11 | Pending |
-| UX-02 | Phase 11 | Pending |
-| UX-03 | Phase 11 | Pending |
+| UX-01 | Phase 11 | Complete |
+| UX-02 | Phase 11 | Complete |
+| UX-03 | Phase 11 | Complete |
 
 **Coverage:**
-- v1.3 requirements: 9 total
+- v1.3 requirements: 9 total (9 complete)
 - Mapped to phases: 9
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 - Phase 10 requirements complete*
+*Last updated: 2026-02-04 - v1.3 requirements complete*

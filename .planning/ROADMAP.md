@@ -5,7 +5,7 @@
 - **v1.0 Unify UI Styling** - Phases 1-5 (shipped 2026-02-03)
 - **v1.1 Dropdown & Form Migration** - Phases 6-8 (shipped 2026-02-04)
 - **v1.2 UI Cleanup** - Phase 9 (shipped 2026-02-04)
-- **v1.3 Polish & Clarity** - Phases 10-11 (in progress)
+- **v1.3 Polish & Clarity** - Phases 10-11 (shipped 2026-02-04)
 
 ## Phases
 
@@ -42,44 +42,16 @@ See `.planning/milestones/v1.2-ROADMAP.md` for full details.
 
 </details>
 
-### v1.3 Polish & Clarity (In Progress)
+<details>
+<summary>v1.3 Polish & Clarity (Phases 10-11) - SHIPPED 2026-02-04</summary>
 
-**Milestone Goal:** Fix TypeScript lint errors and improve status dropdown usability
+- [x] Phase 10: Lint Cleanup (4/4 plans) - completed 2026-02-04
+- [x] Phase 11: Status Dropdown Counts (1/1 plans) - completed 2026-02-04
 
-- [x] **Phase 10: Lint Cleanup** - Fix all TypeScript lint errors for clean codebase - completed 2026-02-04
-- [ ] **Phase 11: Status Dropdown Counts** - Add file counts to status dropdown options
+See `.planning/milestones/v1.3-ROADMAP.md` for full details.
 
-#### Phase 10: Lint Cleanup
-**Goal**: Codebase passes all TypeScript lint checks with zero errors
-**Depends on**: Nothing (first phase of v1.3)
-**Requirements**: LINT-01, LINT-02, LINT-03, LINT-04, LINT-05, LINT-06
-**Success Criteria** (what must be TRUE):
-  1. `npm run lint` exits with zero errors and zero warnings
-  2. All functions have explicit return types (no implicit any returns)
-  3. No `any` types remain in application code (type-safe throughout)
-  4. No non-null assertions (`!`) without proper guards or justification
-  5. No empty functions without explicit `// intentionally empty` comments
-**Plans**: 4 plans in 2 waves
+</details>
 
-Plans:
-- [x] 10-01-PLAN.md - Quick wins: auto-fix style issues + empty function comments
-- [x] 10-02-PLAN.md - Return types: services layer (~80 functions)
-- [x] 10-03-PLAN.md - Return types: pages/common/tests layer (~72 functions)
-- [x] 10-04-PLAN.md - Type safety: replace `any` types + non-null assertions
-
-#### Phase 11: Status Dropdown Counts
-**Goal**: Users can see at a glance how many files are in each status category
-**Depends on**: Phase 10
-**Requirements**: UX-01, UX-02, UX-03
-**Success Criteria** (what must be TRUE):
-  1. Each status option displays count in parentheses (e.g., "Downloaded (5)")
-  2. "All" option shows total file count across all statuses
-  3. Counts update automatically when files change status (no refresh needed)
-  4. Empty statuses show "(0)" count (visible but clearly empty)
-**Plans**: 1 plan
-
-Plans:
-- [ ] 11-01-PLAN.md - Add count computation, formatting, and display to status dropdown
 
 ## Progress
 
@@ -95,9 +67,9 @@ Plans:
 | 8. Final Polish | v1.1 | 2/2 | Complete | 2026-02-04 |
 | 9. Remove Obsolete Buttons | v1.2 | 1/1 | Complete | 2026-02-04 |
 | 10. Lint Cleanup | v1.3 | 4/4 | Complete | 2026-02-04 |
-| 11. Status Dropdown Counts | v1.3 | 0/1 | Not started | - |
+| 11. Status Dropdown Counts | v1.3 | 1/1 | Complete | 2026-02-04 |
 
 ---
 
 *Last updated: 2026-02-04*
-*Phase 10 completed: 2026-02-04*
+*v1.3 milestone completed: 2026-02-04*
