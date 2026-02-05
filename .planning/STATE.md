@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 
 ## Current Position
 
-Phase: 10 of 11 (Lint Cleanup) ✓ VERIFIED
-Plan: Complete
-Status: Phase verified
-Last activity: 2026-02-04 - Phase 10 verified, all 5/5 must-haves confirmed
+Phase: 11 of 11 (Status Dropdown Counts) ✓ COMPLETE
+Plan: 1/1 complete
+Status: Phase complete
+Last activity: 2026-02-04 - Completed 11-01-PLAN.md
 
-Progress: [####################] 50% (1/2 phases in v1.3)
+Progress: [████████████████████] 100% (2/2 phases in v1.3)
 
 ## Milestones Shipped
 
@@ -23,19 +23,21 @@ Progress: [####################] 50% (1/2 phases in v1.3)
 | v1.0 Unify UI Styling | 1-5 | 2026-02-03 |
 | v1.1 Dropdown & Form Migration | 6-8 | 2026-02-04 |
 | v1.2 UI Cleanup | 9 | 2026-02-04 |
+| v1.3 Polish & Clarity | 10-11 | 2026-02-04 |
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4 (v1.3)
-- Average duration: 4.5min
-- Total execution time: 19min
+- Total plans completed: 5 (v1.3)
+- Average duration: 4.2min
+- Total execution time: 21min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 10-lint-cleanup | 4/4 | 19min | 4.75min |
+| 11-status-dropdown-counts | 1/1 | 2min | 2min |
 
 *Updated after each plan completion*
 
@@ -52,6 +54,9 @@ Progress: [####################] 50% (1/2 phases in v1.3)
 | Use `as unknown as T` for test edge cases | 10-04 | Type-safe alternative to `as any` for invalid input tests |
 | Optional chaining in tests instead of `!` | 10-04 | Tests fail on undefined anyway, avoids lint errors |
 | String enum direct assignment | 10-04 | TypeScript 2.4+ supports without <any> cast |
+| Counts refresh on dropdown open (not real-time) | 11-01 | Performance: avoid continuous computation, user only needs current state when viewing dropdown |
+| Single-pass count computation | 11-01 | Efficiency: O(n) single forEach instead of multiple findIndex calls |
+| All statuses always visible with (0) count | 11-01 | UX: users know all possible statuses, disabled state shows unavailable vs hidden |
 
 ### Tech Debt
 
@@ -64,12 +69,12 @@ None
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Phase 10 verified
+Stopped at: Completed 11-01-PLAN.md
 Resume file: None
-Next action: `/gsd:discuss-phase 11` or `/gsd:plan-phase 11`
+Next action: v1.3.0 milestone complete - plan next milestone
 
 ---
 *v1.0 shipped: 2026-02-03*
 *v1.1 shipped: 2026-02-04*
 *v1.2 shipped: 2026-02-04*
-*v1.3 started: 2026-02-04*
+*v1.3 shipped: 2026-02-04*
