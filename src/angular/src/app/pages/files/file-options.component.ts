@@ -43,6 +43,11 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
     public isQueuedStatusEnabled = false;
     public isStoppedStatusEnabled = false;
 
+    // Status count tracking
+    public statusCounts: Map<ViewFile.Status | null, number> = new Map();
+    private numberFormatter = new Intl.NumberFormat();
+    private _latestFiles: Immutable.List<ViewFile> = Immutable.List();
+
     private _latestOptions: ViewFileOptions;
     private destroy$ = new Subject<void>();
 
@@ -54,6 +59,11 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
                 dropdownInstance.hide();
             }
         });
+    };
+
+    private statusDropdownShowHandler = (): void => {
+        this.statusCounts = this.computeStatusCounts(this._latestFiles);
+        this._changeDetector.detectChanges();
     };
 
     constructor(private _changeDetector: ChangeDetectorRef,
@@ -68,6 +78,12 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         // Use the unfiltered files to enable/disable the filter status buttons
         this._viewFileService.files.pipe(takeUntil(this.destroy$)).subscribe(files => {
+            // Store latest files reference for on-demand count computation
+            this._latestFiles = files;
+
+            // Compute initial counts so button shows count before first dropdown open
+            this.statusCounts = this.computeStatusCounts(files);
+
             this.isExtractedStatusEnabled = FileOptionsComponent.isStatusEnabled(
                 files, ViewFile.Status.EXTRACTED
             );
@@ -96,10 +112,22 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
         this._ngZone.runOutsideAngular(() => {
             window.addEventListener("scroll", this.scrollHandler, { passive: true });
         });
+
+        // Add Bootstrap dropdown event listener for on-demand count refresh
+        this._ngZone.runOutsideAngular(() => {
+            const statusDropdown = document.getElementById("filter-status");
+            if (statusDropdown) {
+                statusDropdown.addEventListener("show.bs.dropdown", this.statusDropdownShowHandler);
+            }
+        });
     }
 
     ngOnDestroy(): void {
         window.removeEventListener("scroll", this.scrollHandler);
+        const statusDropdown = document.getElementById("filter-status");
+        if (statusDropdown) {
+            statusDropdown.removeEventListener("show.bs.dropdown", this.statusDropdownShowHandler);
+        }
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -114,6 +142,47 @@ export class FileOptionsComponent implements OnInit, OnDestroy {
 
     onSort(sortMethod: ViewFileOptions.SortMethod): void {
         this.viewFileOptionsService.setSortMethod(sortMethod);
+    }
+
+    /**
+     * Get count for a specific status (or null for "All")
+     * Used for disabled state checks in template
+     */
+    public getCount(status: ViewFile.Status | null): number {
+        return this.statusCounts.get(status) ?? 0;
+    }
+
+    /**
+     * Format count with thousands separator
+     * Used in template interpolation
+     */
+    public formatCount(status: ViewFile.Status | null): string {
+        const count = this.getCount(status);
+        return this.numberFormatter.format(count);
+    }
+
+    /**
+     * Compute status counts from file list
+     * Single-pass approach for efficiency
+     */
+    private computeStatusCounts(files: Immutable.List<ViewFile>): Map<ViewFile.Status | null, number> {
+        const counts = new Map<ViewFile.Status | null, number>();
+
+        // Initialize "All" count
+        counts.set(null, files.size);
+
+        // Initialize all status counts to 0
+        Object.values(ViewFile.Status).forEach(status => {
+            counts.set(status, 0);
+        });
+
+        // Single pass to count files by status
+        files.forEach(file => {
+            const currentCount = counts.get(file.status) ?? 0;
+            counts.set(file.status, currentCount + 1);
+        });
+
+        return counts;
     }
 
     private static isStatusEnabled(files: Immutable.List<ViewFile>, status: ViewFile.Status): boolean {
