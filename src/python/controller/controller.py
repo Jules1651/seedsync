@@ -475,37 +475,27 @@ class Controller:
 
     def _prune_downloaded_files(self, latest_remote_scan: Optional[object]) -> None:
         """
-        Remove missing files from the downloaded files tracking list.
+        Prune downloaded files tracking list.
 
-        This prevents unbounded memory growth from tracking files indefinitely.
+        Note: downloaded_file_names uses a BoundedOrderedSet with LRU eviction,
+        so no manual pruning is needed to prevent unbounded growth.
 
-        A file is removed from tracking if:
-        - It doesn't exist in model AND we've had a successful remote scan
-          (meaning the file is completely gone from both local and remote)
+        Files are intentionally kept in the tracking set even when deleted from
+        both local and remote. This prevents re-downloading files that were:
+        - Downloaded by SeedSync
+        - Deleted/moved by external tools (e.g., Sonarr)
+        - Later re-uploaded to remote (e.g., new episode with same name)
 
-        Note: DELETED files (locally deleted but still remote) are NOT pruned.
-        They must remain tracked so they stay in DELETED state and don't get
-        auto-queued. The user can manually re-queue them when desired.
+        The BoundedOrderedSet will automatically evict the oldest entries when
+        the configured limit (default 10,000) is reached.
 
         Must be called while holding the model lock.
 
         Args:
-            latest_remote_scan: Latest remote scan result for checking scan availability.
+            latest_remote_scan: Latest remote scan result (unused, kept for API compatibility).
         """
-        remove_downloaded_file_names = set()
-        existing_file_names = self.__model.get_file_names()
-
-        for downloaded_file_name in self.__persist.downloaded_file_names:
-            if downloaded_file_name not in existing_file_names:
-                # Not in the model at all - file is completely gone from both local and remote
-                # Only remove if we've had at least one successful remote scan
-                if latest_remote_scan is not None and not latest_remote_scan.failed:
-                    remove_downloaded_file_names.add(downloaded_file_name)
-
-        if remove_downloaded_file_names:
-            self.logger.info("Removing from downloaded list: {}".format(remove_downloaded_file_names))
-            self.__persist.downloaded_file_names.difference_update(remove_downloaded_file_names)
-            self.__model_builder.set_downloaded_files(self.__persist.downloaded_file_names)
+        # No pruning needed - BoundedOrderedSet handles eviction automatically
+        pass
 
     def _apply_model_diff(self, model_diff: List[ModelDiff]) -> None:
         """
