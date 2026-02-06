@@ -23,6 +23,9 @@
 
 SeedSync is a tool to sync files from a remote Linux server (like your seedbox) to a local machine. It uses [LFTP](http://lftp.tech/) for blazing fast parallel transfers and provides a modern web interface for tracking and controlling your downloads.
 
+!!! note
+    This is a maintained fork of [ipsingh06/seedsync](https://github.com/ipsingh06/seedsync), modernized with Angular 19, Bootstrap 5.3, and native ARM64 support.
+
 ---
 
 ## Features
@@ -71,7 +74,7 @@ For detailed installation instructions, see the [Installation Guide](install.md)
 ## Screenshot
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/12875506/37031587-3a5df834-20f4-11e8-98a0-e42ee764f2ea.png" alt="SeedSync Dashboard" />
+    <img src="images/dashboard.png" alt="SeedSync Dashboard" />
 </p>
 
 ---
