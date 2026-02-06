@@ -72,4 +72,4 @@ See [License.txt](https://github.com/thejuran/seedsync/blob/master/LICENSE.txt) 
 
 
 
-![](https://user-images.githubusercontent.com/12875506/37031587-3a5df834-20f4-11e8-98a0-e42ee764f2ea.png)
+![SeedSync Dashboard](src/python/docs/images/dashboard.png)
