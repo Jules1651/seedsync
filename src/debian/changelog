@@ -1,3 +1,23 @@
+seedsync (1.2.0) stable; urgency=low
+
+  * Integrated Bootstrap 5.3 SCSS with custom theme color overrides
+  * Migrated all buttons, dropdowns, and form inputs to Bootstrap components
+  * Added dark theme support for dropdowns and form inputs
+  * Dropdowns auto-close on page scroll
+  * Unified selection colors with hover transitions on file rows
+  * Status dropdown now shows file counts per category
+  * Sticky file-actions-bar when scrolling
+  * Internal scrolling for file list viewport
+  * Removed obsolete Pin and Details buttons
+  * Fixed AutoQueue re-queueing already-downloaded files
+  * Fixed re-downloading of externally deleted files
+  * Fixed re-queuing of evicted downloaded files
+  * Fixed Safari 26+ toolbar color bleed from alert banners
+  * Comprehensive TypeScript lint cleanup (return types, proper types, optional chaining)
+  * Removed legacy %button SCSS placeholder
+
+ -- thejuran <thejuran@users.noreply.github.com>  Wed, 05 Feb 2026 00:00:00 +0000
+
 seedsync (1.0.0) stable; urgency=low
 
   * Fork maintained by thejuran
