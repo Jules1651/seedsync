@@ -4,6 +4,41 @@ All notable changes to SeedSync are documented here.
 
 ---
 
+## [1.2.0] - 2026-02-05
+
+### Added
+- Bulk file actions: new API endpoint for multi-file operations (download, stop, extract, delete)
+- Checkbox-based file selection with select-all and virtual scrolling
+- File action buttons displayed inline on selected rows
+- Bootstrap 5.3 SCSS framework with custom theme color overrides
+- Dark theme support for dropdowns and form inputs
+- Dropdowns auto-close on page scroll
+- Hover transitions on file rows
+- Status dropdown now shows file counts per category
+- Sticky file-actions-bar when scrolling
+- Internal scrolling for file list viewport
+- GitHub Actions workflow for Docker image publishing
+
+### Changed
+- Migrated all buttons, dropdowns, and form inputs to Bootstrap components
+- Unified selection colors using Bootstrap secondary palette
+- Comprehensive TypeScript lint cleanup (explicit return types, proper types, optional chaining)
+- Removed legacy `%button` SCSS placeholder
+
+### Removed
+- Pin button and pin-filter functionality
+- Details button and show-details panel
+
+### Fixed
+- AutoQueue re-queueing files that were already downloaded
+- Re-downloading of files externally deleted from local filesystem
+- Re-queuing of evicted downloaded files
+- Safari 26+ toolbar color bleed from alert banners
+- Race conditions and memory leak in bulk selection
+- Security issues in bulk endpoint
+
+---
+
 ## [1.0.0] - 2026-01-30
 
 This is the first release of the maintained fork by [thejuran](https://github.com/thejuran).
